@@ -1,0 +1,166 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>设置管理员账户</title>
+    <style>
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Arial, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0;
+        }
+        .container {
+            background: white;
+            padding: 40px;
+            border-radius: 12px;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.1);
+            max-width: 400px;
+            width: 100%;
+        }
+        h2 {
+            margin: 0 0 20px;
+            color: #333;
+        }
+        .form-group {
+            margin-bottom: 20px;
+        }
+        label {
+            display: block;
+            margin-bottom: 8px;
+            color: #555;
+        }
+        input {
+            width: 100%;
+            padding: 12px;
+            border: 1px solid #ddd;
+            border-radius: 6px;
+            font-size: 16px;
+        }
+        button {
+            width: 100%;
+            padding: 12px;
+            background: #667eea;
+            color: white;
+            border: none;
+            border-radius: 6px;
+            font-size: 16px;
+            cursor: pointer;
+        }
+        button:hover {
+            background: #5a67d8;
+        }
+        .message {
+            padding: 12px;
+            border-radius: 6px;
+            margin-top: 20px;
+        }
+        .success {
+            background: #10b981;
+            color: white;
+        }
+        .error {
+            background: #ef4444;
+            color: white;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h2>设置管理员账户</h2>
+        <p>创建管理员账户以访问管理面板</p>
+        
+        <form id="setupForm">
+            <div class="form-group">
+                <label>用户名</label>
+                <input type="text" id="username" value="davidwang812" required>
+            </div>
+            
+            <div class="form-group">
+                <label>邮箱</label>
+                <input type="email" id="email" value="davidwang812@gmail.com" required>
+            </div>
+            
+            <div class="form-group">
+                <label>密码</label>
+                <input type="password" id="password" placeholder="输入密码" required>
+            </div>
+            
+            <button type="submit">创建管理员账户</button>
+        </form>
+        
+        <div id="message"></div>
+    </div>
+    
+    <script>
+        document.getElementById('setupForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            
+            const username = document.getElementById('username').value;
+            const email = document.getElementById('email').value;
+            const password = document.getElementById('password').value;
+            const messageDiv = document.getElementById('message');
+            
+            try {
+                // 先尝试注册
+                const registerResponse = await fetch('https://aiproductmanager-production.up.railway.app/api/auth/register', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        username,
+                        email,
+                        password
+                    })
+                });
+                
+                const registerData = await registerResponse.json();
+                
+                if (registerData.success) {
+                    messageDiv.className = 'message success';
+                    messageDiv.textContent = '✅ 管理员账户创建成功！正在跳转到登录页面...';
+                    
+                    setTimeout(() => {
+                        window.location.href = './login.html';
+                    }, 2000);
+                } else {
+                    // 如果用户已存在，尝试登录验证
+                    const loginResponse = await fetch('https://aiproductmanager-production.up.railway.app/api/auth/login', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json'
+                        },
+                        body: JSON.stringify({
+                            username,
+                            password
+                        })
+                    });
+                    
+                    const loginData = await loginResponse.json();
+                    
+                    if (loginData.success) {
+                        messageDiv.className = 'message success';
+                        messageDiv.textContent = '✅ 账户验证成功！正在跳转到登录页面...';
+                        
+                        setTimeout(() => {
+                            window.location.href = './login.html';
+                        }, 2000);
+                    } else {
+                        messageDiv.className = 'message error';
+                        messageDiv.textContent = '❌ ' + (loginData.message || '账户验证失败');
+                    }
+                }
+                
+            } catch (error) {
+                messageDiv.className = 'message error';
+                messageDiv.textContent = '❌ 错误：' + error.message;
+            }
+        });
+    </script>
+</body>
+</html>
