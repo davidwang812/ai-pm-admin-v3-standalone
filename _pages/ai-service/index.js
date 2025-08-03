@@ -105,38 +105,32 @@ export class AIServicePage {
     
     const tabContent = await this.renderTabContent();
     
-    return `
-      <div class="ai-service-container">
-        <div class="page-header">
-          <h2>🤖 AI服务管理</h2>
-        </div>
-        
-        <div class="service-tabs">
-          <button class="tab-btn ${this.currentTab === 'providers' ? 'active' : ''}" data-tab="providers">
-            服务商配置
-          </button>
-          <button class="tab-btn ${this.currentTab === 'unified' ? 'active' : ''}" data-tab="unified">
-            统一配置
-          </button>
-          <button class="tab-btn ${this.currentTab === 'balance' ? 'active' : ''}" data-tab="balance">
-            负载均衡
-          </button>
-          <button class="tab-btn ${this.currentTab === 'cost' ? 'active' : ''}" data-tab="cost">
-            成本分析
-          </button>
-          <button class="tab-btn ${this.currentTab === 'catalog' ? 'active' : ''}" data-tab="catalog">
-            提供商目录
-          </button>
-          <button class="tab-btn ${this.currentTab === 'dataSources' ? 'active' : ''}" data-tab="dataSources">
-            数据源
-          </button>
-        </div>
-        
-        <div class="tab-content" id="ai-service-content">
-          ${tabContent}
-        </div>
-      </div>
-    `;
+    // 确保tabContent是字符串
+    if (typeof tabContent !== 'string') {
+      console.error('❌ Tab content is not a string:', typeof tabContent);
+      tabContent = String(tabContent || '');
+    }
+    
+    // 直接返回HTML字符串，不要使用模板字符串以避免转义问题
+    const html = '<div class="ai-service-container">' +
+      '<div class="page-header">' +
+        '<h2>🤖 AI服务管理</h2>' +
+      '</div>' +
+      '<div class="service-tabs">' +
+        '<button class="tab-btn ' + (this.currentTab === 'providers' ? 'active' : '') + '" data-tab="providers">服务商配置</button>' +
+        '<button class="tab-btn ' + (this.currentTab === 'unified' ? 'active' : '') + '" data-tab="unified">统一配置</button>' +
+        '<button class="tab-btn ' + (this.currentTab === 'balance' ? 'active' : '') + '" data-tab="balance">负载均衡</button>' +
+        '<button class="tab-btn ' + (this.currentTab === 'cost' ? 'active' : '') + '" data-tab="cost">成本分析</button>' +
+        '<button class="tab-btn ' + (this.currentTab === 'catalog' ? 'active' : '') + '" data-tab="catalog">提供商目录</button>' +
+        '<button class="tab-btn ' + (this.currentTab === 'dataSources' ? 'active' : '') + '" data-tab="dataSources">数据源</button>' +
+      '</div>' +
+      '<div class="tab-content" id="ai-service-content">' +
+        tabContent +
+      '</div>' +
+    '</div>';
+    
+    console.log('✅ AIServicePage.render() completed, HTML length:', html.length);
+    return html;
   }
 
   async renderTabContent() {
