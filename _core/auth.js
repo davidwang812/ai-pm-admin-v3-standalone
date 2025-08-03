@@ -45,15 +45,16 @@ export class AuthManager {
   }
 
   /**
-   * 登录 - 使用 Vercel Edge Functions
+   * 登录 - 连接到Railway后端
    */
   async login(username, password) {
     try {
-      console.log('🔐 Attempting login with Vercel Edge Function...');
-      console.log('📍 Target URL: /api/auth/login');
+      console.log('🔐 Attempting login with Railway backend...');
+      const apiUrl = 'https://aiproductmanager-production.up.railway.app/api/admin/login';
+      console.log('📍 Target URL:', apiUrl);
       
-      // 直接使用 fetch 调用本地 Vercel Edge Function
-      const response = await fetch('/api/auth/login', {
+      // 调用Railway后端API
+      const response = await fetch(apiUrl, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json'
@@ -125,7 +126,7 @@ export class AuthManager {
     try {
       // 调用Vercel Edge Function登出接口
       if (this.token) {
-        await fetch('/api/auth/logout', {
+        await fetch('https://aiproductmanager-production.up.railway.app/api/admin/logout', {
           method: 'POST',
           headers: {
             'Authorization': `Bearer ${this.token}`
@@ -170,7 +171,7 @@ export class AuthManager {
    */
   async verifyToken() {
     try {
-      const response = await fetch('/api/auth/verify', {
+      const response = await fetch('https://aiproductmanager-production.up.railway.app/api/admin/verify', {
         method: 'GET',
         headers: {
           'Authorization': `Bearer ${this.token}`
@@ -196,7 +197,7 @@ export class AuthManager {
     try {
       console.log('🔄 Refreshing token...');
       
-      const response = await fetch('/api/auth/refresh', {
+      const response = await fetch('https://aiproductmanager-production.up.railway.app/api/admin/refresh', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json'
