@@ -324,6 +324,11 @@ export class Router {
    * 渲染组件
    */
   async renderComponent(component, route) {
+    // 尝试获取最新的content element
+    if (!this.contentElement) {
+      this.contentElement = document.getElementById('app-content');
+    }
+    
     if (!this.contentElement) {
       console.error('Content element not found');
       return null;

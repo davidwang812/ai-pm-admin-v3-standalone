@@ -35,13 +35,17 @@ export class DashboardPage {
   async mounted() {
     console.log('📌 Dashboard mounted, initializing...');
     
-    // 使用setTimeout确保DOM完全渲染
-    setTimeout(() => {
-      this.initialize().catch(error => {
-        console.error('Failed to initialize dashboard:', error);
-        this.showError(error);
+    // 使用requestAnimationFrame确保DOM完全渲染
+    requestAnimationFrame(() => {
+      // 双重 RAF 确保浏览器完成渲染
+      requestAnimationFrame(() => {
+        console.log('🎯 Starting dashboard initialization after DOM ready');
+        this.initialize().catch(error => {
+          console.error('Failed to initialize dashboard:', error);
+          this.showError(error);
+        });
       });
-    }, 0);
+    });
   }
   
   // 移除waitForDOM方法，不再需要复杂的等待逻辑
@@ -350,6 +354,22 @@ export class DashboardPage {
    */
   async initialize() {
     console.log('📊 Initializing dashboard...');
+    
+    // 首先检查关键DOM元素是否存在
+    const statsGrid = document.getElementById('statsGrid');
+    const usageChartBody = document.getElementById('usageChartBody');
+    const providerChartBody = document.getElementById('providerChartBody');
+    
+    if (!statsGrid || !usageChartBody || !providerChartBody) {
+      console.error('❌ Critical DOM elements not found:', {
+        statsGrid: !!statsGrid,
+        usageChartBody: !!usageChartBody,
+        providerChartBody: !!providerChartBody
+      });
+      // 重试一次
+      setTimeout(() => this.initialize(), 100);
+      return;
+    }
     
     try {
       // 并行加载所有数据

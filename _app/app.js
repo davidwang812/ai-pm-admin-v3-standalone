@@ -207,8 +207,19 @@ export class App {
     // 渲染主布局
     app.innerHTML = this.renderLayout();
     
-    // 确保DOM更新完成后再导航
-    await new Promise(resolve => setTimeout(resolve, 10));
+    // 确保DOM更新完成 - 使用requestAnimationFrame确保浏览器渲染
+    await new Promise(resolve => {
+      requestAnimationFrame(() => {
+        requestAnimationFrame(resolve); // 双重RAF确保完全渲染
+      });
+    });
+    
+    // 验证app-content元素存在
+    const contentElement = document.getElementById('app-content');
+    if (!contentElement) {
+      console.error('❌ app-content element not found after rendering layout');
+      return;
+    }
     
     // 防止重复导航
     if (this.initialNavigation) {
@@ -220,6 +231,9 @@ export class App {
     // 手动触发初始路由加载
     const router = this.modules.get('router');
     if (router && router.initialized) {
+      // 确保 router 知道 content element
+      router.contentElement = contentElement;
+      
       // 获取当前路径或使用默认路径
       const currentPath = router.getCurrentPath() || '/dashboard';
       
