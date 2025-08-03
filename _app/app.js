@@ -172,12 +172,18 @@ export class App {
       
       if (Page) {
         // 检查是函数还是类
-        if (typeof Page === 'function' && !Page.prototype) {
-          // 是一个普通函数，直接调用
-          return await Page(this);
+        // 类有prototype并且prototype上有方法
+        if (typeof Page === 'function') {
+          // 检查是否是类（有render方法的原型）
+          if (Page.prototype && (Page.prototype.render || Page.prototype.constructor)) {
+            // 是一个类，返回类本身让router实例化
+            return Page;
+          } else {
+            // 是一个普通函数，直接调用
+            return await Page(this);
+          }
         } else {
-          // 是一个类，返回类本身让router实例化
-          // 这样router可以控制生命周期
+          // 不是函数，可能是对象或其他
           return Page;
         }
       } else {
