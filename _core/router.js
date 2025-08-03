@@ -118,6 +118,11 @@ export class Router {
     
     // 如果正在导航中，将请求加入队列
     if (this.navigating) {
+      // 检查是否是相同的路径
+      if (this.navigationQueue.some(item => item.path === path)) {
+        console.log(`Already queued navigation to: ${path}`);
+        return false;
+      }
       console.warn(`⏳ Navigation in progress, queueing navigation to: ${path}`);
       this.navigationQueue.push({ path, options });
       return false;

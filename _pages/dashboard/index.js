@@ -534,7 +534,14 @@ export class DashboardPage {
   async renderCharts(data) {
     // 延迟加载图表库
     if (!window.Chart) {
+      console.log('📊 Chart.js not found, loading...');
       await this.loadChartLibrary();
+      
+      // 等待Chart.js完全加载
+      if (!window.Chart) {
+        console.error('❌ Failed to load Chart.js, skipping charts');
+        return;
+      }
     }
 
     this.renderUsageChart(data.usage);
@@ -683,6 +690,30 @@ export class DashboardPage {
         </div>
       </div>
     `).join('');
+  }
+
+  /**
+   * 加载Chart.js库
+   */
+  async loadChartLibrary() {
+    try {
+      const script = document.createElement('script');
+      script.src = 'https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js';
+      
+      return new Promise((resolve, reject) => {
+        script.onload = () => {
+          console.log('✅ Chart.js loaded successfully');
+          resolve();
+        };
+        script.onerror = () => {
+          console.error('❌ Failed to load Chart.js');
+          reject(new Error('Failed to load Chart.js'));
+        };
+        document.head.appendChild(script);
+      });
+    } catch (error) {
+      console.error('Error loading Chart.js:', error);
+    }
   }
 
   /**
