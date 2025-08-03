@@ -39,6 +39,57 @@ export class ApiClient {
   }
 
   /**
+   * AI服务相关API
+   */
+  async getProviders() {
+    try {
+      const response = await this.get('/admin/providers');
+      return { success: true, providers: response.data || {} };
+    } catch (error) {
+      console.error('Failed to get providers:', error);
+      return { success: false, providers: {} };
+    }
+  }
+  
+  async saveProvider(provider) {
+    return this.post('/admin/providers', provider);
+  }
+  
+  async deleteProvider(providerId) {
+    return this.delete(`/admin/providers/${providerId}`);
+  }
+  
+  async getProviderCatalog() {
+    try {
+      const response = await this.get('/admin/provider-catalog');
+      return response.data || { providers: [], models: [] };
+    } catch (error) {
+      console.error('Failed to get provider catalog:', error);
+      return { providers: [], models: [] };
+    }
+  }
+  
+  async getUnifiedConfig() {
+    return this.get('/admin/unified-config');
+  }
+  
+  async saveUnifiedConfig(config) {
+    return this.post('/admin/unified-config', config);
+  }
+  
+  async getLoadBalanceConfig() {
+    return this.get('/admin/load-balance');
+  }
+  
+  async saveLoadBalanceConfig(config) {
+    return this.post('/admin/load-balance', config);
+  }
+  
+  async getCostAnalysis(dateRange) {
+    return this.get(`/admin/cost-analysis?range=${dateRange}`);
+  }
+  
+  /**
    * 通用请求方法
    */
   async request(url, options = {}) {
