@@ -118,12 +118,17 @@ export class Router {
     
     // 如果正在导航中，将请求加入队列
     if (this.navigating) {
-      // 检查是否是相同的路径
+      // 如果正在导航到相同路径，忽略
+      if (this.navigatingTo === path) {
+        console.log(`Already navigating to: ${path}, ignoring duplicate`);
+        return false;
+      }
+      // 检查队列中是否已有相同路径
       if (this.navigationQueue.some(item => item.path === path)) {
         console.log(`Already queued navigation to: ${path}`);
         return false;
       }
-      console.warn(`⏳ Navigation in progress, queueing navigation to: ${path}`);
+      console.warn(`⏳ Navigation in progress to ${this.navigatingTo}, queueing navigation to: ${path}`);
       this.navigationQueue.push({ path, options });
       return false;
     }
@@ -134,8 +139,9 @@ export class Router {
       return true;
     }
     
-    // 设置导航锁
+    // 设置导航锁和目标路径
     this.navigating = true;
+    this.navigatingTo = path;
     
     console.log(`🔄 Navigating to: ${path}`);
     console.log('Available routes:', Array.from(this.routes.keys()));
@@ -205,12 +211,18 @@ export class Router {
     } finally {
       // 释放导航锁
       this.navigating = false;
+      this.navigatingTo = null;
       
       // 处理队列中的下一个导航
       if (this.navigationQueue.length > 0) {
         const next = this.navigationQueue.shift();
-        console.log(`📋 Processing queued navigation to: ${next.path}`);
-        setTimeout(() => this.navigate(next.path, next.options), 0);
+        // 避免导航到当前路由
+        if (next.path !== this.currentRoute) {
+          console.log(`📋 Processing queued navigation to: ${next.path}`);
+          setTimeout(() => this.navigate(next.path, next.options), 0);
+        } else {
+          console.log(`📋 Skipping queued navigation to current route: ${next.path}`);
+        }
       }
     }
   }

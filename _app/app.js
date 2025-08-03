@@ -222,6 +222,13 @@ export class App {
     if (router && router.initialized) {
       // 获取当前路径或使用默认路径
       const currentPath = router.getCurrentPath() || '/dashboard';
+      
+      // 检查是否已经在当前路由
+      if (router.currentRoute === currentPath) {
+        console.log(`📍 Already at route: ${currentPath}, skipping navigation`);
+        return;
+      }
+      
       console.log(`📍 Loading initial route: ${currentPath}`);
       await router.navigate(currentPath);
     }

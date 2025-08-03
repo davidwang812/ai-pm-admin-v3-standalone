@@ -33,40 +33,18 @@ export class DashboardPage {
    * 在DOM渲染完成后调用
    */
   async mounted() {
-    console.log('📌 Dashboard mounted, waiting for DOM...');
+    console.log('📌 Dashboard mounted, initializing...');
     
-    // 等待DOM完全渲染
-    await this.waitForDOM();
-    
-    console.log('✅ DOM ready, initializing dashboard...');
-    await this.initialize();
+    // 使用setTimeout确保DOM完全渲染
+    setTimeout(() => {
+      this.initialize().catch(error => {
+        console.error('Failed to initialize dashboard:', error);
+        this.showError(error);
+      });
+    }, 0);
   }
   
-  /**
-   * 等待DOM元素就绪
-   */
-  async waitForDOM() {
-    // 等待关键DOM元素出现
-    const maxAttempts = 20;
-    let attempts = 0;
-    
-    while (attempts < maxAttempts) {
-      const statsGrid = document.getElementById('statsGrid');
-      const usageChartBody = document.getElementById('usageChartBody');
-      const providerChartBody = document.getElementById('providerChartBody');
-      
-      if (statsGrid && usageChartBody && providerChartBody) {
-        console.log('✅ All DOM elements found');
-        return;
-      }
-      
-      attempts++;
-      console.log(`⏳ Waiting for DOM elements... (${attempts}/${maxAttempts})`);
-      await new Promise(resolve => setTimeout(resolve, 100));
-    }
-    
-    console.warn('⚠️ Some DOM elements not found after waiting');
-  }
+  // 移除waitForDOM方法，不再需要复杂的等待逻辑
 
   /**
    * 获取初始HTML
@@ -568,8 +546,14 @@ export class DashboardPage {
     }
     
     console.log('📊 Rendering charts with Chart.js');
-    this.renderUsageChart(data.usage);
-    this.renderProviderChart(data.providers);
+    
+    // 确保DOM元素存在后再渲染
+    try {
+      this.renderUsageChart(data.usage);
+      this.renderProviderChart(data.providers);
+    } catch (error) {
+      console.error('Error rendering charts:', error);
+    }
   }
   
   /**
@@ -578,7 +562,7 @@ export class DashboardPage {
   renderUsageChart(usageData) {
     const chartBody = document.getElementById('usageChartBody');
     if (!chartBody) {
-      console.error('Chart body not found: usageChartBody');
+      console.warn('Chart body not found: usageChartBody, skipping');
       return;
     }
     
@@ -586,8 +570,6 @@ export class DashboardPage {
     chartBody.innerHTML = '';
     const canvas = document.createElement('canvas');
     canvas.id = 'usageChartCanvas';
-    canvas.style.width = '100%';
-    canvas.style.maxHeight = '300px';
     chartBody.appendChild(canvas);
     console.log('✅ Created canvas for usage chart');
     
@@ -618,7 +600,7 @@ export class DashboardPage {
   renderProviderChart(providerData) {
     const chartBody = document.getElementById('providerChartBody');
     if (!chartBody) {
-      console.error('Chart body not found: providerChartBody');
+      console.warn('Chart body not found: providerChartBody, skipping');
       return;
     }
     
@@ -626,8 +608,6 @@ export class DashboardPage {
     chartBody.innerHTML = '';
     const canvas = document.createElement('canvas');
     canvas.id = 'providerChartCanvas';
-    canvas.style.width = '100%';
-    canvas.style.maxHeight = '300px';
     chartBody.appendChild(canvas);
     console.log('✅ Created canvas for provider chart');
     
