@@ -87,6 +87,18 @@ export class AIServicePage {
     }
   }
 
+  /**
+   * 组件挂载后的生命周期
+   */
+  async mounted() {
+    console.log('📌 AIServicePage mounted, binding events...');
+    
+    // 使用setTimeout确保DOM完全渲染
+    setTimeout(() => {
+      this.bindEvents();
+    }, 0);
+  }
+  
   async render() {
     console.log('🎨 AIServicePage.render() starting...');
     console.log('📍 Current tab:', this.currentTab);
