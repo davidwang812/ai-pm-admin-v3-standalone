@@ -56,9 +56,17 @@ export class AIServicePage {
       this.app.showToast = (type, message) => {
         console.log(`[${type.toUpperCase()}] ${message}`);
         const toast = document.createElement('div');
+        
+        // Choose color based on type
+        let bgColor = '#faad14'; // default info/warning
+        if (type === 'success') bgColor = '#52c41a';
+        else if (type === 'error') bgColor = '#ff4d4f';
+        else if (type === 'warning') bgColor = '#faad14';
+        else if (type === 'info') bgColor = '#1890ff';
+        
         toast.style.cssText = `
           position: fixed; top: 20px; right: 20px; padding: 12px 20px;
-          background: ${type === 'success' ? '#52c41a' : type === 'error' ? '#ff4d4f' : '#faad14'};
+          background: ${bgColor};
           color: white; border-radius: 4px; z-index: 10000; font-size: 14px;
           box-shadow: 0 2px 8px rgba(0,0,0,0.15); animation: slideIn 0.3s ease;
         `;

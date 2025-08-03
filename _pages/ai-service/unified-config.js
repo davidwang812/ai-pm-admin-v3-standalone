@@ -756,35 +756,47 @@ export class UnifiedConfig {
       
       console.log('📋 Config to save:', config);
       
-      // Try to save via API
-      try {
-        if (this.app && this.app.api && typeof this.app.api.saveUnifiedConfig === 'function') {
-          const response = await this.app.api.saveUnifiedConfig(config);
-          if (response && response.success) {
-            if (this.app.showToast) {
-              this.app.showToast('success', '统一配置保存成功');
-            }
-            this.currentConfig = config;
-            // Also save to localStorage as backup
-            localStorage.setItem('unified_config', JSON.stringify(config));
-            return;
-          }
-        } else {
-          console.log('API not available, will use localStorage');
-        }
-      } catch (apiError) {
-        console.log('API 保存失败，使用 localStorage:', apiError.message);
-      }
-      
-      // Fallback: Save to localStorage
+      // Save to localStorage first as backup
       localStorage.setItem('unified_config', JSON.stringify(config));
       this.currentConfig = config;
       
-      // Show success message
-      if (this.app && this.app.showToast) {
-        this.app.showToast('success', '统一配置已保存到本地');
-      } else {
-        console.log('✅ 统一配置已保存到本地');
+      // Try to save via API to database
+      let savedToDatabase = false;
+      try {
+        if (this.app && this.app.api && typeof this.app.api.saveUnifiedConfig === 'function') {
+          console.log('📡 Attempting to save to database via API...');
+          const response = await this.app.api.saveUnifiedConfig(config);
+          console.log('📡 API response:', response);
+          
+          if (response && response.success) {
+            savedToDatabase = true;
+            if (this.app.showToast) {
+              this.app.showToast('success', '✅ 统一配置已保存到数据库');
+            }
+            console.log('✅ Configuration saved to database successfully');
+            return;
+          } else {
+            console.warn('⚠️ API returned unsuccessful response:', response);
+          }
+        } else {
+          console.log('⚠️ API not available or saveUnifiedConfig method missing');
+        }
+      } catch (apiError) {
+        console.error('❌ Failed to save to database:', apiError);
+        console.error('Error details:', {
+          message: apiError.message,
+          stack: apiError.stack,
+          response: apiError.response
+        });
+      }
+      
+      // Show appropriate message based on save result
+      if (!savedToDatabase) {
+        if (this.app && this.app.showToast) {
+          this.app.showToast('warning', '⚠️ 配置已保存到本地（数据库不可用）');
+        } else {
+          console.log('⚠️ Configuration saved to localStorage only (database unavailable)');
+        }
       }
       
       // Also save providers to localStorage if they're not already saved
