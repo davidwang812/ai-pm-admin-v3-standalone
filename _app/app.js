@@ -308,40 +308,56 @@ export class App {
    */
   renderLoginPrompt() {
     return `
-      <div style="
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        height: 100vh;
-        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-      ">
-        <div style="
-          background: white;
-          padding: 40px;
-          border-radius: 12px;
-          box-shadow: 0 20px 40px rgba(0,0,0,0.1);
-          max-width: 400px;
-          width: 100%;
-          text-align: center;
-        ">
-          <h2 style="margin-bottom: 20px;">请先登录</h2>
-          <p style="color: #6b7280; margin-bottom: 30px;">
+      <div class="login-prompt-container">
+        <div class="login-prompt-card">
+          <div class="login-prompt-icon">🔒</div>
+          <h2 class="login-prompt-title">请先登录</h2>
+          <p class="login-prompt-message">
             您需要登录才能访问管理面板
           </p>
-          <button onclick="window.location.href='./login.html'" style="
-            width: 100%;
-            padding: 12px;
-            background: #667eea;
-            color: white;
-            border: none;
-            border-radius: 6px;
-            cursor: pointer;
-            font-size: 16px;
-          ">
+          <button onclick="window.location.href='./login.html'" class="btn btn-primary" style="width: 100%;">
             前往登录
           </button>
         </div>
       </div>
+      
+      <style>
+        .login-prompt-container {
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          min-height: 100vh;
+          background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        }
+        
+        .login-prompt-card {
+          background: white;
+          padding: 48px;
+          border-radius: 16px;
+          box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+          text-align: center;
+          max-width: 400px;
+          width: 90%;
+        }
+        
+        .login-prompt-icon {
+          font-size: 48px;
+          margin-bottom: 16px;
+        }
+        
+        .login-prompt-title {
+          margin-bottom: 12px;
+          color: #1f2937;
+          font-size: 24px;
+          font-weight: 600;
+        }
+        
+        .login-prompt-message {
+          color: #6b7280;
+          margin-bottom: 32px;
+          line-height: 1.6;
+        }
+      </style>
     `;
   }
 

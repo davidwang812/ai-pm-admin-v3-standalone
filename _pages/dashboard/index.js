@@ -113,7 +113,7 @@ export class DashboardPage {
 
       <style>
         .dashboard-container {
-          padding: 24px;
+          padding: 0;
         }
 
         .page-header {
@@ -140,16 +140,18 @@ export class DashboardPage {
           align-items: center;
           gap: 8px;
           padding: 8px 16px;
-          background: #667eea;
+          background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
           color: white;
           border: none;
           border-radius: 6px;
           cursor: pointer;
-          transition: background 0.2s;
+          transition: all 0.2s;
+          font-weight: 500;
         }
 
         .btn-refresh:hover {
-          background: #5a67d8;
+          box-shadow: 0 4px 12px rgba(102, 126, 234, 0.3);
+          transform: translateY(-1px);
         }
 
         .last-updated {
@@ -159,22 +161,24 @@ export class DashboardPage {
 
         .stats-grid {
           display: grid;
-          grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-          gap: 20px;
+          grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+          gap: 24px;
           margin-bottom: 32px;
         }
 
         .stat-card {
           background: white;
           border-radius: 12px;
-          padding: 20px;
-          box-shadow: 0 1px 3px rgba(0,0,0,0.1);
-          transition: transform 0.2s, box-shadow 0.2s;
+          padding: 24px;
+          box-shadow: 0 1px 3px rgba(0,0,0,0.06);
+          transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+          border: 1px solid #e5e7eb;
         }
 
         .stat-card:hover {
-          transform: translateY(-2px);
-          box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+          transform: translateY(-4px);
+          box-shadow: 0 12px 24px rgba(0,0,0,0.1);
+          border-color: #667eea;
         }
 
         .stat-card.loading {
