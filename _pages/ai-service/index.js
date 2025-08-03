@@ -361,6 +361,29 @@ export class AIServicePage {
   deployVercel() {
     this.modules.dataSources.deployVercel();
   }
+  
+  /**
+   * 清理组件
+   */
+  destroy() {
+    console.log('🧹 Destroying AI Service page...');
+    
+    // 清理各个模块
+    for (const [name, module] of Object.entries(this.modules)) {
+      if (module && typeof module.destroy === 'function') {
+        try {
+          module.destroy();
+        } catch (error) {
+          console.error(`Error destroying module ${name}:`, error);
+        }
+      }
+    }
+    
+    // 清理其他资源
+    this.modules.clear();
+    
+    console.log('✅ AI Service page destroyed');
+  }
 }
 
 // Export as default for V3 compatibility

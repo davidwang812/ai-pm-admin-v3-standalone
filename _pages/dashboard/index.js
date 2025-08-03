@@ -13,6 +13,8 @@ export class DashboardPage {
     this.modules = new Map();
     this.initialized = false;
     this.refreshInterval = null;
+    this.isDestroyed = false; // Flag to stop operations when component is destroyed
+    this.retryTimeout = null; // Store retry timeout to clear it
   }
 
   /**
@@ -359,19 +361,48 @@ export class DashboardPage {
   async initialize() {
     console.log('📊 Initializing dashboard...');
     
+    // 如果组件已被销毁，停止初始化
+    if (this.isDestroyed) {
+      console.log('⚠️ Dashboard has been destroyed, stopping initialization');
+      return;
+    }
+    
+    // 检查是否还在dashboard路由
+    const router = window.adminV3App?.modules?.get('router');
+    if (router && router.currentRoute !== '/dashboard' && router.currentRoute !== '/') {
+      console.log('⚠️ No longer on dashboard route, stopping initialization');
+      return;
+    }
+    
     // 首先检查关键DOM元素是否存在
     const statsGrid = document.getElementById('statsGrid');
     const usageChartBody = document.getElementById('usageChartBody');
     const providerChartBody = document.getElementById('providerChartBody');
     
     if (!statsGrid || !usageChartBody || !providerChartBody) {
-      console.error('❌ Critical DOM elements not found:', {
+      console.warn('⚠️ DOM elements not ready yet:', {
         statsGrid: !!statsGrid,
         usageChartBody: !!usageChartBody,
         providerChartBody: !!providerChartBody
       });
-      // 重试一次
-      setTimeout(() => this.initialize(), 100);
+      
+      // 如果组件已被销毁或不在dashboard路由，不重试
+      if (this.isDestroyed || (router && router.currentRoute !== '/dashboard' && router.currentRoute !== '/')) {
+        console.log('⚠️ Stopping retry - component destroyed or route changed');
+        return;
+      }
+      
+      // 清除之前的重试
+      if (this.retryTimeout) {
+        clearTimeout(this.retryTimeout);
+      }
+      
+      // 设置新的重试，并保存引用以便清理
+      this.retryTimeout = setTimeout(() => {
+        if (!this.isDestroyed) {
+          this.initialize();
+        }
+      }, 100);
       return;
     }
     
@@ -717,6 +748,19 @@ export class DashboardPage {
    * 刷新数据
    */
   async refresh() {
+    // 如果组件已被销毁，不刷新
+    if (this.isDestroyed) {
+      console.log('⚠️ Dashboard destroyed, skipping refresh');
+      return;
+    }
+    
+    // 检查是否还在dashboard路由
+    const router = window.adminV3App?.modules?.get('router');
+    if (router && router.currentRoute !== '/dashboard' && router.currentRoute !== '/') {
+      console.log('⚠️ Not on dashboard route, skipping refresh');
+      return;
+    }
+    
     console.log('🔄 Refreshing dashboard...');
     
     // 清除缓存
@@ -829,10 +873,36 @@ export class DashboardPage {
    * 清理
    */
   destroy() {
+    console.log('🧹 Destroying dashboard component...');
+    
+    // 设置销毁标志
+    this.isDestroyed = true;
+    
+    // 清理刷新定时器
     if (this.refreshInterval) {
       clearInterval(this.refreshInterval);
       this.refreshInterval = null;
     }
+    
+    // 清理重试定时器
+    if (this.retryTimeout) {
+      clearTimeout(this.retryTimeout);
+      this.retryTimeout = null;
+    }
+    
+    // 清理所有图表实例
+    const charts = ['usageChartCanvas', 'providerChartCanvas'];
+    charts.forEach(chartId => {
+      const canvas = document.getElementById(chartId);
+      if (canvas && window.Chart) {
+        const chartInstance = Chart.getChart(canvas);
+        if (chartInstance) {
+          chartInstance.destroy();
+        }
+      }
+    });
+    
+    console.log('✅ Dashboard component destroyed');
   }
 }
 

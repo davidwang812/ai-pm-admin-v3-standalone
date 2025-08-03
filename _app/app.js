@@ -401,6 +401,26 @@ export class App {
     }
     window.location.href = './login.html';
   }
+  
+  /**
+   * 刷新仪表板
+   */
+  async refreshDashboard() {
+    const router = this.modules.get('router');
+    if (router && router.currentRoute === '/dashboard' && router.currentComponentInstance) {
+      if (typeof router.currentComponentInstance.refresh === 'function') {
+        await router.currentComponentInstance.refresh();
+      }
+    }
+  }
+  
+  /**
+   * 更新图表周期
+   */
+  updateChartPeriod(period) {
+    console.log('Updating chart period to:', period);
+    // This would be implemented based on specific chart requirements
+  }
 }
 
 export default App;

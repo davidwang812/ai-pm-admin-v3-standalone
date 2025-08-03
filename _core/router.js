@@ -15,6 +15,7 @@ export class Router {
     this.initialized = false;
     this.navigating = false; // 导航锁
     this.navigationQueue = []; // 导航队列
+    this.currentComponentInstance = null; // 当前组件实例
   }
 
   /**
@@ -162,6 +163,17 @@ export class Router {
       return false;
     }
     
+    // 销毁当前组件实例（如果存在）
+    if (this.currentComponentInstance && typeof this.currentComponentInstance.destroy === 'function') {
+      console.log('🧹 Destroying previous component instance');
+      try {
+        this.currentComponentInstance.destroy();
+      } catch (error) {
+        console.error('Error destroying component:', error);
+      }
+      this.currentComponentInstance = null;
+    }
+    
     // 显示加载状态
     this.showLoading();
     
@@ -171,6 +183,9 @@ export class Router {
       
       // 渲染组件并获取实例
       const componentInstance = await this.renderComponent(component, route);
+      
+      // 保存当前组件实例
+      this.currentComponentInstance = componentInstance;
       
       // 更新URL（如果不是replace模式）
       if (!options.replace) {
@@ -639,11 +654,28 @@ export class Router {
    * 重置路由器
    */
   reset() {
+    // 销毁当前组件
+    if (this.currentComponentInstance && typeof this.currentComponentInstance.destroy === 'function') {
+      try {
+        this.currentComponentInstance.destroy();
+      } catch (error) {
+        console.error('Error destroying component during reset:', error);
+      }
+      this.currentComponentInstance = null;
+    }
+    
+    // 清理定时器
+    if (this.navigationQueue.length > 0) {
+      this.navigationQueue = [];
+    }
+    
     this.routes.clear();
     this.componentCache.clear();
     this.currentRoute = null;
     this.beforeEachHooks = [];
     this.afterEachHooks = [];
+    this.navigating = false;
+    this.navigatingTo = null;
   }
 }
 
