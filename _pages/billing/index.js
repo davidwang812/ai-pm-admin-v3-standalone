@@ -85,12 +85,6 @@ export default async function BillingPage() {
     </div>
   `;
   
-  // 设置到app-content容器
-  const appContent = document.getElementById('app-content');
-  if (appContent) {
-    appContent.innerHTML = html;
-  }
-  
   console.log('✅ Billing page initialized');
   return html;
 }
