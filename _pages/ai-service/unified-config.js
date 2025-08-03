@@ -94,30 +94,49 @@ export class UnifiedConfig {
     let config = this.getDefaultConfig();
     let providers = {};
     
+    // First, try to load from localStorage (it may have newer data)
+    const savedConfig = localStorage.getItem('unified_config');
+    if (savedConfig) {
+      try {
+        const parsedConfig = JSON.parse(savedConfig);
+        config = { ...config, ...parsedConfig };
+        console.log('📋 Loaded unified config from localStorage');
+      } catch (e) {
+        console.error('Failed to parse saved config:', e);
+      }
+    }
+    
+    const savedProviders = localStorage.getItem('admin_providers');
+    if (savedProviders) {
+      try {
+        providers = JSON.parse(savedProviders);
+        console.log('📋 Loaded providers from localStorage');
+      } catch (e) {
+        console.error('Failed to parse saved providers:', e);
+      }
+    }
+    
+    // Then try to get fresher data from API (if available)
     try {
-      // Load unified config
+      // Load unified config from API
       const unifiedConfigResponse = await this.app.api.getUnifiedConfig();
-      if (unifiedConfigResponse.success) {
-        config = { ...config, ...unifiedConfigResponse.data };
-      }
-      
-      // Load available providers
-      const providersResponse = await this.app.api.getProviders();
-      if (providersResponse.success) {
-        providers = providersResponse.providers || {};
-      }
-    } catch (error) {
-      console.warn('⚠️ API calls failed, using defaults and localStorage:', error.message);
-      
-      // Try localStorage fallback
-      const savedProviders = localStorage.getItem('admin_providers');
-      if (savedProviders) {
-        try {
-          providers = JSON.parse(savedProviders);
-        } catch (e) {
-          console.error('Failed to parse saved providers:', e);
+      if (unifiedConfigResponse.success && unifiedConfigResponse.data) {
+        // Only use API data if it's newer than localStorage
+        const apiConfig = unifiedConfigResponse.data;
+        if (!savedConfig || (apiConfig.lastUpdated && apiConfig.lastUpdated > config.lastUpdated)) {
+          config = { ...config, ...apiConfig };
+          console.log('📋 Using newer config from API');
         }
       }
+      
+      // Load available providers from API
+      const providersResponse = await this.app.api.getProviders();
+      if (providersResponse.success && providersResponse.providers) {
+        providers = providersResponse.providers;
+        console.log('📋 Updated providers from API');
+      }
+    } catch (error) {
+      console.log('ℹ️ API not available, using localStorage data:', error.message);
     }
     
     this.currentConfig = config;
@@ -752,7 +771,12 @@ export class UnifiedConfig {
       // Fallback: Save to localStorage
       localStorage.setItem('unified_config', JSON.stringify(config));
       this.currentConfig = config;
-      this.app.showToast('success', '统一配置已保存到本地 (离线模式)');
+      this.app.showToast('success', '统一配置已保存到本地');
+      
+      // Also save providers to localStorage if they're not already saved
+      if (Object.keys(this.providers).length > 0) {
+        localStorage.setItem('admin_providers', JSON.stringify(this.providers));
+      }
       
     } catch (error) {
       console.error('Save config error:', error);
