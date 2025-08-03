@@ -371,4 +371,3 @@ export class AIServicePage {
 
 // Export as default for V3 compatibility
 export default AIServicePage;
-export default AIServicePage;
