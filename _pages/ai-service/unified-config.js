@@ -120,12 +120,35 @@ export class UnifiedConfig {
     try {
       // Load unified config from API
       const unifiedConfigResponse = await this.app.api.getUnifiedConfig();
-      if (unifiedConfigResponse.success && unifiedConfigResponse.data) {
-        // Only use API data if it's newer than localStorage
-        const apiConfig = unifiedConfigResponse.data;
-        if (!savedConfig || (apiConfig.lastUpdated && apiConfig.lastUpdated > config.lastUpdated)) {
-          config = { ...config, ...apiConfig };
-          console.log('📋 Using newer config from API');
+      console.log('📡 API config response:', unifiedConfigResponse);
+      
+      if (unifiedConfigResponse) {
+        // Handle Railway API response format
+        let apiConfigData = null;
+        let apiLastUpdated = null;
+        
+        if (unifiedConfigResponse.success && unifiedConfigResponse.data) {
+          // Railway format: {success: true, data: {...}, lastUpdated: ...}
+          apiConfigData = unifiedConfigResponse.data;
+          apiLastUpdated = unifiedConfigResponse.lastUpdated;
+        } else if (unifiedConfigResponse.globalParams || unifiedConfigResponse.aiServices) {
+          // Direct config format
+          apiConfigData = unifiedConfigResponse;
+        }
+        
+        if (apiConfigData) {
+          // Check if API data is newer
+          const localLastUpdated = config.lastUpdated ? new Date(config.lastUpdated).getTime() : 0;
+          const remoteLastUpdated = apiLastUpdated ? new Date(apiLastUpdated).getTime() : Date.now();
+          
+          if (!savedConfig || remoteLastUpdated > localLastUpdated) {
+            config = { ...config, ...apiConfigData };
+            // Save API data to localStorage for next time
+            localStorage.setItem('unified_config', JSON.stringify(config));
+            console.log('📋 Using newer config from API and saved to localStorage');
+          } else {
+            console.log('📋 Local config is newer, keeping it');
+          }
         }
       }
       
@@ -133,6 +156,8 @@ export class UnifiedConfig {
       const providersResponse = await this.app.api.getProviders();
       if (providersResponse.success && providersResponse.providers) {
         providers = providersResponse.providers;
+        // Also save providers to localStorage
+        localStorage.setItem('admin_providers', JSON.stringify(providers));
         console.log('📋 Updated providers from API');
       }
     } catch (error) {
