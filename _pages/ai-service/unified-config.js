@@ -758,11 +758,19 @@ export class UnifiedConfig {
       
       // Try to save via API
       try {
-        const response = await this.app.api.saveUnifiedConfig(config);
-        if (response.success) {
-          this.app.showToast('success', '统一配置保存成功');
-          this.currentConfig = config;
-          return;
+        if (this.app && this.app.api && typeof this.app.api.saveUnifiedConfig === 'function') {
+          const response = await this.app.api.saveUnifiedConfig(config);
+          if (response && response.success) {
+            if (this.app.showToast) {
+              this.app.showToast('success', '统一配置保存成功');
+            }
+            this.currentConfig = config;
+            // Also save to localStorage as backup
+            localStorage.setItem('unified_config', JSON.stringify(config));
+            return;
+          }
+        } else {
+          console.log('API not available, will use localStorage');
         }
       } catch (apiError) {
         console.log('API 保存失败，使用 localStorage:', apiError.message);
@@ -771,7 +779,13 @@ export class UnifiedConfig {
       // Fallback: Save to localStorage
       localStorage.setItem('unified_config', JSON.stringify(config));
       this.currentConfig = config;
-      this.app.showToast('success', '统一配置已保存到本地');
+      
+      // Show success message
+      if (this.app && this.app.showToast) {
+        this.app.showToast('success', '统一配置已保存到本地');
+      } else {
+        console.log('✅ 统一配置已保存到本地');
+      }
       
       // Also save providers to localStorage if they're not already saved
       if (Object.keys(this.providers).length > 0) {
@@ -780,7 +794,14 @@ export class UnifiedConfig {
       
     } catch (error) {
       console.error('Save config error:', error);
-      this.app.showToast('error', '保存失败: ' + error.message);
+      console.error('Error stack:', error.stack);
+      
+      // Check if showToast exists
+      if (this.app && this.app.showToast) {
+        this.app.showToast('error', '保存失败: ' + error.message);
+      } else {
+        alert('保存失败: ' + error.message);
+      }
     } finally {
       // 恢复保存按钮状态
       this.isSaving = false;

@@ -13,19 +13,25 @@ import { DataSources } from './data-sources.js';
 
 export class AIServicePage {
   constructor(app) {
-    this.app = app || window.adminV3App;
+    this.app = app || window.adminV3App || {};
     this.state = this.app?.state || {};
     
-    // Ensure API methods exist
+    // Ensure app has necessary properties
     if (!this.app.api) {
       this.app.api = {
         getProviderCatalog: async () => ({ providers: [], models: [] }),
-        getProviders: async () => ({ success: false, providers: {} })
+        getProviders: async () => ({ success: false, providers: {} }),
+        getUnifiedConfig: async () => ({ success: false, data: {} }),
+        saveUnifiedConfig: async (config) => ({ success: false, message: 'API not available' })
       };
     }
+    
+    // Add showToast if it doesn't exist
+    this.initShowToast();
+    
     this.currentTab = 'providers';
     
-    // Initialize all modules
+    // Initialize all modules with proper app context
     this.modules = {
       providers: new ProviderConfig(this.app),
       catalog: new CatalogManager(this.app),
@@ -43,9 +49,6 @@ export class AIServicePage {
       window.adminV3App.catalogManager = this.modules.catalog;
       window.adminV3App.aiServicePage = this;
     }
-    
-    // Add fallback showToast if not exists
-    this.initShowToast();
   }
   
   initShowToast() {
