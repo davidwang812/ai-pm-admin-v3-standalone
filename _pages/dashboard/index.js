@@ -33,10 +33,39 @@ export class DashboardPage {
    * 在DOM渲染完成后调用
    */
   async mounted() {
-    console.log('📌 Dashboard mounted, initializing...');
+    console.log('📌 Dashboard mounted, waiting for DOM...');
     
-    // 直接初始化，canvas会在需要时动态创建
+    // 等待DOM完全渲染
+    await this.waitForDOM();
+    
+    console.log('✅ DOM ready, initializing dashboard...');
     await this.initialize();
+  }
+  
+  /**
+   * 等待DOM元素就绪
+   */
+  async waitForDOM() {
+    // 等待关键DOM元素出现
+    const maxAttempts = 20;
+    let attempts = 0;
+    
+    while (attempts < maxAttempts) {
+      const statsGrid = document.getElementById('statsGrid');
+      const usageChartBody = document.getElementById('usageChartBody');
+      const providerChartBody = document.getElementById('providerChartBody');
+      
+      if (statsGrid && usageChartBody && providerChartBody) {
+        console.log('✅ All DOM elements found');
+        return;
+      }
+      
+      attempts++;
+      console.log(`⏳ Waiting for DOM elements... (${attempts}/${maxAttempts})`);
+      await new Promise(resolve => setTimeout(resolve, 100));
+    }
+    
+    console.warn('⚠️ Some DOM elements not found after waiting');
   }
 
   /**
@@ -532,18 +561,13 @@ export class DashboardPage {
    * 渲染图表
    */
   async renderCharts(data) {
-    // 延迟加载图表库
+    // Chart.js已在index.html中加载，直接检查
     if (!window.Chart) {
-      console.log('📊 Chart.js not found, loading...');
-      await this.loadChartLibrary();
-      
-      // 等待Chart.js完全加载
-      if (!window.Chart) {
-        console.error('❌ Failed to load Chart.js, skipping charts');
-        return;
-      }
+      console.error('❌ Chart.js not available, skipping charts');
+      return;
     }
-
+    
+    console.log('📊 Rendering charts with Chart.js');
     this.renderUsageChart(data.usage);
     this.renderProviderChart(data.providers);
   }
@@ -552,51 +576,33 @@ export class DashboardPage {
    * 渲染使用量图表
    */
   renderUsageChart(usageData) {
-    // 获取canvas元素 - 使用更精确的查找
-    let canvas = document.getElementById('usageChartCanvas');
-    
-    if (!canvas) {
-      // 创建canvas如果不存在
-      const chartBody = document.getElementById('usageChartBody');
-      if (chartBody) {
-        // 移除占位符
-        const placeholder = chartBody.querySelector('.chart-placeholder');
-        if (placeholder) {
-          placeholder.remove();
-        }
-        
-        // 创建新的canvas
-        canvas = document.createElement('canvas');
-        canvas.id = 'usageChartCanvas';
-        canvas.style.width = '100%';
-        canvas.style.height = '300px';
-        chartBody.appendChild(canvas);
-        console.log('Created canvas element for usage chart');
-      }
-    }
-    
-    if (!canvas) {
-      console.error('Cannot create canvas element: usageChartCanvas');
+    const chartBody = document.getElementById('usageChartBody');
+    if (!chartBody) {
+      console.error('Chart body not found: usageChartBody');
       return;
     }
     
-    const placeholder = document.querySelector('#usageChartBody .chart-placeholder');
-    
-    // 隐藏占位符，显示canvas
-    if (placeholder) placeholder.style.display = 'none';
-    canvas.style.display = 'block';
+    // 清空容器并创建新canvas
+    chartBody.innerHTML = '';
+    const canvas = document.createElement('canvas');
+    canvas.id = 'usageChartCanvas';
+    canvas.style.width = '100%';
+    canvas.style.maxHeight = '300px';
+    chartBody.appendChild(canvas);
+    console.log('✅ Created canvas for usage chart');
     
     const ctx = canvas.getContext('2d');
     new Chart(ctx, {
       type: 'line',
       data: {
-        labels: ['1月', '2月', '3月', '4月', '5月', '6月'],
+        labels: usageData ? usageData.map(d => d.date) : ['Day 1', 'Day 2', 'Day 3', 'Day 4', 'Day 5', 'Day 6', 'Day 7'],
         datasets: [{
           label: 'API调用量',
-          data: usageData || [12000, 19000, 15000, 25000, 22000, 30000],
+          data: usageData ? usageData.map(d => d.value) : [120, 135, 155, 142, 168, 178, 195],
           borderColor: '#667eea',
-          backgroundColor: '#667eea20',
-          tension: 0.4
+          backgroundColor: 'rgba(102, 126, 234, 0.1)',
+          tension: 0.4,
+          fill: true
         }]
       },
       options: {
@@ -610,48 +616,30 @@ export class DashboardPage {
    * 渲染供应商图表
    */
   renderProviderChart(providerData) {
-    // 获取canvas元素 - 使用更精确的查找
-    let canvas = document.getElementById('providerChartCanvas');
-    
-    if (!canvas) {
-      // 创建canvas如果不存在
-      const chartBody = document.getElementById('providerChartBody');
-      if (chartBody) {
-        // 移除占位符
-        const placeholder = chartBody.querySelector('.chart-placeholder');
-        if (placeholder) {
-          placeholder.remove();
-        }
-        
-        // 创建新的canvas
-        canvas = document.createElement('canvas');
-        canvas.id = 'providerChartCanvas';
-        canvas.style.width = '100%';
-        canvas.style.height = '300px';
-        chartBody.appendChild(canvas);
-        console.log('Created canvas element for provider chart');
-      }
-    }
-    
-    if (!canvas) {
-      console.error('Cannot create canvas element: providerChartCanvas');
+    const chartBody = document.getElementById('providerChartBody');
+    if (!chartBody) {
+      console.error('Chart body not found: providerChartBody');
       return;
     }
     
-    const placeholder = document.querySelector('#providerChartBody .chart-placeholder');
-    
-    // 隐藏占位符，显示canvas
-    if (placeholder) placeholder.style.display = 'none';
-    canvas.style.display = 'block';
+    // 清空容器并创建新canvas
+    chartBody.innerHTML = '';
+    const canvas = document.createElement('canvas');
+    canvas.id = 'providerChartCanvas';
+    canvas.style.width = '100%';
+    canvas.style.maxHeight = '300px';
+    chartBody.appendChild(canvas);
+    console.log('✅ Created canvas for provider chart');
     
     const ctx = canvas.getContext('2d');
     new Chart(ctx, {
       type: 'doughnut',
       data: {
-        labels: ['OpenAI', 'Claude', 'Gemini', '其他'],
+        labels: providerData ? providerData.map(p => p.name) : ['OpenAI', 'Anthropic', 'Google', 'Others'],
         datasets: [{
-          data: providerData || [40, 30, 20, 10],
-          backgroundColor: ['#667eea', '#f97316', '#10b981', '#6b7280']
+          data: providerData ? providerData.map(p => p.value) : [45, 30, 15, 10],
+          backgroundColor: providerData ? providerData.map(p => p.color) : ['#10b981', '#6366f1', '#f59e0b', '#8b5cf6'],
+          borderWidth: 0
         }]
       },
       options: {
@@ -668,11 +656,8 @@ export class DashboardPage {
     const list = document.getElementById('activitiesList');
     if (!list) return;
     
-    // 移除占位符
-    const placeholder = list.querySelector('.activities-placeholder');
-    if (placeholder) {
-      placeholder.remove();
-    }
+    // 清空列表
+    list.innerHTML = '';
 
     if (!activities || activities.length === 0) {
       list.innerHTML = '<p style="text-align: center; color: #6b7280;">暂无活动</p>';
@@ -681,40 +666,18 @@ export class DashboardPage {
 
     list.innerHTML = activities.slice(0, 5).map(activity => `
       <div class="activity-item">
-        <div class="activity-icon" style="background: ${this.getActivityColor(activity.type)}20;">
-          ${this.getActivityIcon(activity.type)}
+        <div class="activity-icon" style="background: ${this.getActivityColor(activity.type)}20; color: ${this.getActivityColor(activity.type)};">
+          ${activity.icon || this.getActivityIcon(activity.type)}
         </div>
         <div class="activity-content">
-          <div class="activity-title">${activity.title}</div>
+          <div class="activity-title">${activity.message || activity.title || '未知活动'}</div>
           <div class="activity-time">${this.formatTime(activity.timestamp)}</div>
         </div>
       </div>
     `).join('');
   }
 
-  /**
-   * 加载Chart.js库
-   */
-  async loadChartLibrary() {
-    try {
-      const script = document.createElement('script');
-      script.src = 'https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js';
-      
-      return new Promise((resolve, reject) => {
-        script.onload = () => {
-          console.log('✅ Chart.js loaded successfully');
-          resolve();
-        };
-        script.onerror = () => {
-          console.error('❌ Failed to load Chart.js');
-          reject(new Error('Failed to load Chart.js'));
-        };
-        document.head.appendChild(script);
-      });
-    } catch (error) {
-      console.error('Error loading Chart.js:', error);
-    }
-  }
+  // Chart.js库已在index.html中加载，移除动态加载方法
 
   /**
    * 延迟加载模块
