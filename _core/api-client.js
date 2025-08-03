@@ -74,7 +74,21 @@ export class ApiClient {
   }
   
   async saveUnifiedConfig(config) {
-    return this.post('/admin/unified-config', config);
+    try {
+      const response = await this.post('/admin/unified-config', config);
+      // Normalize the response to always have a success field
+      if (typeof response === 'object' && response !== null) {
+        // If response doesn't have explicit success field, check for common patterns
+        if (!('success' in response)) {
+          response.success = !response.error && !response.errorCode && response.status !== 'error';
+        }
+      }
+      return response;
+    } catch (error) {
+      console.error('saveUnifiedConfig error:', error);
+      // Return error response instead of throwing
+      return { success: false, error: error.message };
+    }
   }
   
   async getLoadBalanceConfig() {
