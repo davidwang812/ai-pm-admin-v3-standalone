@@ -1,0 +1,6 @@
+# Ignore Vercel authentication files
+.vercel
+node_modules
+.git
+*.log
+.env.local

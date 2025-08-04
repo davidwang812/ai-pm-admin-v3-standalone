@@ -4,6 +4,9 @@
   "buildCommand": "",
   "installCommand": "",
   "outputDirectory": ".",
+  "github": {
+    "enabled": false
+  },
   "headers": [
     {
       "source": "/api/(.*)",
