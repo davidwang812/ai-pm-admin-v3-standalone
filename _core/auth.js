@@ -45,16 +45,16 @@ export class AuthManager {
   }
 
   /**
-   * 登录 - 使用Vercel Edge Function
+   * 登录 - 使用Vercel Edge Function代理
    */
   async login(username, password) {
     try {
-      console.log('🔐 Attempting login with Railway backend API...');
-      // 直接调用Railway后端API
-      const apiUrl = 'https://aiproductmanager-production.up.railway.app/api/auth/admin/login';
-      console.log('📍 Target URL:', apiUrl);
+      console.log('🔐 Attempting login with Vercel API proxy...');
+      // 使用相对路径调用本地API代理，避免跨域问题
+      const apiUrl = '/api/auth/admin/login';
+      console.log('📍 Target URL (local proxy):', apiUrl);
       
-      // 调用Railway后端API - 使用正确的参数格式
+      // 调用本地API代理端点
       const response = await fetch(apiUrl, {
         method: 'POST',
         headers: {
@@ -125,9 +125,9 @@ export class AuthManager {
    */
   async logout() {
     try {
-      // 调用Vercel Edge Function登出接口
+      // 调用本地API代理登出接口
       if (this.token) {
-        await fetch('https://aiproductmanager-production.up.railway.app/api/auth/admin/logout', {
+        await fetch('/api/auth/admin/logout', {
           method: 'POST',
           headers: {
             'Authorization': `Bearer ${this.token}`
@@ -172,7 +172,7 @@ export class AuthManager {
    */
   async verifyToken() {
     try {
-      const response = await fetch('https://aiproductmanager-production.up.railway.app/api/auth/verify', {
+      const response = await fetch('/api/auth/verify', {
         method: 'GET',
         headers: {
           'Authorization': `Bearer ${this.token}`
@@ -198,7 +198,7 @@ export class AuthManager {
     try {
       console.log('🔄 Refreshing token...');
       
-      const response = await fetch('https://aiproductmanager-production.up.railway.app/api/auth/refresh', {
+      const response = await fetch('/api/auth/refresh', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json'
