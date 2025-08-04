@@ -3,7 +3,7 @@
  * 独立的管理员认证系统
  */
 
-export default async function handler(req, res) {
+export default function handler(req, res) {
   // 只允许POST请求
   if (req.method !== 'POST') {
     return res.status(405).json({ 
@@ -102,4 +102,4 @@ function generateToken(payload) {
   ).toString('base64url').substring(0, 43);
 
   return `${encodedHeader}.${encodedPayload}.${signature}`;
-}// Trigger deployment Mon Aug  4 19:09:31 CST 2025
+}
