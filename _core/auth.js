@@ -172,7 +172,7 @@ export class AuthManager {
    */
   async verifyToken() {
     try {
-      const response = await fetch('https://aiproductmanager-production.up.railway.app/api/admin/verify', {
+      const response = await fetch('https://aiproductmanager-production.up.railway.app/api/auth/verify', {
         method: 'GET',
         headers: {
           'Authorization': `Bearer ${this.token}`
@@ -198,7 +198,7 @@ export class AuthManager {
     try {
       console.log('🔄 Refreshing token...');
       
-      const response = await fetch('https://aiproductmanager-production.up.railway.app/api/admin/refresh', {
+      const response = await fetch('https://aiproductmanager-production.up.railway.app/api/auth/refresh', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json'
