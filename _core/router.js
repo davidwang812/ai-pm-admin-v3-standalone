@@ -29,6 +29,7 @@ export class Router {
     }
     
     console.log('🔧 Starting router initialization...');
+    console.log('🔧 Router init called with routes:', routes.map(r => r.path));
     
     // 注册路由 - 必须在任何导航之前
     if (routes.length > 0) {
@@ -699,6 +700,24 @@ function getRouterInstance() {
 // 导出一个代理对象，延迟创建实际的路由器
 const router = new Proxy({}, {
   get(target, prop) {
+    // 特殊处理navigate方法，在未初始化时不执行
+    if (prop === 'navigate') {
+      return function(...args) {
+        const instance = getRouterInstance();
+        if (!instance.initialized) {
+          console.warn('⚠️ Router not initialized, queueing navigation:', args[0]);
+          // 延迟执行导航
+          setTimeout(() => {
+            if (instance.initialized) {
+              instance.navigate(...args);
+            }
+          }, 100);
+          return Promise.resolve(false);
+        }
+        return instance.navigate(...args);
+      };
+    }
+    
     const instance = getRouterInstance();
     const value = instance[prop];
     if (typeof value === 'function') {
