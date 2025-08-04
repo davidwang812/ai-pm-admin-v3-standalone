@@ -45,13 +45,13 @@ export class AuthManager {
   }
 
   /**
-   * 登录 - 连接到Railway后端
+   * 登录 - 使用Vercel Edge Function
    */
   async login(username, password) {
     try {
-      console.log('🔐 Attempting login with Railway backend...');
-      // 先尝试普通用户登录API
-      const apiUrl = 'https://aiproductmanager-production.up.railway.app/api/auth/login';
+      console.log('🔐 Attempting login with Vercel Edge Function...');
+      // 使用本地Edge Function
+      const apiUrl = '/api/auth/login';
       console.log('📍 Target URL:', apiUrl);
       
       // 调用Railway后端API - 使用正确的参数格式
