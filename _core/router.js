@@ -79,6 +79,19 @@ export class Router {
     this.initialized = true;
     console.log('✅ Router initialized with routes:', Array.from(this.routes.keys()));
     
+    // 处理等待的导航请求
+    if (this.pendingNavigations && this.pendingNavigations.length > 0) {
+      console.log(`📋 Processing ${this.pendingNavigations.length} pending navigations`);
+      const pending = [...this.pendingNavigations];
+      this.pendingNavigations = [];
+      
+      // 只执行最后一个导航请求（避免多次跳转）
+      const lastNavigation = pending[pending.length - 1];
+      setTimeout(() => {
+        this.navigate(lastNavigation.path, lastNavigation.options);
+      }, 0);
+    }
+    
     // 完全移除自动加载 - 让调用者手动控制
     // 注意：app.js的renderInitialView会手动调用navigate
     if (options.autoLoad === true) {
@@ -114,7 +127,12 @@ export class Router {
   async navigate(path, options = {}) {
     // 如果路由未初始化，等待初始化
     if (!this.initialized) {
-      console.warn('Router not initialized yet, skipping navigation to:', path);
+      console.warn('Router not initialized yet, queueing navigation to:', path);
+      // 保存导航请求，等待初始化后执行
+      if (!this.pendingNavigations) {
+        this.pendingNavigations = [];
+      }
+      this.pendingNavigations.push({ path, options });
       return false;
     }
     
@@ -680,57 +698,21 @@ export class Router {
   }
 }
 
-// 延迟创建单例实例
-let routerInstance = null;
+// 创建单例路由器实例 - 直接创建，不延迟
+const routerInstance = new Router();
 
-// 获取或创建路由器实例
-function getRouterInstance() {
-  if (!routerInstance) {
-    console.log('📦 Creating router instance on first use');
-    routerInstance = new Router();
-    
-    // 在开发环境添加调试信息
-    if (typeof window !== 'undefined') {
-      window.__V3_ROUTER__ = routerInstance;
-    }
-  }
-  return routerInstance;
+// 在开发环境添加调试信息
+if (typeof window !== 'undefined') {
+  window.__V3_ROUTER__ = routerInstance;
 }
 
-// 导出一个代理对象，延迟创建实际的路由器
-const router = new Proxy({}, {
-  get(target, prop) {
-    // 特殊处理navigate方法，在未初始化时不执行
-    if (prop === 'navigate') {
-      return function(...args) {
-        const instance = getRouterInstance();
-        if (!instance.initialized) {
-          console.warn('⚠️ Router not initialized, queueing navigation:', args[0]);
-          // 延迟执行导航
-          setTimeout(() => {
-            if (instance.initialized) {
-              instance.navigate(...args);
-            }
-          }, 100);
-          return Promise.resolve(false);
-        }
-        return instance.navigate(...args);
-      };
-    }
-    
-    const instance = getRouterInstance();
-    const value = instance[prop];
-    if (typeof value === 'function') {
-      return value.bind(instance);
-    }
-    return value;
-  },
-  set(target, prop, value) {
-    const instance = getRouterInstance();
-    instance[prop] = value;
-    return true;
-  }
-});
+// 导出路由器实例
+const router = routerInstance;
+
+// 提供获取实例的函数（为了兼容性）
+function getRouterInstance() {
+  return routerInstance;
+}
 
 export default router;
 export { getRouterInstance };
