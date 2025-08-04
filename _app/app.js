@@ -139,6 +139,8 @@ export class App {
       return;
     }
     
+    console.log('🔧 Initializing router with routes...');
+    
     // 配置路由
     const routes = [
       { path: '/', component: () => this.loadPage('dashboard') },
@@ -147,6 +149,8 @@ export class App {
       { path: '/user', component: () => this.loadPage('user') },
       { path: '/billing', component: () => this.loadPage('billing') }
     ];
+    
+    console.log('📝 Routes to register:', routes.map(r => r.path));
     
     // 初始化路由器（不会触发自动导航）
     router.init(routes, {
@@ -157,6 +161,13 @@ export class App {
       },
       autoLoad: false  // 禁用自动加载初始路由
     });
+    
+    // 等待确保路由初始化完成
+    await new Promise(resolve => setTimeout(resolve, 0));
+    
+    // 验证路由已注册
+    console.log('✅ Router initialized, registered routes:', Array.from(router.routes.keys()));
+    console.log('🔍 Router initialized status:', router.initialized);
   }
 
   /**
@@ -260,21 +271,44 @@ export class App {
     
     // 手动触发初始路由加载
     const router = this.modules.get('router');
-    if (router && router.initialized) {
+    if (router) {
       // 确保 router 知道 content element
       router.contentElement = contentElement;
+      
+      // 等待一个微任务确保路由完全初始化
+      await new Promise(resolve => setTimeout(resolve, 10));
+      
+      // 验证路由是否初始化和注册
+      if (!router.initialized) {
+        console.error('❌ Router not initialized');
+        return;
+      }
+      
+      console.log('📋 Checking registered routes:', Array.from(router.routes.keys()));
       
       // 获取当前路径或使用默认路径
       const currentPath = router.getCurrentPath() || '/dashboard';
       
-      // 检查是否已经在当前路由
-      if (router.currentRoute === currentPath) {
-        console.log(`📍 Already at route: ${currentPath}, skipping navigation`);
+      // 检查路由是否存在
+      if (!router.routes.has(currentPath) && !router.routes.has('/')) {
+        console.error(`❌ No routes registered! Routes map size: ${router.routes.size}`);
+        console.error('Available routes:', Array.from(router.routes.keys()));
         return;
       }
       
-      console.log(`📍 Loading initial route: ${currentPath}`);
-      await router.navigate(currentPath);
+      // 如果当前路径不存在，使用根路径
+      const targetPath = router.routes.has(currentPath) ? currentPath : '/';
+      
+      // 检查是否已经在当前路由
+      if (router.currentRoute === targetPath) {
+        console.log(`📍 Already at route: ${targetPath}, skipping navigation`);
+        return;
+      }
+      
+      console.log(`📍 Loading initial route: ${targetPath}`);
+      await router.navigate(targetPath);
+    } else {
+      console.error('❌ Router module not found');
     }
   }
 
