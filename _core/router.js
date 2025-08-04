@@ -107,18 +107,25 @@ export class Router {
    * 注册路由
    */
   register(route) {
+    console.log(`📝 Registering route: ${route.path}`);
+    
     if (!route.path || !route.component) {
       console.error('Invalid route:', route);
+      console.error('  path:', route.path);
+      console.error('  component:', route.component);
       return;
     }
     
-    this.routes.set(route.path, {
+    const routeConfig = {
       ...route,
       loaded: false,
       loading: false,
       component: null,
       loader: route.component
-    });
+    };
+    
+    this.routes.set(route.path, routeConfig);
+    console.log(`✅ Route registered: ${route.path}, total routes: ${this.routes.size}`);
   }
 
   /**
@@ -174,13 +181,23 @@ export class Router {
     }
     
     // 查找路由
+    console.log(`🔍 Looking for route: ${path}`);
+    console.log(`📋 Available routes: ${Array.from(this.routes.keys()).join(', ')}`);
+    console.log(`📊 Routes map size: ${this.routes.size}`);
+    
     const route = this.findRoute(path);
     if (!route) {
-      console.error(`Route not found: ${path}`);
-      console.error('Registered routes:', Array.from(this.routes.keys()));
+      console.error(`❌ Route not found: ${path}`);
+      console.error('📋 Registered routes:', Array.from(this.routes.keys()));
+      console.error('🗺️ Routes map details:');
+      for (const [key, value] of this.routes.entries()) {
+        console.error(`  - ${key}: loader type = ${typeof value.loader}`);
+      }
       await this.handle404(path);
       return false;
     }
+    
+    console.log(`✅ Route found for ${path}`);
     
     // 销毁当前组件实例（如果存在）
     if (this.currentComponentInstance && typeof this.currentComponentInstance.destroy === 'function') {
@@ -337,8 +354,20 @@ export class Router {
       const startTime = performance.now();
       
       // 执行loader函数
-      const module = await route.loader();
-      const component = module.default || module;
+      console.log(`🔄 Executing route.loader for ${route.path}`);
+      console.log(`   Loader type: ${typeof route.loader}`);
+      
+      const result = await route.loader();
+      
+      console.log(`📦 Loader result type: ${typeof result}`);
+      console.log(`   Has default property: ${!!(result && result.default)}`);
+      
+      // 判断返回的是模块还是组件
+      // 如果有default属性，说明是ES6模块
+      // 否则直接作为组件使用
+      const component = result && result.default ? result.default : result;
+      
+      console.log(`🎯 Final component type: ${typeof component}`);
       
       const loadTime = performance.now() - startTime;
       console.log(`✅ Component loaded in ${loadTime.toFixed(2)}ms`);
