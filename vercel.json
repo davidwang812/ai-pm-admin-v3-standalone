@@ -1,5 +1,6 @@
 {
   "version": 2,
+  "public": true,
   "buildCommand": "",
   "installCommand": "",
   "outputDirectory": ".",
