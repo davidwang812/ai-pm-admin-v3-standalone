@@ -164,11 +164,20 @@ export class App {
    */
   async loadPage(pageName) {
     console.log(`📄 Loading page: ${pageName}`);
+    console.log(`📄 Import path: ../_pages/${pageName}/index.js`);
     
     try {
       // 动态导入页面模块
-      const module = await import(`../_pages/${pageName}/index.js`);
+      const modulePath = `../_pages/${pageName}/index.js`;
+      console.log(`🔍 Attempting to import from: ${modulePath}`);
+      
+      const module = await import(modulePath);
+      console.log(`✅ Module imported successfully:`, module);
+      console.log(`📦 Module keys:`, Object.keys(module));
+      
       const Page = module.default || module[pageName];
+      console.log(`🎯 Page component found:`, Page ? 'Yes' : 'No');
+      console.log(`📝 Page type:`, typeof Page);
       
       if (Page) {
         // 检查是函数还是类
