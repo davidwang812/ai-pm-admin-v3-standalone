@@ -167,18 +167,44 @@ class Bootstrap {
     const appContent = document.getElementById('app-content');
     const app = document.getElementById('app');
     
+    console.log('🔄 Switching to main app...');
+    console.log('  Loading screen found:', !!loadingScreen);
+    console.log('  App content found:', !!appContent);
+    console.log('  App container found:', !!app);
+    
+    // 强制移除加载画面
     if (loadingScreen) {
       loadingScreen.style.display = 'none';
+      loadingScreen.style.visibility = 'hidden';
+      // 完全移除元素以确保不会干扰
+      setTimeout(() => {
+        loadingScreen.remove();
+        console.log('🗑️ Loading screen removed from DOM');
+      }, 100);
     }
     
+    // 强制显示主内容
     if (appContent) {
       appContent.style.display = 'block';
+      appContent.style.visibility = 'visible';
+      appContent.style.opacity = '1';
       console.log('📱 Switched to main app interface');
+    } else {
+      console.error('❌ App content element not found!');
+      // 创建app-content如果不存在
+      const newAppContent = document.createElement('div');
+      newAppContent.id = 'app-content';
+      newAppContent.style.display = 'block';
+      if (app) {
+        app.appendChild(newAppContent);
+        console.log('✅ Created app-content element');
+      }
     }
     
     // 确保app容器可见
     if (app) {
       app.style.display = 'block';
+      app.style.visibility = 'visible';
     }
   }
 

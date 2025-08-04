@@ -219,8 +219,23 @@ export class App {
       return;
     }
     
-    // 渲染主布局
-    app.innerHTML = this.renderLayout();
+    // 检查是否已经有app-content元素（从index.html）
+    let appContent = document.getElementById('app-content');
+    if (!appContent) {
+      console.log('📝 Rendering layout as app-content not found');
+      // 渲染主布局
+      app.innerHTML = this.renderLayout();
+    } else {
+      console.log('✅ Using existing app-content element');
+      // 如果已经有app-content，只更新周围的UI元素
+      // 保留app-content元素
+      const tempContent = appContent.cloneNode(true);
+      app.innerHTML = this.renderLayout();
+      appContent = document.getElementById('app-content');
+      if (appContent && tempContent) {
+        appContent.innerHTML = tempContent.innerHTML;
+      }
+    }
     
     // 确保DOM更新完成 - 使用requestAnimationFrame确保浏览器渲染
     await new Promise(resolve => {
