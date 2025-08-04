@@ -102,4 +102,4 @@ function generateToken(payload) {
   ).toString('base64url').substring(0, 43);
 
   return `${encodedHeader}.${encodedPayload}.${signature}`;
-}
+}// Trigger deployment Mon Aug  4 19:09:31 CST 2025
