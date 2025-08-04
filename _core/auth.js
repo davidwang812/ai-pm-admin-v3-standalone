@@ -51,7 +51,7 @@ export class AuthManager {
     try {
       console.log('🔐 Attempting login with Railway backend API...');
       // 直接调用Railway后端API
-      const apiUrl = 'https://aiproductmanager-production.up.railway.app/api/admin/login';
+      const apiUrl = 'https://aiproductmanager-production.up.railway.app/api/auth/admin/login';
       console.log('📍 Target URL:', apiUrl);
       
       // 调用Railway后端API - 使用正确的参数格式
@@ -127,7 +127,7 @@ export class AuthManager {
     try {
       // 调用Vercel Edge Function登出接口
       if (this.token) {
-        await fetch('https://aiproductmanager-production.up.railway.app/api/admin/logout', {
+        await fetch('https://aiproductmanager-production.up.railway.app/api/auth/admin/logout', {
           method: 'POST',
           headers: {
             'Authorization': `Bearer ${this.token}`
