@@ -230,21 +230,41 @@ export class App {
       return;
     }
     
-    // 检查是否已经有app-content元素（从index.html）
-    let appContent = document.getElementById('app-content');
-    if (!appContent) {
-      console.log('📝 Rendering layout as app-content not found');
-      // 渲染主布局
-      app.innerHTML = this.renderLayout();
+    // 检查是否bootstrap已经切换了界面
+    const loadingScreen = document.getElementById('loading-screen');
+    const hasLoadingScreen = loadingScreen && loadingScreen.style.display !== 'none';
+    const bootstrapSwitched = window.adminV3BootstrapSwitched === true;
+    
+    // 如果bootstrap已经切换或loading-screen已经被隐藏
+    if (bootstrapSwitched || !hasLoadingScreen) {
+      console.log('✅ Bootstrap already switched UI, checking for layout...');
+      
+      // 检查是否需要渲染布局
+      const layout = this.renderLayout();
+      if (layout) {
+        console.log('📝 Rendering layout structure...');
+        // 只渲染布局结构，保留app-content
+        const appContent = document.getElementById('app-content');
+        const tempContent = appContent ? appContent.innerHTML : '';
+        app.innerHTML = layout;
+        
+        // 恢复app-content内容
+        const newAppContent = document.getElementById('app-content');
+        if (newAppContent && tempContent) {
+          newAppContent.innerHTML = tempContent;
+        }
+      } else {
+        console.log('✅ Layout already exists, skipping render');
+      }
     } else {
-      console.log('✅ Using existing app-content element');
-      // 如果已经有app-content，只更新周围的UI元素
-      // 保留app-content元素
-      const tempContent = appContent.cloneNode(true);
+      console.log('📝 Loading screen still visible, rendering full layout');
+      // 如果loading-screen还在，渲染完整布局
       app.innerHTML = this.renderLayout();
-      appContent = document.getElementById('app-content');
-      if (appContent && tempContent) {
-        appContent.innerHTML = tempContent.innerHTML;
+      
+      // 强制隐藏loading-screen
+      if (loadingScreen) {
+        loadingScreen.style.display = 'none';
+        loadingScreen.remove();
       }
     }
     
@@ -316,6 +336,13 @@ export class App {
    * 渲染布局
    */
   renderLayout() {
+    // 检查是否已经有布局存在
+    const existingLayout = document.querySelector('.app-layout');
+    if (existingLayout) {
+      console.log('📋 Layout already exists, skipping render');
+      return null;
+    }
+    
     return `
       <div class="app-layout">
         <!-- Header -->
@@ -358,10 +385,6 @@ export class App {
         <!-- Content -->
         <main class="app-content" id="app-content">
           <!-- Page content will be loaded here -->
-          <div style="padding: 40px; text-align: center;">
-            <div class="loading-spinner"></div>
-            <p>加载中...</p>
-          </div>
         </main>
       </div>
     `;

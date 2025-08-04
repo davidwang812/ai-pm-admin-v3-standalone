@@ -178,8 +178,10 @@ class Bootstrap {
       loadingScreen.style.visibility = 'hidden';
       // 完全移除元素以确保不会干扰
       setTimeout(() => {
-        loadingScreen.remove();
-        console.log('🗑️ Loading screen removed from DOM');
+        if (loadingScreen.parentNode) {
+          loadingScreen.remove();
+          console.log('🗑️ Loading screen removed from DOM');
+        }
       }, 100);
     }
     
@@ -206,6 +208,10 @@ class Bootstrap {
       app.style.display = 'block';
       app.style.visibility = 'visible';
     }
+    
+    // 设置标志表示界面已经切换
+    window.adminV3BootstrapSwitched = true;
+    console.log('✅ Bootstrap UI switch completed');
   }
 
   /**
