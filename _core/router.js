@@ -22,10 +22,18 @@ export class Router {
    * 初始化路由系统
    */
   init(routes = [], options = {}) {
-    // 防止重复初始化
+    // 允许重新初始化
     if (this.initialized) {
-      console.warn('Router already initialized');
-      return;
+      console.warn('⚠️ Router re-initializing, clearing old routes');
+      // 清空所有旧路由
+      this.routes.clear();
+      // 清空组件缓存
+      this.componentCache.clear();
+      // 重置导航状态
+      this.navigating = false;
+      this.navigationQueue = [];
+      // 重置初始化标志以允许重新初始化
+      this.initialized = false;
     }
     
     console.log('🔧 Starting router initialization...');
