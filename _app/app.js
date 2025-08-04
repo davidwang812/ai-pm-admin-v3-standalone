@@ -453,11 +453,34 @@ export class App {
    * 登出
    */
   async logout() {
-    const auth = this.modules.get('auth');
-    if (auth) {
-      await auth.logout();
+    console.log('🔓 Logout initiated...');
+    
+    try {
+      const auth = this.modules.get('auth');
+      console.log('Auth module:', auth);
+      
+      if (auth) {
+        await auth.logout();
+        console.log('✅ Auth logout completed');
+      } else {
+        console.warn('⚠️ Auth module not found, clearing local storage directly');
+        // 直接清理本地存储
+        localStorage.removeItem('admin_token_v3');
+        localStorage.removeItem('admin_user_v3');
+        sessionStorage.clear();
+      }
+      
+      // 跳转到登录页
+      console.log('📍 Redirecting to login page...');
+      window.location.href = './login.html';
+    } catch (error) {
+      console.error('❌ Logout error:', error);
+      // 强制清理并跳转
+      localStorage.removeItem('admin_token_v3');
+      localStorage.removeItem('admin_user_v3');
+      sessionStorage.clear();
+      window.location.href = './login.html';
     }
-    window.location.href = './login.html';
   }
   
   /**
