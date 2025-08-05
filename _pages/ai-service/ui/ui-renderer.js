@@ -58,18 +58,18 @@ export class UIRenderer {
         </div>
         
         <div class="provider-actions">
-          <button class="btn btn-sm" onclick="window.adminApp.editProvider('${provider.id}')">
+          <button class="btn btn-sm" onclick="window.adminV3App.editProvider('${provider.id}')">
             編輯
           </button>
-          <button class="btn btn-sm" onclick="window.adminApp.testProvider('${provider.id}')">
+          <button class="btn btn-sm" onclick="window.adminV3App.testProvider('${provider.id}')">
             測試
           </button>
           <button class="btn btn-sm btn-${status ? 'warning' : 'success'}" 
-                  onclick="window.adminApp.toggleProvider('${provider.id}', ${!status})">
+                  onclick="window.adminV3App.toggleProvider('${provider.id}', ${!status})">
             ${status ? '停用' : '啟用'}
           </button>
           <button class="btn btn-sm btn-danger" 
-                  onclick="window.adminApp.deleteProvider('${provider.id}')">
+                  onclick="window.adminV3App.deleteProvider('${provider.id}')">
             刪除
           </button>
         </div>
@@ -133,7 +133,7 @@ export class UIRenderer {
         <h3 class="empty-title">${message.title}</h3>
         <p class="empty-description">${message.description}</p>
         ${message.action ? `
-          <button class="btn btn-primary" onclick="window.adminApp.showAddProviderDialog()">
+          <button class="btn btn-primary" onclick="window.adminV3App.showAddProviderDialog()">
             ${message.action}
           </button>
         ` : ''}
@@ -147,16 +147,16 @@ export class UIRenderer {
   renderQuickActions() {
     return `
       <div class="quick-actions">
-        <button class="btn btn-primary" onclick="window.adminApp.showAddProviderDialog()">
+        <button class="btn btn-primary" onclick="window.adminV3App.showAddProviderDialog()">
           <span class="btn-icon">+</span> 添加服務商
         </button>
-        <button class="btn" onclick="window.adminApp.importProviders()">
+        <button class="btn" onclick="window.adminV3App.importProviders()">
           <span class="btn-icon">📥</span> 導入配置
         </button>
-        <button class="btn" onclick="window.adminApp.exportProviders()">
+        <button class="btn" onclick="window.adminV3App.exportProviders()">
           <span class="btn-icon">📤</span> 導出配置
         </button>
-        <button class="btn" onclick="window.adminApp.refreshProviders()">
+        <button class="btn" onclick="window.adminV3App.refreshProviders()">
           <span class="btn-icon">🔄</span> 刷新
         </button>
       </div>
@@ -252,7 +252,7 @@ export class UIRenderer {
           ${tabs.map(tab => `
             <button class="tab-item ${tab.key === activeTab ? 'active' : ''}"
                     data-tab="${tab.key}"
-                    onclick="window.adminApp.switchTab('${tab.key}')">
+                    onclick="window.adminV3App.switchTab('${tab.key}')">
               ${tab.icon ? `<span class="tab-icon">${tab.icon}</span>` : ''}
               ${tab.label}
               ${tab.badge ? `<span class="tab-badge">${tab.badge}</span>` : ''}

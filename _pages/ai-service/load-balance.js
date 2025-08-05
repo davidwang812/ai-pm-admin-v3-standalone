@@ -130,7 +130,7 @@ export class LoadBalance {
                       <td>${providerConfig.avgResponseTime || '-'}ms</td>
                       <td>${providerConfig.requestCount || 0}</td>
                       <td>
-                        <button class="btn btn-sm btn-default" onclick="window.adminApp.testProviderHealth('${provider.id}')">
+                        <button class="btn btn-sm btn-default" onclick="window.adminV3App.testProviderHealth('${provider.id}')">
                           测试
                         </button>
                       </td>

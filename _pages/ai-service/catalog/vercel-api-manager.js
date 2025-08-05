@@ -308,10 +308,10 @@ export class VercelApiManager {
               font-size: 14px;
             "
           />
-          <button class="btn btn-default" onclick="window.adminApp.currentPage.saveVercelApiUrl()">
+          <button class="btn btn-default" onclick="window.adminV3App.currentPage.saveVercelApiUrl()">
             💾 保存
           </button>
-          <button class="btn btn-default" onclick="window.adminApp.currentPage.testVercelApi()">
+          <button class="btn btn-default" onclick="window.adminV3App.currentPage.testVercelApi()">
             🧪 测试
           </button>
           <a 
