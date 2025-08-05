@@ -66,10 +66,10 @@ export class CatalogManager {
                 font-size: 14px;
               "
             />
-            <button class="btn btn-default" onclick="window.adminV3App.currentPage.saveVercelDataFetcherUrl()">
+            <button class="btn btn-default" onclick="window.adminApp.currentPage.saveVercelDataFetcherUrl()">
               💾 保存
             </button>
-            <button class="btn btn-default" onclick="window.adminV3App.currentPage.testVercelDataFetcher()">
+            <button class="btn btn-default" onclick="window.adminApp.currentPage.testVercelDataFetcher()">
               🧪 測試
             </button>
             <a 
@@ -197,11 +197,11 @@ export class CatalogManager {
                   </td>
                   <td>
                     <div class="action-buttons">
-                      <button class="btn btn-sm btn-default" onclick="window.adminV3App.viewProviderModels('${providerCode}')">
+                      <button class="btn btn-sm btn-default" onclick="window.adminApp.viewProviderModels('${providerCode}')">
                         📊 查看
                       </button>
                       <button class="btn btn-sm ${normalizedProvider.isActive ? 'btn-warning' : 'btn-success'}" 
-                              onclick="window.adminV3App.toggleCatalogProvider('${providerCode}', ${!normalizedProvider.isActive})">
+                              onclick="window.adminApp.toggleCatalogProvider('${providerCode}', ${!normalizedProvider.isActive})">
                         ${normalizedProvider.isActive ? '⏸️ 禁用' : '▶️ 启用'}
                       </button>
                     </div>
