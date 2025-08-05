@@ -221,21 +221,21 @@
             alert.style.display = 'none';
             
             try {
-                // 动态导入auth模块
-                const { default: authManager } = await import('./_core/auth.js');
+                // 动态导入V3独立auth模块
+                const { default: authManager } = await import('./_core/auth-v3.js');
                 
-                console.log('🔐 Attempting login with:', username);
+                console.log('🔐 V3 Independent Auth - Attempting login with:', username);
                 const result = await authManager.login(username, password);
                 
                 if (result.success) {
                     showAlert('登录成功，正在跳转...', 'success');
                     
-                    // 跳转到V3管理后台
+                    // 跳转到指定页面或默认页面
                     setTimeout(() => {
-                        window.location.href = './index.html';
+                        window.location.href = result.redirectUrl || './admin.html';
                     }, 1000);
                 } else {
-                    showAlert(result.message || '登录失败，请检查邮箱和密码');
+                    showAlert(result.message || '登录失败，请检查用户名和密码');
                 }
             } catch (error) {
                 showAlert('网络错误，请稍后重试');
@@ -249,12 +249,12 @@
         // 检查是否已经登录
         (async () => {
             try {
-                const { default: authManager } = await import('./_core/auth.js');
+                const { default: authManager } = await import('./_core/auth-v3.js');
                 const isAuthenticated = await authManager.check();
                 
                 if (isAuthenticated) {
-                    console.log('✅ Already authenticated, redirecting...');
-                    window.location.href = './index.html';
+                    console.log('✅ V3 Already authenticated, redirecting...');
+                    window.location.href = './admin.html';
                 }
             } catch (error) {
                 console.log('Not authenticated, showing login form');

@@ -1,11 +1,29 @@
 /**
- * Vercel Edge Function - Admin Login Proxy
- * 代理到Railway后端，解决无痕浏览器跨域问题
+ * Vercel Edge Function - Admin Login
+ * V3独立认证系统，不依赖Railway后端
+ * 
+ * 契约要求：
+ * - 独立认证
+ * - 快速响应 (<1秒)
+ * - 安全验证
  */
+
+import { SignJWT } from 'jose';
 
 export const config = {
   runtime: 'edge',
 };
+
+// 简化的认证配置（Edge Runtime兼容）
+const ADMIN_CREDENTIALS = {
+  username: process.env.SUPER_ADMIN_USERNAME || 'davidwang812',
+  password: process.env.SUPER_ADMIN_PASSWORD || 'Admin@4444',
+  email: process.env.SUPER_ADMIN_EMAIL || 'davidwang812@gmail.com'
+};
+
+const JWT_SECRET = new TextEncoder().encode(
+  process.env.JWT_SECRET || 'v3-admin-secret-key-default'
+);
 
 export default async function handler(request) {
   // 处理OPTIONS请求（CORS预检）
@@ -60,47 +78,56 @@ export default async function handler(request) {
       );
     }
 
-    console.log('🔐 Proxying admin login request to Railway backend...');
+    console.log('🔐 V3 Local Authentication - Validating credentials...');
 
-    // 代理到Railway后端
-    const railwayUrl = 'https://aiproductmanager-production.up.railway.app/api/auth/admin/login';
-    
-    const response = await fetch(railwayUrl, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        'Accept': 'application/json',
-        // 转发原始请求的headers（如果需要）
-        'X-Forwarded-For': request.headers.get('x-forwarded-for') || 'unknown',
-        'X-Original-Host': request.headers.get('host') || 'unknown'
-      },
-      body: JSON.stringify({
-        username,
-        password
-      })
-    });
-
-    // 获取响应数据
-    const data = await response.json();
-
-    // 如果是成功响应，确保返回格式正确
-    if (response.ok && data.success) {
-      console.log('✅ Admin login proxy successful');
+    // 本地验证管理员凭据
+    if (username === ADMIN_CREDENTIALS.username && 
+        password === ADMIN_CREDENTIALS.password) {
       
-      // 确保响应包含必要的字段
+      console.log('✅ V3 Admin authentication successful');
+      
+      // 生成JWT Token
+      const token = await new SignJWT({
+        id: 'super-admin-v3',
+        username: ADMIN_CREDENTIALS.username,
+        email: ADMIN_CREDENTIALS.email,
+        isAdmin: true,
+        isSuperAdmin: true,
+        role: 'super_admin'
+      })
+        .setProtectedHeader({ alg: 'HS256' })
+        .setIssuedAt()
+        .setIssuer('ai-pm-v3')
+        .setAudience('admin-panel')
+        .setExpirationTime('2h')
+        .sign(JWT_SECRET);
+      
+      // 生成Refresh Token
+      const refreshToken = await new SignJWT({
+        id: 'super-admin-v3',
+        type: 'refresh'
+      })
+        .setProtectedHeader({ alg: 'HS256' })
+        .setIssuedAt()
+        .setIssuer('ai-pm-v3')
+        .setExpirationTime('7d')
+        .sign(JWT_SECRET);
+      
       return new Response(
         JSON.stringify({
           success: true,
           data: {
-            user: data.data?.user || {
-              id: 'super-admin',
-              username: username,
-              email: 'admin@example.com',
+            user: {
+              id: 'super-admin-v3',
+              username: ADMIN_CREDENTIALS.username,
+              email: ADMIN_CREDENTIALS.email,
               isAdmin: true,
-              isSuperAdmin: true
+              isSuperAdmin: true,
+              role: 'super_admin'
             },
-            token: data.data?.token || data.token,
-            redirectUrl: data.data?.redirectUrl || '/admin/dashboard-full.html'
+            token: token,
+            refreshToken: refreshToken,
+            redirectUrl: '/admin.html'
           }
         }),
         {
@@ -113,12 +140,15 @@ export default async function handler(request) {
       );
     }
 
-    // 转发错误响应
-    console.log('❌ Admin login proxy failed:', response.status, data.message);
+    // 认证失败
+    console.log('❌ V3 Admin authentication failed');
     return new Response(
-      JSON.stringify(data),
+      JSON.stringify({
+        success: false,
+        message: 'Invalid username or password'
+      }),
       {
-        status: response.status,
+        status: 401,
         headers: {
           'Content-Type': 'application/json',
           'Access-Control-Allow-Origin': '*'
@@ -127,31 +157,12 @@ export default async function handler(request) {
     );
 
   } catch (error) {
-    console.error('Proxy error:', error);
+    console.error('V3 Auth error:', error);
     
-    // 如果Railway不可用，返回友好的错误信息
-    if (error.name === 'FetchError' || error.code === 'ECONNREFUSED') {
-      return new Response(
-        JSON.stringify({
-          success: false,
-          message: 'Backend service temporarily unavailable. Please try again later.',
-          error: 'SERVICE_UNAVAILABLE'
-        }),
-        {
-          status: 503,
-          headers: {
-            'Content-Type': 'application/json',
-            'Access-Control-Allow-Origin': '*'
-          }
-        }
-      );
-    }
-
-    // 其他错误
     return new Response(
       JSON.stringify({
         success: false,
-        message: 'Internal server error',
+        message: 'Authentication service error',
         error: error.message
       }),
       {

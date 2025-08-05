@@ -1,11 +1,17 @@
 /**
- * Vercel Edge Function - Token Verify Proxy
- * 代理到Railway后端
+ * Vercel Edge Function - Token Verify
+ * V3独立JWT验证，不依赖Railway后端
  */
+
+import { jwtVerify } from 'jose';
 
 export const config = {
   runtime: 'edge',
 };
+
+const JWT_SECRET = new TextEncoder().encode(
+  process.env.JWT_SECRET || 'v3-admin-secret-key-default'
+);
 
 export default async function handler(request) {
   // 处理OPTIONS请求（CORS预检）
@@ -58,27 +64,36 @@ export default async function handler(request) {
       );
     }
 
-    console.log('🔐 Proxying token verify request to Railway backend...');
-
-    // 代理到Railway后端
-    const railwayUrl = 'https://aiproductmanager-production.up.railway.app/api/auth/verify';
+    // 提取token
+    const token = authHeader.replace('Bearer ', '');
     
-    const response = await fetch(railwayUrl, {
-      method: 'GET',
-      headers: {
-        'Authorization': authHeader,
-        'Accept': 'application/json'
-      }
+    console.log('🔐 V3 Local Token Verification...');
+
+    // 验证JWT Token
+    const { payload } = await jwtVerify(token, JWT_SECRET, {
+      issuer: 'ai-pm-v3',
+      audience: 'admin-panel',
     });
 
-    // 获取响应数据
-    const data = await response.json();
+    console.log('✅ V3 Token verified successfully');
 
-    // 转发响应
+    // 返回用户信息
     return new Response(
-      JSON.stringify(data),
+      JSON.stringify({
+        success: true,
+        data: {
+          user: {
+            id: payload.id,
+            username: payload.username,
+            email: payload.email,
+            isAdmin: payload.isAdmin,
+            isSuperAdmin: payload.isSuperAdmin,
+            role: payload.role
+          }
+        }
+      }),
       {
-        status: response.status,
+        status: 200,
         headers: {
           'Content-Type': 'application/json',
           'Access-Control-Allow-Origin': '*'
@@ -87,16 +102,16 @@ export default async function handler(request) {
     );
 
   } catch (error) {
-    console.error('Verify proxy error:', error);
+    console.error('V3 Token verification error:', error);
     
+    // Token无效或过期
     return new Response(
       JSON.stringify({
         success: false,
-        message: 'Failed to verify token',
-        error: error.message
+        message: 'Invalid or expired token'
       }),
       {
-        status: 500,
+        status: 401,
         headers: {
           'Content-Type': 'application/json',
           'Access-Control-Allow-Origin': '*'

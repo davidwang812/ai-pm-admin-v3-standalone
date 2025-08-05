@@ -1,11 +1,17 @@
 /**
- * Vercel Edge Function - Token Refresh Proxy
- * 代理到Railway后端
+ * Vercel Edge Function - Token Refresh
+ * V3独立Token刷新，不依赖Railway后端
  */
+
+import { jwtVerify, SignJWT } from 'jose';
 
 export const config = {
   runtime: 'edge',
 };
+
+const JWT_SECRET = new TextEncoder().encode(
+  process.env.JWT_SECRET || 'v3-admin-secret-key-default'
+);
 
 export default async function handler(request) {
   // 处理OPTIONS请求（CORS预检）
@@ -59,30 +65,57 @@ export default async function handler(request) {
       );
     }
 
-    console.log('🔐 Proxying token refresh request to Railway backend...');
+    console.log('🔐 V3 Local Token Refresh...');
 
-    // 代理到Railway后端
-    const railwayUrl = 'https://aiproductmanager-production.up.railway.app/api/auth/refresh';
-    
-    const response = await fetch(railwayUrl, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        'Accept': 'application/json'
-      },
-      body: JSON.stringify({
-        refreshToken
-      })
+    // 验证Refresh Token
+    const { payload } = await jwtVerify(refreshToken, JWT_SECRET, {
+      issuer: 'ai-pm-v3'
     });
 
-    // 获取响应数据
-    const data = await response.json();
+    // 确保是refresh token
+    if (payload.type !== 'refresh') {
+      throw new Error('Invalid token type');
+    }
 
-    // 转发响应
+    console.log('✅ V3 Refresh token verified');
+
+    // 生成新的Access Token
+    const newToken = await new SignJWT({
+      id: payload.id,
+      username: process.env.SUPER_ADMIN_USERNAME || 'davidwang812',
+      email: process.env.SUPER_ADMIN_EMAIL || 'davidwang812@gmail.com',
+      isAdmin: true,
+      isSuperAdmin: true,
+      role: 'super_admin'
+    })
+      .setProtectedHeader({ alg: 'HS256' })
+      .setIssuedAt()
+      .setIssuer('ai-pm-v3')
+      .setAudience('admin-panel')
+      .setExpirationTime('2h')
+      .sign(JWT_SECRET);
+    
+    // 生成新的Refresh Token
+    const newRefreshToken = await new SignJWT({
+      id: payload.id,
+      type: 'refresh'
+    })
+      .setProtectedHeader({ alg: 'HS256' })
+      .setIssuedAt()
+      .setIssuer('ai-pm-v3')
+      .setExpirationTime('7d')
+      .sign(JWT_SECRET);
+
     return new Response(
-      JSON.stringify(data),
+      JSON.stringify({
+        success: true,
+        data: {
+          token: newToken,
+          refreshToken: newRefreshToken
+        }
+      }),
       {
-        status: response.status,
+        status: 200,
         headers: {
           'Content-Type': 'application/json',
           'Access-Control-Allow-Origin': '*'
@@ -91,7 +124,7 @@ export default async function handler(request) {
     );
 
   } catch (error) {
-    console.error('Refresh proxy error:', error);
+    console.error('V3 Refresh error:', error);
     
     return new Response(
       JSON.stringify({
@@ -100,7 +133,7 @@ export default async function handler(request) {
         error: error.message
       }),
       {
-        status: 500,
+        status: 401,
         headers: {
           'Content-Type': 'application/json',
           'Access-Control-Allow-Origin': '*'
