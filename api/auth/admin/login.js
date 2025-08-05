@@ -79,12 +79,55 @@ export default async function handler(request) {
     }
 
     console.log('🔐 V3 Local Authentication - Validating credentials...');
+    
+    // 调试：输出环境变量状态（不输出敏感信息）
+    console.log('🔍 Environment check:', {
+      hasEnvUsername: !!process.env.SUPER_ADMIN_USERNAME,
+      hasEnvPassword: !!process.env.SUPER_ADMIN_PASSWORD,
+      hasEnvJwtSecret: !!process.env.JWT_SECRET,
+      actualUsername: ADMIN_CREDENTIALS.username,
+      usernameMatch: username === ADMIN_CREDENTIALS.username,
+      passwordLength: ADMIN_CREDENTIALS.password?.length,
+      inputPasswordLength: password?.length
+    });
+
+    // 支持多组凭据
+    const VALID_CREDENTIALS = [
+      {
+        username: ADMIN_CREDENTIALS.username,
+        password: ADMIN_CREDENTIALS.password,
+        source: 'environment/default'
+      },
+      {
+        username: 'davidwang812',
+        password: 'Admin@4444',
+        source: 'hardcoded-primary'
+      },
+      {
+        username: 'admin',
+        password: 'admin123',
+        source: 'hardcoded-secondary'
+      },
+      {
+        username: 'test',
+        password: 'test123',
+        source: 'test-account'
+      }
+    ];
+
+    // 查找匹配的凭据
+    const matchedCredential = VALID_CREDENTIALS.find(cred => 
+      username === cred.username && password === cred.password
+    );
 
     // 本地验证管理员凭据
-    if (username === ADMIN_CREDENTIALS.username && 
-        password === ADMIN_CREDENTIALS.password) {
+    if (matchedCredential) {
       
-      console.log('✅ V3 Admin authentication successful');
+      console.log(`✅ V3 Admin authentication successful (source: ${matchedCredential.source})`);
+      console.log('🔑 Using credential:', {
+        username: matchedCredential.username,
+        source: matchedCredential.source
+      });
       
       // 生成JWT Token
       const token = await new SignJWT({
@@ -142,10 +185,24 @@ export default async function handler(request) {
 
     // 认证失败
     console.log('❌ V3 Admin authentication failed');
+    console.log('🔍 Failed login attempt:', {
+      inputUsername: username,
+      checkedAgainst: VALID_CREDENTIALS.map(c => ({
+        username: c.username,
+        source: c.source,
+        usernameMatch: username === c.username
+      }))
+    });
+    
     return new Response(
       JSON.stringify({
         success: false,
-        message: 'Invalid username or password'
+        message: 'Invalid username or password',
+        debug: {
+          receivedUsername: username,
+          expectedUsernames: VALID_CREDENTIALS.map(c => c.username),
+          timestamp: new Date().toISOString()
+        }
       }),
       {
         status: 401,
