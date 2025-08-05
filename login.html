@@ -216,16 +216,37 @@
             const username = document.getElementById('username').value;
             const password = document.getElementById('password').value;
             
-            submitBtn.disabled = true;
-            submitBtn.innerHTML = '登录中<span class="loading"></span>';
-            alert.style.display = 'none';
-            
+            // 输入验证
             try {
+                // 动态导入验证器
+                const { default: validator } = await import('./_utils/input-validator.js');
+                
+                // 验证用户名
+                if (!validator.validateUsername(username)) {
+                    showAlert('用户名格式错误：只能包含字母、数字、下划线和横线，长度3-20');
+                    return;
+                }
+                
+                // 验证密码
+                const passwordResult = validator.validatePassword(password);
+                if (!passwordResult.valid) {
+                    showAlert(passwordResult.messages.join('; '));
+                    return;
+                }
+                
+                // 清理输入
+                const cleanUsername = validator.sanitizeInput(username, 'username');
+                const cleanPassword = password; // 密码不需要清理，保持原样
+                
+                submitBtn.disabled = true;
+                submitBtn.innerHTML = '登录中<span class="loading"></span>';
+                alert.style.display = 'none';
+                
                 // 动态导入V3独立auth模块
                 const { default: authManager } = await import('./_core/auth-v3.js');
                 
-                console.log('🔐 V3 Independent Auth - Attempting login with:', username);
-                const result = await authManager.login(username, password);
+                console.log('🔐 V3 Independent Auth - Attempting login with:', cleanUsername);
+                const result = await authManager.login(cleanUsername, cleanPassword);
                 
                 if (result.success) {
                     showAlert('登录成功，正在跳转...', 'success');

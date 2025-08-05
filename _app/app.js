@@ -356,8 +356,31 @@ export class App {
             <span class="brand-icon">🚀</span>
             <span class="brand-text">Admin V3</span>
             <span class="brand-badge">Vercel</span>
+            <span class="version-info" onclick="adminV3App.showVersionInfo()" style="
+              margin-left: 12px;
+              font-size: 12px;
+              color: #9ca3af;
+              cursor: pointer;
+              transition: color 0.2s;
+            " onmouseover="this.style.color='#667eea'" onmouseout="this.style.color='#9ca3af'">
+              v${this.config?.app?.version || '3.0.0'}
+            </span>
           </div>
           <div class="header-user">
+            <button class="btn-check-update" onclick="adminV3App.checkForUpdates()" style="
+              margin-right: 12px;
+              padding: 6px 12px;
+              background: transparent;
+              color: #667eea;
+              border: 1px solid #667eea;
+              border-radius: 4px;
+              font-size: 13px;
+              cursor: pointer;
+              transition: all 0.2s;
+            " onmouseover="this.style.background='#667eea'; this.style.color='white'" 
+               onmouseout="this.style.background='transparent'; this.style.color='#667eea'">
+              🔄 检查更新
+            </button>
             <span>${this.state.user?.username || 'Guest'}</span>
             <button class="btn-logout" onclick="adminV3App.logout()">
               退出
@@ -529,6 +552,298 @@ export class App {
   updateChartPeriod(period) {
     console.log('Updating chart period to:', period);
     // This would be implemented based on specific chart requirements
+  }
+
+  /**
+   * 显示版本信息
+   */
+  showVersionInfo() {
+    if (!window.adminV3Version) {
+      console.error('版本管理器未初始化');
+      return;
+    }
+
+    const versionInfo = window.adminV3Version.getVersionInfo();
+    const changelog = window.adminV3Version.getChangelog(versionInfo.current);
+    
+    // 使用showModal显示版本信息
+    if (this.showModal) {
+      this.showModal({
+        title: '📦 版本信息',
+        content: `
+          <div style="font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;">
+            <div style="margin-bottom: 20px;">
+              <h4 style="margin-bottom: 8px; color: #333;">当前版本</h4>
+              <p style="font-size: 24px; color: #667eea; margin: 0;">
+                v${versionInfo.current}
+              </p>
+              <p style="color: #666; margin-top: 4px;">
+                更新通道: ${versionInfo.channel}
+              </p>
+            </div>
+            
+            <div style="margin-bottom: 20px;">
+              <h4 style="margin-bottom: 8px; color: #333;">版本特性</h4>
+              <ul style="list-style: none; padding: 0;">
+                ${changelog.map(change => `
+                  <li style="margin-bottom: 6px; padding-left: 20px; position: relative;">
+                    <span style="position: absolute; left: 0; color: #10b981;">✓</span>
+                    ${change}
+                  </li>
+                `).join('')}
+              </ul>
+            </div>
+            
+            <div style="background: #f3f4f6; padding: 12px; border-radius: 6px;">
+              <p style="margin: 0; font-size: 12px; color: #6b7280;">
+                最后检查更新: ${versionInfo.lastCheck ? new Date(versionInfo.lastCheck).toLocaleString() : '从未检查'}
+              </p>
+            </div>
+          </div>
+        `,
+        confirmText: '导出版本报告',
+        cancelText: '关闭',
+        onConfirm: () => {
+          window.adminV3Version.exportVersionReport();
+          this.showToast('success', '版本报告已导出');
+        }
+      });
+    }
+  }
+
+  /**
+   * 检查更新
+   */
+  async checkForUpdates() {
+    if (!window.adminV3Version) {
+      console.error('版本管理器未初始化');
+      return;
+    }
+
+    await window.adminV3Version.manualUpdateCheck();
+  }
+
+  /**
+   * 显示模态框
+   */
+  showModal(options) {
+    // 创建模态框元素
+    const modal = document.createElement('div');
+    modal.className = 'modal-overlay';
+    modal.innerHTML = `
+      <div class="modal-container">
+        <div class="modal-header">
+          <h3 class="modal-title">${options.title}</h3>
+        </div>
+        <div class="modal-content">
+          ${options.content}
+        </div>
+        <div class="modal-footer">
+          ${options.showCancel !== false ? `
+            <button class="modal-btn modal-btn-cancel">${options.cancelText || '取消'}</button>
+          ` : ''}
+          <button class="modal-btn modal-btn-confirm">${options.confirmText || '确定'}</button>
+        </div>
+      </div>
+    `;
+
+    // 添加样式
+    const style = document.createElement('style');
+    style.textContent = `
+      .modal-overlay {
+        position: fixed;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background: rgba(0, 0, 0, 0.5);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        z-index: 9999;
+        animation: modalFadeIn 0.2s ease-out;
+      }
+      
+      @keyframes modalFadeIn {
+        from { opacity: 0; }
+        to { opacity: 1; }
+      }
+      
+      .modal-container {
+        background: white;
+        border-radius: 12px;
+        box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1);
+        max-width: 500px;
+        width: 90%;
+        max-height: 80vh;
+        display: flex;
+        flex-direction: column;
+        animation: modalSlideIn 0.3s ease-out;
+      }
+      
+      @keyframes modalSlideIn {
+        from { transform: translateY(-20px); }
+        to { transform: translateY(0); }
+      }
+      
+      .modal-header {
+        padding: 20px 24px;
+        border-bottom: 1px solid #e5e7eb;
+      }
+      
+      .modal-title {
+        margin: 0;
+        font-size: 18px;
+        font-weight: 600;
+        color: #1f2937;
+      }
+      
+      .modal-content {
+        padding: 24px;
+        overflow-y: auto;
+        flex: 1;
+      }
+      
+      .modal-footer {
+        padding: 16px 24px;
+        border-top: 1px solid #e5e7eb;
+        display: flex;
+        justify-content: flex-end;
+        gap: 12px;
+      }
+      
+      .modal-btn {
+        padding: 8px 16px;
+        border: none;
+        border-radius: 6px;
+        font-size: 14px;
+        font-weight: 500;
+        cursor: pointer;
+        transition: all 0.2s;
+      }
+      
+      .modal-btn-cancel {
+        background: #e5e7eb;
+        color: #374151;
+      }
+      
+      .modal-btn-cancel:hover {
+        background: #d1d5db;
+      }
+      
+      .modal-btn-confirm {
+        background: #667eea;
+        color: white;
+      }
+      
+      .modal-btn-confirm:hover {
+        background: #5a67d8;
+      }
+    `;
+
+    document.head.appendChild(style);
+    document.body.appendChild(modal);
+
+    // 绑定事件
+    const confirmBtn = modal.querySelector('.modal-btn-confirm');
+    const cancelBtn = modal.querySelector('.modal-btn-cancel');
+
+    const closeModal = () => {
+      modal.remove();
+      style.remove();
+    };
+
+    confirmBtn.addEventListener('click', () => {
+      if (options.onConfirm) {
+        options.onConfirm();
+      }
+      closeModal();
+    });
+
+    if (cancelBtn) {
+      cancelBtn.addEventListener('click', () => {
+        if (options.onCancel) {
+          options.onCancel();
+        }
+        closeModal();
+      });
+    }
+
+    // 点击遮罩层关闭
+    modal.addEventListener('click', (e) => {
+      if (e.target === modal) {
+        closeModal();
+      }
+    });
+  }
+
+  /**
+   * 显示Toast提示
+   */
+  showToast(type, message, duration = 3000) {
+    const toast = document.createElement('div');
+    toast.className = `toast toast-${type}`;
+    
+    const icons = {
+      success: '✓',
+      error: '✗',
+      warning: '⚠',
+      info: 'i'
+    };
+    
+    toast.innerHTML = `
+      <span class="toast-icon">${icons[type] || icons.info}</span>
+      <span class="toast-message">${message}</span>
+    `;
+
+    // 添加样式
+    const style = document.createElement('style');
+    style.textContent = `
+      .toast {
+        position: fixed;
+        top: 20px;
+        right: 20px;
+        padding: 12px 20px;
+        border-radius: 6px;
+        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        font-size: 14px;
+        color: white;
+        z-index: 10000;
+        animation: toastSlideIn 0.3s ease-out;
+      }
+      
+      @keyframes toastSlideIn {
+        from { transform: translateX(100%); opacity: 0; }
+        to { transform: translateX(0); opacity: 1; }
+      }
+      
+      .toast-success { background: #10b981; }
+      .toast-error { background: #ef4444; }
+      .toast-warning { background: #f59e0b; }
+      .toast-info { background: #3b82f6; }
+      
+      .toast-icon {
+        font-weight: bold;
+        font-size: 16px;
+      }
+    `;
+
+    if (!document.querySelector('style[data-toast-styles]')) {
+      style.setAttribute('data-toast-styles', 'true');
+      document.head.appendChild(style);
+    }
+
+    document.body.appendChild(toast);
+
+    // 自动移除
+    setTimeout(() => {
+      toast.style.animation = 'toastSlideOut 0.3s ease-in';
+      toast.style.animationFillMode = 'forwards';
+      setTimeout(() => toast.remove(), 300);
+    }, duration);
   }
 }
 

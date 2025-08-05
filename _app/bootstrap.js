@@ -5,6 +5,9 @@
 
 import { App } from './app.js';
 import { config } from './config.js';
+import errorBoundary from '../_utils/error-boundary.js';
+import performanceMonitor from '../_utils/performance-monitor.js';
+import versionManager from '../_utils/version-manager.js';
 
 class Bootstrap {
   constructor() {
@@ -18,6 +21,13 @@ class Bootstrap {
   async init() {
     try {
       console.log('⚡ V3 Bootstrap initializing...');
+      
+      // Step 0: 安装错误边界和性能监控
+      this.setupErrorHandling();
+      this.setupPerformanceMonitoring();
+      
+      // Step 0.5: 初始化版本管理
+      await this.initVersionManager();
       
       // Step 1: 检测环境
       this.detectEnvironment();
@@ -41,6 +51,61 @@ class Bootstrap {
       console.error('❌ Bootstrap failed:', error);
       this.handleBootstrapError(error);
     }
+  }
+
+  /**
+   * 设置错误处理
+   */
+  setupErrorHandling() {
+    // 注册全局错误处理器
+    errorBoundary.registerHandler('bootstrap', (errorRecord) => {
+      console.error('Bootstrap error captured:', errorRecord);
+      
+      // 对于关键错误，显示错误页面
+      if (errorRecord.error?.message?.includes('Failed to fetch dynamically imported module')) {
+        this.handleBootstrapError(new Error('模块加载失败，请检查网络连接'));
+      }
+    });
+
+    // 包装关键函数
+    this.init = errorBoundary.wrap(this.init.bind(this), 'bootstrap.init');
+  }
+
+  /**
+   * 初始化版本管理
+   */
+  async initVersionManager() {
+    try {
+      const versionInfo = await versionManager.init();
+      console.log('📦 Version Manager initialized:', versionInfo);
+      
+      // 将版本信息添加到配置中
+      config.app.version = versionInfo.current;
+      config.app.updateChannel = versionInfo.channel;
+      
+      // 将版本管理器暴露给全局使用
+      window.adminV3Version = versionManager;
+    } catch (error) {
+      console.error('Failed to initialize version manager:', error);
+    }
+  }
+
+  /**
+   * 设置性能监控
+   */
+  setupPerformanceMonitoring() {
+    // 标记启动时间
+    performanceMonitor.mark('bootstrap-start');
+    
+    // 监控内存使用
+    performanceMonitor.addAlertObserver((alert) => {
+      if (alert.level === 'critical' && alert.metricName.includes('memory')) {
+        console.warn('内存使用过高，建议刷新页面');
+        if (window.adminV3App?.showToast) {
+          window.adminV3App.showToast('warning', '内存使用较高，建议刷新页面以获得最佳性能');
+        }
+      }
+    });
   }
 
   /**
@@ -221,12 +286,26 @@ class Bootstrap {
     const loadTime = performance.now() - this.startTime;
     console.log(`⚡ Bootstrap time: ${loadTime.toFixed(2)}ms`);
     
+    // 标记启动完成
+    performanceMonitor.mark('bootstrap-end');
+    performanceMonitor.measure('bootstrap-duration', 'bootstrap-start', 'bootstrap-end');
+    
+    // 记录启动性能
+    performanceMonitor.record('bootstrap.loadTime', loadTime, {
+      environment: config.environment.isProduction ? 'production' : 'development'
+    });
+    
+    // 生成性能报告
+    const report = performanceMonitor.getReport();
+    console.log('📊 Performance Report:', report);
+    
     // 发送性能数据到分析服务（如果配置了）
     if (config.analytics?.enabled) {
       this.sendAnalytics('bootstrap_performance', {
         loadTime,
         environment: config.environment.isProduction ? 'production' : 'development',
-        timestamp: new Date().toISOString()
+        timestamp: new Date().toISOString(),
+        webVitals: report.webVitals
       });
     }
   }

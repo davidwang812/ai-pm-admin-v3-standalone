@@ -8,7 +8,9 @@ export const config = {
   app: {
     name: 'AI Product Manager Admin V3',
     version: '3.0.0',
-    description: 'Vercel Optimized Admin Panel'
+    description: 'Vercel Optimized Admin Panel',
+    buildDate: '2025-01-28',
+    updateChannel: 'production'
   },
 
   // 环境配置（由bootstrap动态设置）
