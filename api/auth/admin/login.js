@@ -170,7 +170,7 @@ export default async function handler(request) {
             },
             token: token,
             refreshToken: refreshToken,
-            redirectUrl: '/admin.html'
+            redirectUrl: '/index.html'
           }
         }),
         {

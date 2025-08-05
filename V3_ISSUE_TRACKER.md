@@ -162,6 +162,60 @@ if (prop === 'navigate') {
 
 ---
 
+### Issue #005: 登录循环问题 - 错误的重定向目标
+**状态**: ✅ 已修复  
+**优先级**: P0 - 紧急  
+**报告时间**: 2025-08-05  
+**修复时间**: 2025-08-05  
+
+#### 问题描述
+- 用户反馈：登录后一直重复登录，进不去下个页面
+- 登录成功后跳转到 `/admin.html`
+- `admin.html` 是一个重定向页面，会跳转回 `login.html`
+- 形成了无限循环：login.html → admin.html → login.html
+
+#### 根因分析
+✅ 页面结构分析：
+- `index.html` - V3的主管理界面（根据CONTRACT.md）
+- `admin.html` - 只是一个重定向页面，原本重定向到login.html
+- `login.html` - 登录页面
+
+✅ 错误链条：
+1. 登录API返回 `redirectUrl: '/admin.html'`
+2. 登录成功后跳转到 admin.html
+3. admin.html 立即重定向回 login.html
+4. 形成无限循环
+
+✅ 根本原因：
+- 开发时误以为 `admin.html` 是管理界面
+- 实际上 `index.html` 才是真正的管理界面
+- 文件命名造成了混淆
+
+#### 解决方案
+✅ 修复步骤：
+1. ✅ 修改 `/api/auth/admin/login.js`：将 redirectUrl 改为 '/index.html'
+2. ✅ 修改 `login.html`：将默认跳转改为 './index.html'
+3. ✅ 更新 `admin.html`：添加注释说明，并重定向到 index.html
+
+#### 预防措施
+1. **文件命名规范**：
+   - 管理界面应命名为 `dashboard.html` 或 `admin-dashboard.html`
+   - 避免使用容易混淆的通用名称
+
+2. **页面职责文档**：
+   - 每个HTML文件顶部添加用途说明
+   - 在README中列出所有页面及其功能
+
+3. **端到端测试**：
+   - 测试完整的登录流程
+   - 验证没有循环重定向
+
+4. **代码审查**：
+   - 检查所有重定向逻辑
+   - 确保跳转目标页面的正确性
+
+---
+
 ## 📋 闭环管理流程
 
 ### 1️⃣ 问题发现 (Discovery)
@@ -222,10 +276,10 @@ graph LR
 
 | 类型 | 总数 | 已解决 | 进行中 | 待处理 |
 |------|------|--------|--------|--------|
-| Bug | 2 | 2 | 0 | 0 |
+| Bug | 3 | 3 | 0 | 0 |
 | 功能缺失 | 1 | 1 | 0 | 0 |
 | 性能问题 | 0 | 0 | 0 | 0 |
-| 用户体验 | 0 | 0 | 0 | 0 |
+| 用户体验 | 1 | 0 | 1 | 0 |
 
 ## 🔧 快速调试命令
 
@@ -283,6 +337,7 @@ curl -H "Authorization: Bearer [TOKEN]" https://api.vercel.com/v6/deployments?pr
 | 2025-08-04 | 记录路由初始化时序问题 | Claude |
 | 2025-08-04 | 修复路由初始化问题 | Claude |
 | 2025-08-04 | 实现Edge Functions认证 | Claude |
+| 2025-08-05 | 修复登录循环问题 | Claude |
 
 ---
 

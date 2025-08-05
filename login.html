@@ -232,7 +232,7 @@
                     
                     // 跳转到指定页面或默认页面
                     setTimeout(() => {
-                        window.location.href = result.redirectUrl || './admin.html';
+                        window.location.href = result.redirectUrl || './index.html';
                     }, 1000);
                 } else {
                     showAlert(result.message || '登录失败，请检查用户名和密码');
@@ -254,7 +254,7 @@
                 
                 if (isAuthenticated) {
                     console.log('✅ V3 Already authenticated, redirecting...');
-                    window.location.href = './admin.html';
+                    window.location.href = './index.html';
                 }
             } catch (error) {
                 console.log('Not authenticated, showing login form');
