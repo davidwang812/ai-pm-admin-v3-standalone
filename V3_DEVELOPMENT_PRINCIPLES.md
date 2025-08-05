@@ -134,10 +134,33 @@ export class AuthenticationService extends AbstractBaseService {
 }
 ```
 
+## ⚠️ 批量修改禁忌
+
+### 绝对禁止的操作
+```bash
+# 🚫 禁止使用sed批量替换
+sed -i 's/old/new/g' *.js
+
+# 🚫 禁止使用find + xargs + sed
+find . -name "*.js" | xargs sed -i 's/old/new/g'
+
+# ✅ 正确做法：手动逐个文件修改
+# 每个文件修改后立即测试
+```
+
+### 教训总结
+> **2025-08-05事件**: 使用sed批量替换导致AI服务页面无法加载  
+> **根因**: sed可能改变文件编码或特殊字符  
+> **后果**: 功能完全破坏，需要回滚重做  
+> **原则**: 宁可慢，不可错
+
 ## 🎯 记住
 
 > **"完美不是没有东西可以加，而是没有东西可以减"**  
 > —— Antoine de Saint-Exupéry
+
+> **"一次看似简单的批量替换，可能破坏整个系统"**  
+> —— V3开发血泪史
 
 ---
 
