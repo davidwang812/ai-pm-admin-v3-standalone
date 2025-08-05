@@ -1,0 +1,305 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>成本分析API测试</title>
+    <style>
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            padding: 20px;
+            background: #f5f5f5;
+        }
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            background: white;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        }
+        h1 {
+            color: #333;
+            margin-bottom: 20px;
+        }
+        .test-section {
+            margin: 20px 0;
+            padding: 15px;
+            background: #f8f9fa;
+            border-radius: 6px;
+            border: 1px solid #e9ecef;
+        }
+        .test-section h3 {
+            margin-top: 0;
+            color: #495057;
+        }
+        button {
+            background: #007bff;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 4px;
+            cursor: pointer;
+            margin-right: 10px;
+            margin-bottom: 10px;
+        }
+        button:hover {
+            background: #0056b3;
+        }
+        .result {
+            margin-top: 15px;
+            padding: 15px;
+            background: #f1f3f4;
+            border-radius: 4px;
+            font-family: 'Courier New', monospace;
+            white-space: pre-wrap;
+            max-height: 400px;
+            overflow-y: auto;
+        }
+        .success {
+            background: #d4edda;
+            border: 1px solid #c3e6cb;
+            color: #155724;
+        }
+        .error {
+            background: #f8d7da;
+            border: 1px solid #f5c6cb;
+            color: #721c24;
+        }
+        .info {
+            background: #d1ecf1;
+            border: 1px solid #bee5eb;
+            color: #0c5460;
+        }
+        .stats {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px;
+            margin: 20px 0;
+        }
+        .stat-card {
+            background: #f8f9fa;
+            padding: 15px;
+            border-radius: 6px;
+            text-align: center;
+        }
+        .stat-value {
+            font-size: 24px;
+            font-weight: bold;
+            color: #007bff;
+        }
+        .stat-label {
+            color: #6c757d;
+            font-size: 14px;
+            margin-top: 5px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🧪 成本分析API测试</h1>
+        
+        <div class="test-section">
+            <h3>测试环境配置</h3>
+            <div>
+                <label>API端点: </label>
+                <input type="text" id="apiEndpoint" value="https://aiproductmanager-production.up.railway.app/api" style="width: 400px; padding: 5px;">
+                <button onclick="saveEndpoint()">保存</button>
+            </div>
+            <div style="margin-top: 10px;">
+                <label>管理员Token: </label>
+                <input type="password" id="adminToken" placeholder="输入管理员token" style="width: 400px; padding: 5px;">
+                <button onclick="saveToken()">保存</button>
+            </div>
+        </div>
+
+        <div class="test-section">
+            <h3>1. 测试成本分析API</h3>
+            <p>测试不同时间范围的成本分析数据获取</p>
+            <button onclick="testCostAnalysis('today')">今天</button>
+            <button onclick="testCostAnalysis('week')">本周</button>
+            <button onclick="testCostAnalysis('month')">本月</button>
+            <button onclick="testCostAnalysis('year')">本年</button>
+            <div id="cost-analysis-result" class="result"></div>
+        </div>
+
+        <div class="test-section">
+            <h3>2. 成本统计展示</h3>
+            <div id="cost-stats" class="stats"></div>
+        </div>
+
+        <div class="test-section">
+            <h3>3. 成本趋势测试</h3>
+            <button onclick="testCostTrends(7)">7天趋势</button>
+            <button onclick="testCostTrends(30)">30天趋势</button>
+            <div id="cost-trends-result" class="result"></div>
+        </div>
+
+        <div class="test-section">
+            <h3>4. 前端集成测试</h3>
+            <button onclick="testFrontendIntegration()">测试前端API调用</button>
+            <div id="frontend-result" class="result"></div>
+        </div>
+    </div>
+
+    <script>
+        // 从localStorage加载配置
+        document.getElementById('apiEndpoint').value = localStorage.getItem('apiEndpoint') || 'https://aiproductmanager-production.up.railway.app/api';
+        document.getElementById('adminToken').value = localStorage.getItem('adminToken') || '';
+
+        function saveEndpoint() {
+            localStorage.setItem('apiEndpoint', document.getElementById('apiEndpoint').value);
+            alert('API端点已保存');
+        }
+
+        function saveToken() {
+            localStorage.setItem('adminToken', document.getElementById('adminToken').value);
+            alert('Token已保存');
+        }
+
+        async function makeRequest(path, method = 'GET', body = null) {
+            const apiEndpoint = document.getElementById('apiEndpoint').value;
+            const token = document.getElementById('adminToken').value;
+            
+            const options = {
+                method: method,
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': token ? `Bearer ${token}` : ''
+                }
+            };
+            
+            if (body) {
+                options.body = JSON.stringify(body);
+            }
+            
+            try {
+                const response = await fetch(`${apiEndpoint}${path}`, options);
+                const data = await response.json();
+                return { status: response.status, data: data };
+            } catch (error) {
+                return { status: 'error', data: { error: error.message } };
+            }
+        }
+
+        async function testCostAnalysis(range) {
+            const resultDiv = document.getElementById('cost-analysis-result');
+            resultDiv.innerHTML = '⏳ 正在获取成本分析数据...';
+            resultDiv.className = 'result info';
+            
+            try {
+                const result = await makeRequest(`/admin/cost-analysis?range=${range}`);
+                
+                if (result.status === 200 && result.data.success) {
+                    resultDiv.className = 'result success';
+                    resultDiv.innerHTML = `✅ 成功获取${range}的成本分析数据\n\n${JSON.stringify(result.data, null, 2)}`;
+                    
+                    // 更新统计展示
+                    updateCostStats(result.data);
+                } else {
+                    resultDiv.className = 'result error';
+                    resultDiv.innerHTML = `❌ 获取失败 (${result.status})\n\n${JSON.stringify(result.data, null, 2)}`;
+                }
+            } catch (error) {
+                resultDiv.className = 'result error';
+                resultDiv.innerHTML = `❌ 请求失败: ${error.message}`;
+            }
+        }
+
+        function updateCostStats(data) {
+            const statsDiv = document.getElementById('cost-stats');
+            statsDiv.innerHTML = `
+                <div class="stat-card">
+                    <div class="stat-value">¥${data.totalCost.toFixed(2)}</div>
+                    <div class="stat-label">总成本</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-value">${data.totalRequests}</div>
+                    <div class="stat-label">总请求数</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-value">¥${data.avgCost.toFixed(4)}</div>
+                    <div class="stat-label">平均成本</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-value">${data.totalTokens.toLocaleString()}</div>
+                    <div class="stat-label">总Token数</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-value">${data.topService}</div>
+                    <div class="stat-label">最高消费服务</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-value">${data.metadata.isSimulated ? '模拟数据' : '真实数据'}</div>
+                    <div class="stat-label">数据类型</div>
+                </div>
+            `;
+        }
+
+        async function testCostTrends(days) {
+            const resultDiv = document.getElementById('cost-trends-result');
+            resultDiv.innerHTML = '⏳ 正在获取成本趋势数据...';
+            resultDiv.className = 'result info';
+            
+            try {
+                const result = await makeRequest(`/admin/cost-analysis/trends?days=${days}`);
+                
+                if (result.status === 200 && result.data.success) {
+                    resultDiv.className = 'result success';
+                    resultDiv.innerHTML = `✅ 成功获取${days}天的成本趋势数据\n\n${JSON.stringify(result.data, null, 2)}`;
+                } else {
+                    resultDiv.className = 'result error';
+                    resultDiv.innerHTML = `❌ 获取失败 (${result.status})\n\n${JSON.stringify(result.data, null, 2)}`;
+                }
+            } catch (error) {
+                resultDiv.className = 'result error';
+                resultDiv.innerHTML = `❌ 请求失败: ${error.message}`;
+            }
+        }
+
+        async function testFrontendIntegration() {
+            const resultDiv = document.getElementById('frontend-result');
+            resultDiv.innerHTML = '⏳ 正在测试前端集成...';
+            resultDiv.className = 'result info';
+            
+            try {
+                // 模拟前端的API客户端调用
+                const apiClient = {
+                    getCostAnalysis: async function(dateRange) {
+                        const result = await makeRequest(`/admin/cost-analysis?range=${dateRange}`);
+                        return result.data;
+                    }
+                };
+                
+                // 测试API调用
+                const data = await apiClient.getCostAnalysis('month');
+                
+                if (data.success) {
+                    resultDiv.className = 'result success';
+                    resultDiv.innerHTML = `✅ 前端API集成测试成功！
+                    
+总成本: ¥${data.totalCost.toFixed(2)}
+总请求: ${data.totalRequests}
+平均成本: ¥${data.avgCost.toFixed(4)}
+最高消费: ${data.topService}
+
+趋势数据点: ${data.trends.length}
+服务商数量: ${data.providers.length}
+详细记录数: ${data.details.length}`;
+                } else {
+                    resultDiv.className = 'result error';
+                    resultDiv.innerHTML = `❌ API调用失败\n\n${JSON.stringify(data, null, 2)}`;
+                }
+            } catch (error) {
+                resultDiv.className = 'result error';
+                resultDiv.innerHTML = `❌ 集成测试失败: ${error.message}`;
+            }
+        }
+
+        // 页面加载时自动测试
+        window.onload = () => {
+            console.log('成本分析测试页面已加载');
+        };
+    </script>
+</body>
+</html>

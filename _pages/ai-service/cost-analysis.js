@@ -86,6 +86,9 @@ export class CostAnalysis {
     if (typeof Chart !== 'undefined') {
       this.initCharts();
     }
+    
+    // Load initial data
+    this.loadCostData('month');
   }
 
   initCharts() {
@@ -158,10 +161,19 @@ export class CostAnalysis {
 
   async loadCostData(dateRange) {
     try {
+      console.log('Loading cost data for range:', dateRange);
       const data = await this.app.api.getCostAnalysis(dateRange);
-      this.updateCostDisplay(data);
+      
+      if (data && data.success) {
+        this.updateCostDisplay(data);
+        this.updateCharts(data);
+      } else {
+        console.error('Failed to load cost data:', data);
+        this.app.showToast('error', '获取成本数据失败');
+      }
     } catch (error) {
       console.error('Failed to load cost data:', error);
+      this.app.showToast('error', '获取成本数据失败: ' + error.message);
     }
   }
 
@@ -169,23 +181,73 @@ export class CostAnalysis {
     // Update summary cards
     const summaryCards = document.querySelectorAll('.summary-value');
     if (summaryCards[0]) summaryCards[0].textContent = `¥${(data.totalCost || 0).toFixed(2)}`;
-    if (summaryCards[1]) summaryCards[1].textContent = data.totalRequests || 0;
+    if (summaryCards[1]) summaryCards[1].textContent = (data.totalRequests || 0).toLocaleString();
     if (summaryCards[2]) summaryCards[2].textContent = `¥${(data.avgCost || 0).toFixed(4)}`;
     if (summaryCards[3]) summaryCards[3].textContent = data.topService || '-';
 
     // Update details table
     const tbody = document.getElementById('cost-details-tbody');
-    if (tbody && data.details && data.details.length > 0) {
-      tbody.innerHTML = data.details.map(record => `
-        <tr>
-          <td>${new Date(record.timestamp).toLocaleString()}</td>
-          <td>${record.provider}</td>
-          <td>${record.model}</td>
-          <td>${record.inputTokens}</td>
-          <td>${record.outputTokens}</td>
-          <td>¥${record.cost.toFixed(4)}</td>
-        </tr>
-      `).join('');
+    if (tbody) {
+      if (data.details && data.details.length > 0) {
+        tbody.innerHTML = data.details.map(record => `
+          <tr>
+            <td>${new Date(record.timestamp).toLocaleString('zh-CN')}</td>
+            <td>${record.provider}</td>
+            <td>${record.model}</td>
+            <td>${record.inputTokens.toLocaleString()}</td>
+            <td>${record.outputTokens.toLocaleString()}</td>
+            <td>¥${record.cost.toFixed(4)}</td>
+          </tr>
+        `).join('');
+      } else {
+        tbody.innerHTML = '<tr><td colspan="6" style="text-align: center; color: #999;">暂无数据</td></tr>';
+      }
+    }
+    
+    // Show data source indicator
+    if (data.metadata && data.metadata.isSimulated) {
+      this.showDataSourceIndicator(true);
+    }
+  }
+  
+  updateCharts(data) {
+    // Update cost trend chart
+    const trendChart = Chart.getChart('cost-trend-chart');
+    if (trendChart && data.trends) {
+      const labels = data.trends.map(t => t.period);
+      const costs = data.trends.map(t => t.cost);
+      
+      trendChart.data.labels = labels;
+      trendChart.data.datasets[0].data = costs;
+      trendChart.update();
+    }
+    
+    // Update provider distribution chart
+    const providerChart = Chart.getChart('provider-cost-chart');
+    if (providerChart && data.providers) {
+      const labels = data.providers.map(p => p.provider);
+      const costs = data.providers.map(p => p.cost);
+      
+      providerChart.data.labels = labels;
+      providerChart.data.datasets[0].data = costs;
+      providerChart.update();
+    }
+  }
+  
+  showDataSourceIndicator(isSimulated) {
+    // Add indicator to show if data is simulated
+    const header = document.querySelector('.cost-header');
+    if (header) {
+      let indicator = header.querySelector('.data-source-indicator');
+      if (!indicator) {
+        indicator = document.createElement('span');
+        indicator.className = 'data-source-indicator';
+        indicator.style.cssText = 'margin-left: 10px; padding: 4px 12px; background: #fff3cd; color: #856404; border-radius: 4px; font-size: 12px;';
+        header.appendChild(indicator);
+      }
+      indicator.textContent = isSimulated ? '模拟数据' : '真实数据';
+      indicator.style.background = isSimulated ? '#fff3cd' : '#d4edda';
+      indicator.style.color = isSimulated ? '#856404' : '#155724';
     }
   }
 }
