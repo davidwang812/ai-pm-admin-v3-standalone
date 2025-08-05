@@ -1,0 +1,2117 @@
+{
+  "total": 409,
+  "byFile": {
+    "_app/app.js": [
+      {
+        "line": 68,
+        "type": "log",
+        "content": "console.log(`✅ Loaded module: ${module.name}`);"
+      },
+      {
+        "line": 70,
+        "type": "error",
+        "content": "console.error(`❌ Failed to load module ${module.name}:`, error);"
+      },
+      {
+        "line": 81,
+        "type": "warn",
+        "content": "console.warn(`⚠️ Creating placeholder for missing module: ${name}`);"
+      },
+      {
+        "line": 119,
+        "type": "warn",
+        "content": "console.warn('⚠️ Auth module not available');"
+      },
+      {
+        "line": 127,
+        "type": "log",
+        "content": "console.log('✅ User authenticated:', this.state.user);"
+      },
+      {
+        "line": 129,
+        "type": "log",
+        "content": "console.log('ℹ️ User not authenticated');"
+      },
+      {
+        "line": 132,
+        "type": "error",
+        "content": "console.error('❌ Auth check failed:', error);"
+      },
+      {
+        "line": 143,
+        "type": "warn",
+        "content": "console.warn('⚠️ Router module not available');"
+      },
+      {
+        "line": 147,
+        "type": "log",
+        "content": "console.log('🔧 Initializing router with routes...');"
+      },
+      {
+        "line": 158,
+        "type": "log",
+        "content": "console.log('📝 Routes to register:', routes.map(r => r.path));"
+      },
+      {
+        "line": 163,
+        "type": "log",
+        "content": "console.log(`🔄 Navigating: ${from} → ${to}`);"
+      },
+      {
+        "line": 174,
+        "type": "log",
+        "content": "console.log('✅ Router initialized, registered routes:', Array.from(router.routes.keys()));"
+      },
+      {
+        "line": 175,
+        "type": "log",
+        "content": "console.log('🔍 Router initialized status:', router.initialized);"
+      },
+      {
+        "line": 182,
+        "type": "log",
+        "content": "console.log(`📄 Loading page: ${pageName}`);"
+      },
+      {
+        "line": 183,
+        "type": "log",
+        "content": "console.log(`📄 Import path: ../_pages/${pageName}/index.js`);"
+      },
+      {
+        "line": 188,
+        "type": "log",
+        "content": "console.log(`🔍 Attempting to import from: ${modulePath}`);"
+      },
+      {
+        "line": 191,
+        "type": "log",
+        "content": "console.log(`✅ Module imported successfully:`, module);"
+      },
+      {
+        "line": 192,
+        "type": "log",
+        "content": "console.log(`📦 Module keys:`, Object.keys(module));"
+      },
+      {
+        "line": 195,
+        "type": "log",
+        "content": "console.log(`🎯 Page component found:`, Page ? 'Yes' : 'No');"
+      },
+      {
+        "line": 196,
+        "type": "log",
+        "content": "console.log(`📝 Page type:`, typeof Page);"
+      },
+      {
+        "line": 218,
+        "type": "error",
+        "content": "console.error(`❌ Failed to load page ${pageName}:`, error);"
+      },
+      {
+        "line": 245,
+        "type": "log",
+        "content": "console.log('✅ Bootstrap already switched UI, checking for layout...');"
+      },
+      {
+        "line": 250,
+        "type": "log",
+        "content": "console.log('📝 Rendering layout structure...');"
+      },
+      {
+        "line": 262,
+        "type": "log",
+        "content": "console.log('✅ Layout already exists, skipping render');"
+      },
+      {
+        "line": 265,
+        "type": "log",
+        "content": "console.log('📝 Loading screen still visible, rendering full layout');"
+      },
+      {
+        "line": 286,
+        "type": "error",
+        "content": "console.error('❌ app-content element not found after rendering layout');"
+      },
+      {
+        "line": 292,
+        "type": "log",
+        "content": "console.log('⚠️ Initial navigation already performed, skipping');"
+      },
+      {
+        "line": 308,
+        "type": "error",
+        "content": "console.error('❌ Router not initialized');"
+      },
+      {
+        "line": 312,
+        "type": "log",
+        "content": "console.log('📋 Checking registered routes:', Array.from(router.routes.keys()));"
+      },
+      {
+        "line": 319,
+        "type": "error",
+        "content": "console.error(`❌ No routes registered! Routes map size: ${router.routes.size}`);"
+      },
+      {
+        "line": 320,
+        "type": "error",
+        "content": "console.error('Available routes:', Array.from(router.routes.keys()));"
+      },
+      {
+        "line": 329,
+        "type": "log",
+        "content": "console.log(`📍 Already at route: ${targetPath}, skipping navigation`);"
+      },
+      {
+        "line": 333,
+        "type": "log",
+        "content": "console.log(`📍 Loading initial route: ${targetPath}`);"
+      },
+      {
+        "line": 336,
+        "type": "error",
+        "content": "console.error('❌ Router module not found');"
+      },
+      {
+        "line": 347,
+        "type": "log",
+        "content": "console.log('📋 Layout already exists, skipping render');"
+      },
+      {
+        "line": 484,
+        "type": "log",
+        "content": "console.log('🔓 Logout initiated...');"
+      },
+      {
+        "line": 488,
+        "type": "log",
+        "content": "console.log('Auth module:', auth);"
+      },
+      {
+        "line": 492,
+        "type": "log",
+        "content": "console.log('✅ Auth logout completed');"
+      },
+      {
+        "line": 494,
+        "type": "warn",
+        "content": "console.warn('⚠️ Auth module not found, clearing local storage directly');"
+      },
+      {
+        "line": 502,
+        "type": "log",
+        "content": "console.log('📍 Redirecting to login page...');"
+      },
+      {
+        "line": 505,
+        "type": "error",
+        "content": "console.error('❌ Logout error:', error);"
+      },
+      {
+        "line": 530,
+        "type": "log",
+        "content": "console.log('Updating chart period to:', period);"
+      }
+    ],
+    "_app/bootstrap.js": [
+      {
+        "line": 20,
+        "type": "log",
+        "content": "console.log('⚡ V3 Bootstrap initializing...');"
+      },
+      {
+        "line": 38,
+        "type": "log",
+        "content": "console.log('✅ V3 Bootstrap completed');"
+      },
+      {
+        "line": 41,
+        "type": "error",
+        "content": "console.error('❌ Bootstrap failed:', error);"
+      },
+      {
+        "line": 64,
+        "type": "log",
+        "content": "console.log('🌍 Environment detected:', config.environment);"
+      },
+      {
+        "line": 95,
+        "type": "log",
+        "content": "console.log(`✅ Preloaded ${modules.length} critical modules`);"
+      },
+      {
+        "line": 97,
+        "type": "warn",
+        "content": "console.warn('⚠️ Some modules failed to preload:', error);"
+      },
+      {
+        "line": 170,
+        "type": "log",
+        "content": "console.log('🔄 Switching to main app...');"
+      },
+      {
+        "line": 171,
+        "type": "log",
+        "content": "console.log('  Loading screen found:', !!loadingScreen);"
+      },
+      {
+        "line": 172,
+        "type": "log",
+        "content": "console.log('  App content found:', !!appContent);"
+      },
+      {
+        "line": 173,
+        "type": "log",
+        "content": "console.log('  App container found:', !!app);"
+      },
+      {
+        "line": 183,
+        "type": "log",
+        "content": "console.log('🗑️ Loading screen removed from DOM');"
+      },
+      {
+        "line": 193,
+        "type": "log",
+        "content": "console.log('📱 Switched to main app interface');"
+      },
+      {
+        "line": 195,
+        "type": "error",
+        "content": "console.error('❌ App content element not found!');"
+      },
+      {
+        "line": 202,
+        "type": "log",
+        "content": "console.log('✅ Created app-content element');"
+      },
+      {
+        "line": 214,
+        "type": "log",
+        "content": "console.log('✅ Bootstrap UI switch completed');"
+      },
+      {
+        "line": 222,
+        "type": "log",
+        "content": "console.log(`⚡ Bootstrap time: ${loadTime.toFixed(2)}ms`);"
+      },
+      {
+        "line": 240,
+        "type": "log",
+        "content": "console.log('📊 Analytics:', event, data);"
+      }
+    ],
+    "_app/lazy-loader.js": [
+      {
+        "line": 57,
+        "type": "log",
+        "content": "console.log(`✅ Module from cache: ${modulePath}`);"
+      },
+      {
+        "line": 63,
+        "type": "log",
+        "content": "console.log(`⏳ Waiting for loading module: ${modulePath}`);"
+      },
+      {
+        "line": 92,
+        "type": "log",
+        "content": "console.log(`🔄 Retry ${attempt}/${this.config.retryAttempts}: ${modulePath}`);"
+      },
+      {
+        "line": 97,
+        "type": "log",
+        "content": "console.log(`📦 Loading module: ${modulePath}`);"
+      },
+      {
+        "line": 106,
+        "type": "log",
+        "content": "console.log(`✅ Module loaded in ${loadTime.toFixed(2)}ms: ${modulePath}`);"
+      },
+      {
+        "line": 115,
+        "type": "error",
+        "content": "console.error(`❌ Failed to load module (attempt ${attempt + 1}):`, error);"
+      },
+      {
+        "line": 285,
+        "type": "error",
+        "content": "console.error(`Module load failed: ${path}`, error);"
+      },
+      {
+        "line": 352,
+        "type": "error",
+        "content": "console.error(`Conditional load failed: ${modulePath}`, error);"
+      }
+    ],
+    "_app/modules/unified-config.js": [
+      {
+        "line": 321,
+        "type": "error",
+        "content": "console.error('Config watcher error:', error);"
+      }
+    ],
+    "_core/api-client.js": [
+      {
+        "line": 49,
+        "type": "error",
+        "content": "console.error('Failed to get providers:', error);"
+      },
+      {
+        "line": 67,
+        "type": "error",
+        "content": "console.error('Failed to get provider catalog:', error);"
+      },
+      {
+        "line": 88,
+        "type": "error",
+        "content": "console.error('saveUnifiedConfig error:', error);"
+      },
+      {
+        "line": 115,
+        "type": "log",
+        "content": "console.log(`♻️ Reusing pending request: ${requestKey}`);"
+      },
+      {
+        "line": 172,
+        "type": "warn",
+        "content": "console.warn(`⏱️ Request timeout: ${url}`);"
+      },
+      {
+        "line": 189,
+        "type": "log",
+        "content": "console.log('📦 Using cached data after timeout');"
+      },
+      {
+        "line": 197,
+        "type": "log",
+        "content": "console.log(`🔄 Retrying (${retryCount + 1}/${this.config.retryAttempts})...`);"
+      },
+      {
+        "line": 344,
+        "type": "log",
+        "content": "console.log('🧹 Cache cleared');"
+      }
+    ],
+    "_core/auth-old.js": [
+      {
+        "line": 40,
+        "type": "error",
+        "content": "console.error('Failed to load stored auth:', error);"
+      },
+      {
+        "line": 52,
+        "type": "log",
+        "content": "console.log('🔐 Attempting login with Vercel Edge Function...');"
+      },
+      {
+        "line": 88,
+        "type": "log",
+        "content": "console.log('✅ Login successful:', this.user.username || this.user.email);"
+      },
+      {
+        "line": 101,
+        "type": "error",
+        "content": "console.error('❌ Login error:', error);"
+      },
+      {
+        "line": 124,
+        "type": "warn",
+        "content": "console.warn('Logout API call failed:', error);"
+      },
+      {
+        "line": 130,
+        "type": "log",
+        "content": "console.log('👋 Logged out successfully');"
+      },
+      {
+        "line": 175,
+        "type": "error",
+        "content": "console.error('Token verification failed:', error);"
+      },
+      {
+        "line": 190,
+        "type": "log",
+        "content": "console.log('🔄 Refreshing token...');"
+      },
+      {
+        "line": 213,
+        "type": "log",
+        "content": "console.log('✅ Token refreshed');"
+      },
+      {
+        "line": 217,
+        "type": "error",
+        "content": "console.error('Failed to refresh token:', error);"
+      },
+      {
+        "line": 244,
+        "type": "log",
+        "content": "console.log(`⏰ Auto refresh scheduled in ${Math.round(delay / 1000)}s`);"
+      },
+      {
+        "line": 264,
+        "type": "error",
+        "content": "console.error('Failed to parse token:', error);"
+      }
+    ],
+    "_core/auth-v3.js": [
+      {
+        "line": 40,
+        "type": "error",
+        "content": "console.error('Failed to load stored auth:', error);"
+      },
+      {
+        "line": 52,
+        "type": "log",
+        "content": "console.log('🔐 V3 Independent Authentication...');"
+      },
+      {
+        "line": 65,
+        "type": "log",
+        "content": "console.log('📡 Response status:', response.status);"
+      },
+      {
+        "line": 68,
+        "type": "log",
+        "content": "console.log('📦 Response data:', data);"
+      },
+      {
+        "line": 87,
+        "type": "log",
+        "content": "console.log('✅ V3 Login successful:', user.username);"
+      },
+      {
+        "line": 101,
+        "type": "error",
+        "content": "console.error('❌ V3 Login error:', error);"
+      },
+      {
+        "line": 123,
+        "type": "warn",
+        "content": "console.warn('Logout API call failed:', error);"
+      },
+      {
+        "line": 129,
+        "type": "log",
+        "content": "console.log('👋 V3 Logged out successfully');"
+      },
+      {
+        "line": 165,
+        "type": "error",
+        "content": "console.error('Token verification failed:', error);"
+      },
+      {
+        "line": 181,
+        "type": "log",
+        "content": "console.log('🔄 V3 Refreshing token...');"
+      },
+      {
+        "line": 204,
+        "type": "log",
+        "content": "console.log('✅ V3 Token refreshed');"
+      },
+      {
+        "line": 208,
+        "type": "error",
+        "content": "console.error('Failed to refresh token:', error);"
+      },
+      {
+        "line": 234,
+        "type": "log",
+        "content": "console.log(`⏰ V3 Auto refresh scheduled in ${Math.round(delay / 1000)}s`);"
+      },
+      {
+        "line": 254,
+        "type": "error",
+        "content": "console.error('Failed to parse token:', error);"
+      }
+    ],
+    "_core/auth.js": [
+      {
+        "line": 40,
+        "type": "error",
+        "content": "console.error('Failed to load stored auth:', error);"
+      },
+      {
+        "line": 52,
+        "type": "log",
+        "content": "console.log('🔐 Attempting login with Vercel API proxy...');"
+      },
+      {
+        "line": 55,
+        "type": "log",
+        "content": "console.log('📍 Target URL (local proxy):', apiUrl);"
+      },
+      {
+        "line": 69,
+        "type": "log",
+        "content": "console.log('📡 Response status:', response.status);"
+      },
+      {
+        "line": 72,
+        "type": "error",
+        "content": "console.error('❌ Response not OK:', response.status, response.statusText);"
+      },
+      {
+        "line": 80,
+        "type": "log",
+        "content": "console.log('📦 Response data:', data);"
+      },
+      {
+        "line": 102,
+        "type": "log",
+        "content": "console.log('✅ Login successful:', this.user.username || this.user.email);"
+      },
+      {
+        "line": 115,
+        "type": "error",
+        "content": "console.error('❌ Login error:', error);"
+      },
+      {
+        "line": 138,
+        "type": "warn",
+        "content": "console.warn('Logout API call failed:', error);"
+      },
+      {
+        "line": 144,
+        "type": "log",
+        "content": "console.log('👋 Logged out successfully');"
+      },
+      {
+        "line": 184,
+        "type": "error",
+        "content": "console.error('Token verification failed:', error);"
+      },
+      {
+        "line": 199,
+        "type": "log",
+        "content": "console.log('🔄 Refreshing token...');"
+      },
+      {
+        "line": 222,
+        "type": "log",
+        "content": "console.log('✅ Token refreshed');"
+      },
+      {
+        "line": 226,
+        "type": "error",
+        "content": "console.error('Failed to refresh token:', error);"
+      },
+      {
+        "line": 253,
+        "type": "log",
+        "content": "console.log(`⏰ Auto refresh scheduled in ${Math.round(delay / 1000)}s`);"
+      },
+      {
+        "line": 273,
+        "type": "error",
+        "content": "console.error('Failed to parse token:', error);"
+      }
+    ],
+    "_core/cache.js": [
+      {
+        "line": 62,
+        "type": "error",
+        "content": "console.error('IndexedDB initialization failed');"
+      },
+      {
+        "line": 68,
+        "type": "log",
+        "content": "console.log('✅ IndexedDB initialized');"
+      },
+      {
+        "line": 98,
+        "type": "log",
+        "content": "console.log(`✅ Cache hit [${layer}]: ${fullKey}`);"
+      },
+      {
+        "line": 108,
+        "type": "log",
+        "content": "console.log(`❌ Cache miss: ${fullKey}`);"
+      },
+      {
+        "line": 133,
+        "type": "log",
+        "content": "console.log(`💾 Cache set [${strategy.layers.join(',')}]: ${fullKey}`);"
+      },
+      {
+        "line": 150,
+        "type": "log",
+        "content": "console.log(`🗑️ Cache deleted: ${fullKey}`);"
+      },
+      {
+        "line": 205,
+        "type": "log",
+        "content": "console.log('🧹 Cache cleared' + (type ? `: ${type}` : ' (all)'));"
+      },
+      {
+        "line": 253,
+        "type": "warn",
+        "content": "console.warn('SessionStorage full, clearing old entries');"
+      },
+      {
+        "line": 258,
+        "type": "error",
+        "content": "console.error('Failed to write to SessionStorage');"
+      },
+      {
+        "line": 422,
+        "type": "log",
+        "content": "console.log('🔥 Cache warmup starting...');"
+      },
+      {
+        "line": 428,
+        "type": "log",
+        "content": "console.log(`✅ Cache warmup completed: ${items.length} items`);"
+      },
+      {
+        "line": 494,
+        "type": "log",
+        "content": "console.log('✅ Cache data imported');"
+      }
+    ],
+    "_core/load-balance-manager.js": [
+      {
+        "line": 52,
+        "type": "log",
+        "content": "console.log(`Initialized load balance manager with ${this.pools.size} pools`);"
+      },
+      {
+        "line": 54,
+        "type": "error",
+        "content": "console.error('Failed to initialize load balance manager:', error);"
+      },
+      {
+        "line": 69,
+        "type": "error",
+        "content": "console.error('Failed to get load balancing dashboard:', error);"
+      },
+      {
+        "line": 86,
+        "type": "error",
+        "content": "console.error('Failed to create load balancing pool:', error);"
+      },
+      {
+        "line": 103,
+        "type": "error",
+        "content": "console.error('Failed to update load balancing pool:', error);"
+      },
+      {
+        "line": 124,
+        "type": "error",
+        "content": "console.error('Failed to add provider to pool:', error);"
+      },
+      {
+        "line": 143,
+        "type": "error",
+        "content": "console.error('Failed to update pool member:', error);"
+      },
+      {
+        "line": 166,
+        "type": "error",
+        "content": "console.error('Failed to remove provider from pool:', error);"
+      },
+      {
+        "line": 189,
+        "type": "error",
+        "content": "console.error('Failed to select provider:', error);"
+      },
+      {
+        "line": 325,
+        "type": "error",
+        "content": "console.error('Failed to record metrics:', error);"
+      },
+      {
+        "line": 359,
+        "type": "error",
+        "content": "console.error('Failed to perform health check:', error);"
+      },
+      {
+        "line": 377,
+        "type": "error",
+        "content": "console.error('Failed to get performance analytics:', error);"
+      },
+      {
+        "line": 395,
+        "type": "error",
+        "content": "console.error('Failed to get recent decisions:', error);"
+      },
+      {
+        "line": 472,
+        "type": "error",
+        "content": "console.error('Failed to import configuration:', error);"
+      }
+    ],
+    "_core/router.js": [
+      {
+        "line": 27,
+        "type": "warn",
+        "content": "console.warn('⚠️ Router re-initializing, clearing old routes');"
+      },
+      {
+        "line": 39,
+        "type": "log",
+        "content": "console.log('🔧 Starting router initialization...');"
+      },
+      {
+        "line": 40,
+        "type": "log",
+        "content": "console.log('🔧 Router init called with routes:', routes.map(r => r.path));"
+      },
+      {
+        "line": 45,
+        "type": "log",
+        "content": "console.log(`📝 Registered ${routes.length} routes:`, Array.from(this.routes.keys()));"
+      },
+      {
+        "line": 47,
+        "type": "warn",
+        "content": "console.warn('⚠️ No routes provided to router.init()');"
+      },
+      {
+        "line": 53,
+        "type": "warn",
+        "content": "console.warn('⚠️ Content element not found during init');"
+      },
+      {
+        "line": 88,
+        "type": "log",
+        "content": "console.log('✅ Router initialized with routes:', Array.from(this.routes.keys()));"
+      },
+      {
+        "line": 92,
+        "type": "log",
+        "content": "console.log(`📋 Processing ${this.pendingNavigations.length} pending navigations`);"
+      },
+      {
+        "line": 106,
+        "type": "log",
+        "content": "console.log('🚀 Auto-loading initial route...');"
+      },
+      {
+        "line": 110,
+        "type": "log",
+        "content": "console.log('⏸️ Auto-load disabled, waiting for manual navigation');"
+      },
+      {
+        "line": 118,
+        "type": "log",
+        "content": "console.log(`📝 Registering route: ${route.path}`);"
+      },
+      {
+        "line": 121,
+        "type": "error",
+        "content": "console.error('Invalid route:', route);"
+      },
+      {
+        "line": 122,
+        "type": "error",
+        "content": "console.error('  path:', route.path);"
+      },
+      {
+        "line": 123,
+        "type": "error",
+        "content": "console.error('  component:', route.component);"
+      },
+      {
+        "line": 136,
+        "type": "log",
+        "content": "console.log(`✅ Route registered: ${route.path}, total routes: ${this.routes.size}`);"
+      },
+      {
+        "line": 145,
+        "type": "warn",
+        "content": "console.warn('Router not initialized yet, queueing navigation to:', path);"
+      },
+      {
+        "line": 158,
+        "type": "log",
+        "content": "console.log(`Already navigating to: ${path}, ignoring duplicate`);"
+      },
+      {
+        "line": 163,
+        "type": "log",
+        "content": "console.log(`Already queued navigation to: ${path}`);"
+      },
+      {
+        "line": 166,
+        "type": "warn",
+        "content": "console.warn(`⏳ Navigation in progress to ${this.navigatingTo}, queueing navigation to: ${path}`);"
+      },
+      {
+        "line": 173,
+        "type": "log",
+        "content": "console.log(`Already at route: ${path}`);"
+      },
+      {
+        "line": 181,
+        "type": "log",
+        "content": "console.log(`🔄 Navigating to: ${path}`);"
+      },
+      {
+        "line": 182,
+        "type": "log",
+        "content": "console.log('Available routes:', Array.from(this.routes.keys()));"
+      },
+      {
+        "line": 187,
+        "type": "log",
+        "content": "console.log('❌ Navigation cancelled by guard');"
+      },
+      {
+        "line": 192,
+        "type": "log",
+        "content": "console.log(`🔍 Looking for route: ${path}`);"
+      },
+      {
+        "line": 193,
+        "type": "log",
+        "content": "console.log(`📋 Available routes: ${Array.from(this.routes.keys()).join(', ')}`);"
+      },
+      {
+        "line": 194,
+        "type": "log",
+        "content": "console.log(`📊 Routes map size: ${this.routes.size}`);"
+      },
+      {
+        "line": 198,
+        "type": "error",
+        "content": "console.error(`❌ Route not found: ${path}`);"
+      },
+      {
+        "line": 199,
+        "type": "error",
+        "content": "console.error('📋 Registered routes:', Array.from(this.routes.keys()));"
+      },
+      {
+        "line": 200,
+        "type": "error",
+        "content": "console.error('🗺️ Routes map details:');"
+      },
+      {
+        "line": 202,
+        "type": "error",
+        "content": "console.error(`  - ${key}: loader type = ${typeof value.loader}`);"
+      },
+      {
+        "line": 208,
+        "type": "log",
+        "content": "console.log(`✅ Route found for ${path}`);"
+      },
+      {
+        "line": 212,
+        "type": "log",
+        "content": "console.log('🧹 Destroying previous component instance');"
+      },
+      {
+        "line": 216,
+        "type": "error",
+        "content": "console.error('Error destroying component:', error);"
+      },
+      {
+        "line": 254,
+        "type": "log",
+        "content": "console.log('🎯 Calling component mounted lifecycle');"
+      },
+      {
+        "line": 267,
+        "type": "error",
+        "content": "console.error(`Failed to navigate to ${path}:`, error);"
+      },
+      {
+        "line": 280,
+        "type": "log",
+        "content": "console.log(`📋 Processing queued navigation to: ${next.path}`);"
+      },
+      {
+        "line": 283,
+        "type": "log",
+        "content": "console.log(`📋 Skipping queued navigation to current route: ${next.path}`);"
+      },
+      {
+        "line": 361,
+        "type": "log",
+        "content": "console.log(`📦 Loading component for: ${route.path}`);"
+      },
+      {
+        "line": 365,
+        "type": "log",
+        "content": "console.log(`🔄 Executing route.loader for ${route.path}`);"
+      },
+      {
+        "line": 366,
+        "type": "log",
+        "content": "console.log(`   Loader type: ${typeof route.loader}`);"
+      },
+      {
+        "line": 370,
+        "type": "log",
+        "content": "console.log(`📦 Loader result type: ${typeof result}`);"
+      },
+      {
+        "line": 371,
+        "type": "log",
+        "content": "console.log(`   Has default property: ${!!(result && result.default)}`);"
+      },
+      {
+        "line": 378,
+        "type": "log",
+        "content": "console.log(`🎯 Final component type: ${typeof component}`);"
+      },
+      {
+        "line": 381,
+        "type": "log",
+        "content": "console.log(`✅ Component loaded in ${loadTime.toFixed(2)}ms`);"
+      },
+      {
+        "line": 404,
+        "type": "error",
+        "content": "console.error('Content element not found');"
+      },
+      {
+        "line": 408,
+        "type": "log",
+        "content": "console.log('🎨 Rendering component, type:', typeof component);"
+      },
+      {
+        "line": 418,
+        "type": "log",
+        "content": "console.log('📝 Rendering class component');"
+      },
+      {
+        "line": 427,
+        "type": "log",
+        "content": "console.log('✅ Rendered HTML string from class');"
+      },
+      {
+        "line": 430,
+        "type": "log",
+        "content": "console.log('✅ Rendered HTMLElement from class');"
+      },
+      {
+        "line": 434,
+        "type": "log",
+        "content": "console.log('📝 Rendering function component');"
+      },
+      {
+        "line": 446,
+        "type": "log",
+        "content": "console.log('✅ Rendered HTML string from function');"
+      },
+      {
+        "line": 449,
+        "type": "log",
+        "content": "console.log('✅ Rendered HTMLElement from function');"
+      },
+      {
+        "line": 453,
+        "type": "log",
+        "content": "console.log('📝 Rendering object with render method');"
+      },
+      {
+        "line": 459,
+        "type": "log",
+        "content": "console.log('✅ Rendered HTML string from object');"
+      },
+      {
+        "line": 462,
+        "type": "log",
+        "content": "console.log('✅ Rendered HTMLElement from object');"
+      },
+      {
+        "line": 466,
+        "type": "log",
+        "content": "console.log('📝 Rendering HTML string directly');"
+      },
+      {
+        "line": 468,
+        "type": "log",
+        "content": "console.log('✅ Rendered direct HTML string');"
+      },
+      {
+        "line": 470,
+        "type": "error",
+        "content": "console.error('❌ Unknown component type:', typeof component, component);"
+      },
+      {
+        "line": 588,
+        "type": "log",
+        "content": "console.log(`🏁 Loading initial route: ${path}`);"
+      },
+      {
+        "line": 718,
+        "type": "error",
+        "content": "console.error('Error destroying component during reset:', error);"
+      }
+    ],
+    "_core/state.js": [
+      {
+        "line": 126,
+        "type": "log",
+        "content": "console.log('State update cancelled by middleware');"
+      },
+      {
+        "line": 170,
+        "type": "log",
+        "content": "console.log(`📝 State updated: ${path}`, value);"
+      },
+      {
+        "line": 221,
+        "type": "log",
+        "content": "console.log(`🗑️ State deleted: ${path}`);"
+      },
+      {
+        "line": 268,
+        "type": "error",
+        "content": "console.error('Subscriber error:', error);"
+      },
+      {
+        "line": 286,
+        "type": "error",
+        "content": "console.error('Subscriber error:', error);"
+      },
+      {
+        "line": 300,
+        "type": "error",
+        "content": "console.error('Global subscriber error:', error);"
+      },
+      {
+        "line": 324,
+        "type": "error",
+        "content": "console.error('Middleware error:', error);"
+      },
+      {
+        "line": 402,
+        "type": "log",
+        "content": "console.log('🔄 State reset' + (path ? `: ${path}` : ''));"
+      },
+      {
+        "line": 426,
+        "type": "log",
+        "content": "console.log('📥 State loaded from storage');"
+      },
+      {
+        "line": 428,
+        "type": "error",
+        "content": "console.error('Failed to load persisted state:', error);"
+      },
+      {
+        "line": 448,
+        "type": "log",
+        "content": "console.log('💾 State persisted');"
+      },
+      {
+        "line": 450,
+        "type": "error",
+        "content": "console.error('Failed to persist state:', error);"
+      },
+      {
+        "line": 485,
+        "type": "error",
+        "content": "console.error('Invalid history index');"
+      },
+      {
+        "line": 491,
+        "type": "log",
+        "content": "console.log('Time travel to:', this.history[index]);"
+      }
+    ],
+    "_pages/ai-service/catalog/catalog-manager.js": [
+      {
+        "line": 23,
+        "type": "log",
+        "content": "console.log('📚 CatalogManager.render() starting...');"
+      },
+      {
+        "line": 235,
+        "type": "log",
+        "content": "console.log('📚 Binding CatalogManager events');"
+      },
+      {
+        "line": 240,
+        "type": "log",
+        "content": "console.log('Searching for:', searchTerm);"
+      },
+      {
+        "line": 245,
+        "type": "log",
+        "content": "console.log('Fetching catalog data...');"
+      },
+      {
+        "line": 250,
+        "type": "log",
+        "content": "console.log('Saving catalog to database...');"
+      },
+      {
+        "line": 277,
+        "type": "error",
+        "content": "console.error('Failed to parse cached catalog:', e);"
+      },
+      {
+        "line": 294,
+        "type": "warn",
+        "content": "console.warn('Failed to fetch catalog from API:', error.message);"
+      },
+      {
+        "line": 328,
+        "type": "error",
+        "content": "console.error('Failed to save catalog:', error);"
+      },
+      {
+        "line": 347,
+        "type": "error",
+        "content": "console.error('Failed to fetch from OpenRouter:', error);"
+      },
+      {
+        "line": 367,
+        "type": "error",
+        "content": "console.error('Failed to fetch from Vercel:', error);"
+      },
+      {
+        "line": 437,
+        "type": "warn",
+        "content": "console.warn(`Price overflow: ${numPrice} → ${maxPrice}`);"
+      },
+      {
+        "line": 721,
+        "type": "error",
+        "content": "console.error('Failed to refresh from Vercel:', error);"
+      },
+      {
+        "line": 883,
+        "type": "warn",
+        "content": "console.warn('CatalogManager: 無效的提供商數據', provider);"
+      }
+    ],
+    "_pages/ai-service/catalog/vercel-api-manager.js": [
+      {
+        "line": 148,
+        "type": "error",
+        "content": "console.error('Failed to fetch from Vercel API:', error);"
+      },
+      {
+        "line": 262,
+        "type": "warn",
+        "content": "console.warn(`Price overflow: ${numPrice} → ${maxPrice}`);"
+      }
+    ],
+    "_pages/ai-service/contract-compliance.js": [
+      {
+        "line": 283,
+        "type": "log",
+        "content": "console.log('🔄 正在迁移配置到契约合规格式...');"
+      },
+      {
+        "line": 307,
+        "type": "log",
+        "content": "console.log('✅ 配置迁移完成');"
+      }
+    ],
+    "_pages/ai-service/cost-analysis.js": [
+      {
+        "line": 164,
+        "type": "log",
+        "content": "console.log('Loading cost data for range:', dateRange);"
+      },
+      {
+        "line": 171,
+        "type": "error",
+        "content": "console.error('Failed to load cost data:', data);"
+      },
+      {
+        "line": 175,
+        "type": "error",
+        "content": "console.error('Failed to load cost data:', error);"
+      }
+    ],
+    "_pages/ai-service/data/data-source-manager.js": [
+      {
+        "line": 147,
+        "type": "log",
+        "content": "console.log(`📦 Using cached data for ${sourceId}`);"
+      },
+      {
+        "line": 156,
+        "type": "log",
+        "content": "console.log(`📡 Fetching data from ${source.name}...`);"
+      },
+      {
+        "line": 188,
+        "type": "log",
+        "content": "console.log(`✅ Successfully fetched data from ${source.name}`);"
+      },
+      {
+        "line": 192,
+        "type": "error",
+        "content": "console.error(`❌ Failed to fetch from ${source.name}:`, error);"
+      },
+      {
+        "line": 504,
+        "type": "error",
+        "content": "console.error('Failed to load data source configuration:', error);"
+      }
+    ],
+    "_pages/ai-service/data-sources.js": [
+      {
+        "line": 19,
+        "type": "log",
+        "content": "console.log('Failed to load data source config:', e);"
+      },
+      {
+        "line": 189,
+        "type": "error",
+        "content": "console.error('Failed to parse catalog data:', e);"
+      }
+    ],
+    "_pages/ai-service/events/event-handlers.js": [
+      {
+        "line": 209,
+        "type": "log",
+        "content": "console.log('Switching to tab:', tab);"
+      },
+      {
+        "line": 250,
+        "type": "error",
+        "content": "console.error('Update catalog failed:', error);"
+      },
+      {
+        "line": 270,
+        "type": "error",
+        "content": "console.error('Save catalog failed:', error);"
+      },
+      {
+        "line": 298,
+        "type": "error",
+        "content": "console.error('Export failed:', error);"
+      },
+      {
+        "line": 338,
+        "type": "error",
+        "content": "console.error('Refresh failed:', error);"
+      }
+    ],
+    "_pages/ai-service/index.js": [
+      {
+        "line": 59,
+        "type": "log",
+        "content": "console.log(`[${type.toUpperCase()}] ${message}`);"
+      },
+      {
+        "line": 107,
+        "type": "log",
+        "content": "console.log('📌 AIServicePage mounted, binding events...');"
+      },
+      {
+        "line": 116,
+        "type": "log",
+        "content": "console.log('🎨 AIServicePage.render() starting...');"
+      },
+      {
+        "line": 117,
+        "type": "log",
+        "content": "console.log('📍 Current tab:', this.currentTab);"
+      },
+      {
+        "line": 123,
+        "type": "error",
+        "content": "console.error('❌ Tab content is not a string:', typeof tabContent);"
+      },
+      {
+        "line": 146,
+        "type": "log",
+        "content": "console.log('✅ AIServicePage.render() completed, HTML length:', html.length);"
+      },
+      {
+        "line": 151,
+        "type": "log",
+        "content": "console.log('🔄 Rendering tab:', this.currentTab);"
+      },
+      {
+        "line": 173,
+        "type": "log",
+        "content": "console.log('📚 Rendering catalog tab...');"
+      },
+      {
+        "line": 175,
+        "type": "log",
+        "content": "console.log('📚 Catalog content length:', content ? content.length : 0);"
+      },
+      {
+        "line": 179,
+        "type": "error",
+        "content": "console.error('❌ Catalog render returned empty content!');"
+      },
+      {
+        "line": 192,
+        "type": "log",
+        "content": "console.log(`✅ Tab ${this.currentTab} rendered, content length: ${content ? content.length : 0}`);"
+      },
+      {
+        "line": 196,
+        "type": "error",
+        "content": "console.error('❌ Error rendering tab content:', error, error.stack);"
+      },
+      {
+        "line": 209,
+        "type": "log",
+        "content": "console.log('🎯 renderProviderCatalog called');"
+      },
+      {
+        "line": 212,
+        "type": "log",
+        "content": "console.log('📊 Catalog HTML length:', html ? html.length : 0);"
+      },
+      {
+        "line": 217,
+        "type": "log",
+        "content": "console.log('🔗 AIServicePage afterRender called');"
+      },
+      {
+        "line": 222,
+        "type": "log",
+        "content": "console.log('🔗 Binding AIServicePage events...');"
+      },
+      {
+        "line": 226,
+        "type": "log",
+        "content": "console.log(`📌 Found ${tabButtons.length} tab buttons`);"
+      },
+      {
+        "line": 238,
+        "type": "log",
+        "content": "console.log('🔄 Tab clicked:', tab);"
+      },
+      {
+        "line": 241,
+        "type": "error",
+        "content": "console.error('❌ No tab data attribute found');"
+      },
+      {
+        "line": 255,
+        "type": "log",
+        "content": "console.log('📝 Rendering content for tab:', tab);"
+      },
+      {
+        "line": 260,
+        "type": "log",
+        "content": "console.log(`✅ Content rendered for ${tab}, length: ${html ? html.length : 0}`);"
+      },
+      {
+        "line": 270,
+        "type": "log",
+        "content": "console.log(`📊 Content element now has ${contentEl.innerHTML.length} characters`);"
+      },
+      {
+        "line": 273,
+        "type": "error",
+        "content": "console.error('❌ Failed to render tab:', error);"
+      },
+      {
+        "line": 283,
+        "type": "error",
+        "content": "console.error('❌ Content element not found');"
+      },
+      {
+        "line": 293,
+        "type": "log",
+        "content": "console.log('🔗 Binding events for tab:', this.currentTab);"
+      },
+      {
+        "line": 383,
+        "type": "log",
+        "content": "console.log('🧹 Destroying AI Service page...');"
+      },
+      {
+        "line": 391,
+        "type": "error",
+        "content": "console.error(`Error destroying module ${name}:`, error);"
+      },
+      {
+        "line": 399,
+        "type": "log",
+        "content": "console.log('✅ AI Service page destroyed');"
+      }
+    ],
+    "_pages/ai-service/load-balance-enhanced.js": [
+      {
+        "line": 194,
+        "type": "error",
+        "content": "console.error('Failed to render load balance page:', error);"
+      },
+      {
+        "line": 341,
+        "type": "error",
+        "content": "console.error('Failed to load strategies:', error);"
+      },
+      {
+        "line": 652,
+        "type": "error",
+        "content": "console.error('Failed to load analytics:', error);"
+      }
+    ],
+    "_pages/ai-service/load-balance.js": [
+      {
+        "line": 29,
+        "type": "log",
+        "content": "console.log('Using default load balance config due to API error:', error.message);"
+      },
+      {
+        "line": 192,
+        "type": "error",
+        "content": "console.error('Failed to save load balance config:', error);"
+      }
+    ],
+    "_pages/ai-service/price-standardizer.js": [
+      {
+        "line": 41,
+        "type": "warn",
+        "content": "console.warn(`⚠️ Price overflow for ${modelId}: ${numPrice} → ${this.MAX_PRICE}`);"
+      }
+    ],
+    "_pages/ai-service/provider-config.js": [
+      {
+        "line": 46,
+        "type": "log",
+        "content": "console.log('📋 ProviderConfig.render() starting...');"
+      },
+      {
+        "line": 51,
+        "type": "log",
+        "content": "console.log('📋 Providers loaded:', loadResult);"
+      },
+      {
+        "line": 85,
+        "type": "log",
+        "content": "console.log('✅ ProviderConfig.render() completed');"
+      },
+      {
+        "line": 89,
+        "type": "error",
+        "content": "console.error('❌ ProviderConfig.render() failed:', error);"
+      },
+      {
+        "line": 95,
+        "type": "log",
+        "content": "console.log('📋 Loading providers from API...');"
+      },
+      {
+        "line": 100,
+        "type": "warn",
+        "content": "console.warn('⚠️ API call failed:', err.message);"
+      },
+      {
+        "line": 106,
+        "type": "log",
+        "content": "console.log('✅ Loaded providers from API:', Object.keys(this.providers));"
+      },
+      {
+        "line": 117,
+        "type": "error",
+        "content": "console.error('❌ Unexpected error loading providers:', error);"
+      },
+      {
+        "line": 121,
+        "type": "log",
+        "content": "console.log('🔄 API unavailable, checking localStorage...');"
+      },
+      {
+        "line": 135,
+        "type": "log",
+        "content": "console.log('📋 Using cached providers from localStorage:', Object.keys(this.providers));"
+      },
+      {
+        "line": 139,
+        "type": "error",
+        "content": "console.error('Failed to parse saved providers:', e);"
+      },
+      {
+        "line": 144,
+        "type": "log",
+        "content": "console.log('📁 Loading real database content as fallback...');"
+      },
+      {
+        "line": 208,
+        "type": "log",
+        "content": "console.log('✅ Loaded 4 real providers from database: 提问AI, 绘图AI, 协助AI, 翻译AI');"
+      },
+      {
+        "line": 333,
+        "type": "log",
+        "content": "console.log('🔄 开始迁移提供商数据到契约格式...');"
+      },
+      {
+        "line": 344,
+        "type": "log",
+        "content": "console.log(`🔄 迁移提供商: ${provider.name || provider.id}`);"
+      },
+      {
+        "line": 360,
+        "type": "log",
+        "content": "console.log(`✅ 完成 ${migrationCount} 个提供商的数据迁移`);"
+      },
+      {
+        "line": 362,
+        "type": "log",
+        "content": "console.log('✅ 所有提供商数据已符合契约格式');"
+      },
+      {
+        "line": 501,
+        "type": "log",
+        "content": "console.log('📋 Generating provider options from catalog:', catalogData);"
+      },
+      {
+        "line": 541,
+        "type": "log",
+        "content": "console.log('📋 Using fallback provider list');"
+      },
+      {
+        "line": 568,
+        "type": "log",
+        "content": "console.log('✅ Generated options for providers:', Object.keys(modelsData));"
+      },
+      {
+        "line": 581,
+        "type": "log",
+        "content": "console.log('🔄 Provider type changed to:', selectedType);"
+      },
+      {
+        "line": 590,
+        "type": "log",
+        "content": "console.log('📋 Available models for', selectedType, ':', models.length);"
+      },
+      {
+        "line": 629,
+        "type": "log",
+        "content": "console.log('🎯 Selected models:', selected);"
+      },
+      {
+        "line": 639,
+        "type": "log",
+        "content": "console.log('📋 Binding provider config events...');"
+      },
+      {
+        "line": 655,
+        "type": "log",
+        "content": "console.log('📋 Loading provider catalog for add dialog...');"
+      },
+      {
+        "line": 678,
+        "type": "log",
+        "content": "console.log('✅ Catalog loaded:', catalogData);"
+      },
+      {
+        "line": 680,
+        "type": "warn",
+        "content": "console.warn('⚠️ Failed to load catalog from API:', error.message);"
+      },
+      {
+        "line": 770,
+        "type": "error",
+        "content": "console.error('❌ Error loading add dialog:', error);"
+      },
+      {
+        "line": 837,
+        "type": "log",
+        "content": "console.log('API 添加失敗，使用 localStorage 模式:', apiError.message);"
+      },
+      {
+        "line": 867,
+        "type": "error",
+        "content": "console.error('Save provider error:', error);"
+      },
+      {
+        "line": 1011,
+        "type": "log",
+        "content": "console.log('API 更新失敗，使用 localStorage 模式:', apiError.message);"
+      },
+      {
+        "line": 1050,
+        "type": "error",
+        "content": "console.error('Update provider error:', error);"
+      },
+      {
+        "line": 1071,
+        "type": "log",
+        "content": "console.log('API 切換失敗，使用 localStorage 模式:', apiError.message);"
+      },
+      {
+        "line": 1097,
+        "type": "error",
+        "content": "console.error('Toggle provider error:', error);"
+      },
+      {
+        "line": 1114,
+        "type": "log",
+        "content": "console.log('API 測試失敗，使用 fallback 模式:', apiError.message);"
+      },
+      {
+        "line": 1130,
+        "type": "error",
+        "content": "console.error('Test provider error:', error);"
+      },
+      {
+        "line": 1150,
+        "type": "log",
+        "content": "console.log('API 刪除失敗，使用 localStorage 模式:', apiError.message);"
+      },
+      {
+        "line": 1175,
+        "type": "error",
+        "content": "console.error('Delete provider error:', error);"
+      },
+      {
+        "line": 1181,
+        "type": "log",
+        "content": "console.log('🔄 Refreshing providers...');"
+      }
+    ],
+    "_pages/ai-service/unified-config.js": [
+      {
+        "line": 14,
+        "type": "log",
+        "content": "console.log('✅ 契约合规性管理器已加载 - Contract Development Principles Loaded');"
+      },
+      {
+        "line": 98,
+        "type": "log",
+        "content": "console.log('🎨 UnifiedConfig.render() starting...');"
+      },
+      {
+        "line": 107,
+        "type": "log",
+        "content": "console.log('📡 尝试从数据库加载统一配置...');"
+      },
+      {
+        "line": 116,
+        "type": "log",
+        "content": "console.log('✅ 已从数据库加载配置并同步到本地缓存');"
+      },
+      {
+        "line": 118,
+        "type": "log",
+        "content": "console.log('ℹ️ 数据库中暂无配置，尝试本地缓存...');"
+      },
+      {
+        "line": 122,
+        "type": "warn",
+        "content": "console.warn('⚠️ 数据库加载失败，使用本地缓存:', dbError.message);"
+      },
+      {
+        "line": 132,
+        "type": "log",
+        "content": "console.log('📋 Loaded unified config from localStorage fallback');"
+      },
+      {
+        "line": 134,
+        "type": "error",
+        "content": "console.error('Failed to parse saved config:', e);"
+      },
+      {
+        "line": 143,
+        "type": "log",
+        "content": "console.log('📋 Loaded providers from localStorage');"
+      },
+      {
+        "line": 145,
+        "type": "error",
+        "content": "console.error('Failed to parse saved providers:', e);"
+      },
+      {
+        "line": 153,
+        "type": "log",
+        "content": "console.log('📡 API config response:', unifiedConfigResponse);"
+      },
+      {
+        "line": 187,
+        "type": "log",
+        "content": "console.log('📋 Using newer config from API and saved to localStorage');"
+      },
+      {
+        "line": 189,
+        "type": "warn",
+        "content": "console.warn('⚠️ API config data missing essential structure, keeping local config');"
+      },
+      {
+        "line": 192,
+        "type": "log",
+        "content": "console.log('📋 Local config is newer or API timestamp invalid, keeping local config');"
+      },
+      {
+        "line": 203,
+        "type": "log",
+        "content": "console.log('📋 Updated providers from API');"
+      },
+      {
+        "line": 206,
+        "type": "log",
+        "content": "console.log('ℹ️ API not available, using localStorage data:', error.message);"
+      },
+      {
+        "line": 210,
+        "type": "log",
+        "content": "console.log('🔍 正在进行契约合规性检查...');"
+      },
+      {
+        "line": 214,
+        "type": "warn",
+        "content": "console.warn('⚠️ 配置不符合数据库契约，开始自动迁移...');"
+      },
+      {
+        "line": 215,
+        "type": "log",
+        "content": "console.log('❌ 合规性错误:', complianceResult.errors);"
+      },
+      {
+        "line": 216,
+        "type": "log",
+        "content": "console.log('⚠️ 合规性警告:', complianceResult.warnings);"
+      },
+      {
+        "line": 224,
+        "type": "log",
+        "content": "console.log('✅ 配置已迁移到契约合规格式');"
+      },
+      {
+        "line": 231,
+        "type": "error",
+        "content": "console.error('❌ 迁移配置保存失败:', error);"
+      },
+      {
+        "line": 234,
+        "type": "log",
+        "content": "console.log(`✅ 配置符合契约要求 (合规度: ${complianceResult.complianceScore}%)`);"
+      },
+      {
+        "line": 239,
+        "type": "log",
+        "content": "console.log('💡 合规性建议:', complianceResult.recommendations);"
+      },
+      {
+        "line": 317,
+        "type": "log",
+        "content": "console.log('🔍 Real providers extracted:', realProviders);"
+      },
+      {
+        "line": 518,
+        "type": "log",
+        "content": "console.log(`📋 Extracted ${realProviders.length} real providers:`, realProviders.map(p => `${p.typeName}-${p.name}`));"
+      },
+      {
+        "line": 554,
+        "type": "log",
+        "content": "console.log(`🎯 Edit prompt for ${service} on ${providerType}/${providerId}`);"
+      },
+      {
+        "line": 656,
+        "type": "log",
+        "content": "console.log('🔗 UnifiedConfig.bindEvents() starting...');"
+      },
+      {
+        "line": 730,
+        "type": "log",
+        "content": "console.log(`🔄 Service ${service} on ${providerType}/${providerId} changed to:`, e.target.checked);"
+      },
+      {
+        "line": 746,
+        "type": "log",
+        "content": "console.log(`✅ Updated ${provider}.${field} = ${value}`);"
+      },
+      {
+        "line": 780,
+        "type": "log",
+        "content": "console.log(`✅ Updated service assignment: ${service} -> ${providerType}/${providerId} (${enabled})`);"
+      },
+      {
+        "line": 784,
+        "type": "log",
+        "content": "console.log('🔄 Syncing providers...');"
+      },
+      {
+        "line": 799,
+        "type": "error",
+        "content": "console.error('Sync providers error:', error);"
+      },
+      {
+        "line": 807,
+        "type": "log",
+        "content": "console.log('⚠️ 保存操作进行中，跳过重复请求');"
+      },
+      {
+        "line": 812,
+        "type": "log",
+        "content": "console.log('💾 Saving unified config...');"
+      },
+      {
+        "line": 861,
+        "type": "log",
+        "content": "console.log('📋 Config to save:', config);"
+      },
+      {
+        "line": 864,
+        "type": "log",
+        "content": "console.log('🔍 保存前进行契约合规性验证...');"
+      },
+      {
+        "line": 868,
+        "type": "warn",
+        "content": "console.warn('⚠️ 配置不符合契约，自动修复后保存...');"
+      },
+      {
+        "line": 877,
+        "type": "log",
+        "content": "console.log('📡 尝试保存配置到数据库...');"
+      },
+      {
+        "line": 888,
+        "type": "log",
+        "content": "console.log('✅ 配置已成功保存到数据库');"
+      },
+      {
+        "line": 890,
+        "type": "warn",
+        "content": "console.warn('⚠️ 数据库保存失败:', dbResult?.message || '未知错误');"
+      },
+      {
+        "line": 894,
+        "type": "error",
+        "content": "console.error('❌ 数据库保存异常:', dbError);"
+      },
+      {
+        "line": 901,
+        "type": "log",
+        "content": "console.log('✅ Configuration saved to localStorage successfully');"
+      },
+      {
+        "line": 912,
+        "type": "log",
+        "content": "console.log('✅ localStorage save verification passed');"
+      },
+      {
+        "line": 915,
+        "type": "error",
+        "content": "console.error('❌ Critical: Failed to save to localStorage:', saveError);"
+      },
+      {
+        "line": 931,
+        "type": "log",
+        "content": "console.log('⚠️ Configuration saved to localStorage only (database unavailable)');"
+      },
+      {
+        "line": 941,
+        "type": "error",
+        "content": "console.error('Save config error:', error);"
+      },
+      {
+        "line": 942,
+        "type": "error",
+        "content": "console.error('Error stack:', error.stack);"
+      },
+      {
+        "line": 970,
+        "type": "log",
+        "content": "console.log('🔄 Configuration reset to defaults:', defaultConfig);"
+      },
+      {
+        "line": 1008,
+        "type": "log",
+        "content": "console.log('🔄 Force loading config from localStorage...');"
+      },
+      {
+        "line": 1014,
+        "type": "log",
+        "content": "console.log('✅ Configuration force-loaded from localStorage');"
+      },
+      {
+        "line": 1026,
+        "type": "error",
+        "content": "console.error('❌ Failed to parse localStorage config:', error);"
+      },
+      {
+        "line": 1033,
+        "type": "warn",
+        "content": "console.warn('⚠️ No config found in localStorage');"
+      }
+    ],
+    "_pages/billing/index.js": [
+      {
+        "line": 7,
+        "type": "log",
+        "content": "console.log('💰 Initializing Billing page...');"
+      },
+      {
+        "line": 88,
+        "type": "log",
+        "content": "console.log('✅ Billing page initialized');"
+      }
+    ],
+    "_pages/dashboard/index.js": [
+      {
+        "line": 38,
+        "type": "log",
+        "content": "console.log('📌 Dashboard mounted, initializing...');"
+      },
+      {
+        "line": 44,
+        "type": "log",
+        "content": "console.log('🎯 Starting dashboard initialization after DOM ready');"
+      },
+      {
+        "line": 46,
+        "type": "error",
+        "content": "console.error('Failed to initialize dashboard:', error);"
+      },
+      {
+        "line": 362,
+        "type": "log",
+        "content": "console.log('📊 Initializing dashboard...');"
+      },
+      {
+        "line": 366,
+        "type": "log",
+        "content": "console.log('⚠️ Dashboard has been destroyed, stopping initialization');"
+      },
+      {
+        "line": 373,
+        "type": "log",
+        "content": "console.log('⚠️ No longer on dashboard route, stopping initialization');"
+      },
+      {
+        "line": 383,
+        "type": "warn",
+        "content": "console.warn('⚠️ DOM elements not ready yet:', {"
+      },
+      {
+        "line": 391,
+        "type": "log",
+        "content": "console.log('⚠️ Stopping retry - component destroyed or route changed');"
+      },
+      {
+        "line": 432,
+        "type": "log",
+        "content": "console.log('✅ Dashboard initialized');"
+      },
+      {
+        "line": 435,
+        "type": "error",
+        "content": "console.error('Failed to initialize dashboard:', error);"
+      },
+      {
+        "line": 451,
+        "type": "log",
+        "content": "console.log('📊 Using mock data for dashboard stats');"
+      },
+      {
+        "line": 474,
+        "type": "log",
+        "content": "console.log('📈 Using mock data for dashboard charts');"
+      },
+      {
+        "line": 502,
+        "type": "log",
+        "content": "console.log('📝 Using mock data for dashboard activities');"
+      },
+      {
+        "line": 599,
+        "type": "error",
+        "content": "console.error('❌ Chart.js not available, skipping charts');"
+      },
+      {
+        "line": 603,
+        "type": "log",
+        "content": "console.log('📊 Rendering charts with Chart.js');"
+      },
+      {
+        "line": 610,
+        "type": "error",
+        "content": "console.error('Error rendering charts:', error);"
+      },
+      {
+        "line": 620,
+        "type": "warn",
+        "content": "console.warn('Chart body not found: usageChartBody, skipping');"
+      },
+      {
+        "line": 629,
+        "type": "log",
+        "content": "console.log('✅ Created canvas for usage chart');"
+      },
+      {
+        "line": 658,
+        "type": "warn",
+        "content": "console.warn('Chart body not found: providerChartBody, skipping');"
+      },
+      {
+        "line": 667,
+        "type": "log",
+        "content": "console.log('✅ Created canvas for provider chart');"
+      },
+      {
+        "line": 753,
+        "type": "log",
+        "content": "console.log('⚠️ Dashboard destroyed, skipping refresh');"
+      },
+      {
+        "line": 760,
+        "type": "log",
+        "content": "console.log('⚠️ Not on dashboard route, skipping refresh');"
+      },
+      {
+        "line": 764,
+        "type": "log",
+        "content": "console.log('🔄 Refreshing dashboard...');"
+      },
+      {
+        "line": 876,
+        "type": "log",
+        "content": "console.log('🧹 Destroying dashboard component...');"
+      },
+      {
+        "line": 905,
+        "type": "log",
+        "content": "console.log('✅ Dashboard component destroyed');"
+      }
+    ],
+    "_pages/user/index.js": [
+      {
+        "line": 13,
+        "type": "log",
+        "content": "console.log('👥 Rendering User Management page...');"
+      },
+      {
+        "line": 294,
+        "type": "log",
+        "content": "console.log('✅ User Management page rendered');"
+      },
+      {
+        "line": 302,
+        "type": "log",
+        "content": "console.log('📌 UserPage mounted, loading data...');"
+      },
+      {
+        "line": 424,
+        "type": "log",
+        "content": "console.log('🧹 Destroying User page...');"
+      }
+    ],
+    "_utils/log-stats.js": [
+      {
+        "line": 24,
+        "type": "table",
+        "content": "console.table(this.counts);"
+      },
+      {
+        "line": 26,
+        "type": "log",
+        "content": "console.log(`Total console calls: ${total}`);"
+      }
+    ]
+  },
+  "byType": {
+    "log": 261,
+    "error": 116,
+    "warn": 31,
+    "info": 0,
+    "debug": 0,
+    "other": 0,
+    "table": 1
+  }
+}

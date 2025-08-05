@@ -1,0 +1,79 @@
+{
+  "total": 10,
+  "passed": 10,
+  "failed": 0,
+  "scenarios": [
+    {
+      "name": "服务商配置管理流程",
+      "steps": [
+        {
+          "name": "创建服务商配置表单元素",
+          "passed": true
+        },
+        {
+          "name": "填写并保存服务商配置",
+          "passed": true
+        }
+      ],
+      "passed": true
+    },
+    {
+      "name": "统一配置管理流程",
+      "steps": [
+        {
+          "name": "创建全局参数配置元素",
+          "passed": true
+        },
+        {
+          "name": "设置全局参数值",
+          "passed": true
+        }
+      ],
+      "passed": true
+    },
+    {
+      "name": "负载均衡池创建流程",
+      "steps": [
+        {
+          "name": "创建负载池表单",
+          "passed": true
+        },
+        {
+          "name": "填写并提交负载池配置",
+          "passed": true
+        }
+      ],
+      "passed": true
+    },
+    {
+      "name": "成本分析查看流程",
+      "steps": [
+        {
+          "name": "创建成本分析元素",
+          "passed": true
+        },
+        {
+          "name": "切换时间范围并刷新",
+          "passed": true
+        }
+      ],
+      "passed": true
+    },
+    {
+      "name": "配置导入导出流程",
+      "steps": [
+        {
+          "name": "模拟配置导出",
+          "passed": true
+        },
+        {
+          "name": "模拟配置导入",
+          "passed": true
+        }
+      ],
+      "passed": true
+    }
+  ],
+  "startTime": "2025-08-05T06:30:39.387Z",
+  "endTime": "2025-08-05T06:30:39.393Z"
+}

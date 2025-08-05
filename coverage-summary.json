@@ -1,0 +1,252 @@
+{
+  "modules": {
+    "_core": {
+      "total": 9,
+      "tested": 8,
+      "files": [
+        {
+          "name": "api-client.js",
+          "path": "_core/api-client.js",
+          "hasTest": true
+        },
+        {
+          "name": "auth-config.js",
+          "path": "_core/auth-config.js",
+          "hasTest": true
+        },
+        {
+          "name": "auth-old.js",
+          "path": "_core/auth-old.js",
+          "hasTest": false
+        },
+        {
+          "name": "auth-v3.js",
+          "path": "_core/auth-v3.js",
+          "hasTest": true
+        },
+        {
+          "name": "auth.js",
+          "path": "_core/auth.js",
+          "hasTest": true
+        },
+        {
+          "name": "cache.js",
+          "path": "_core/cache.js",
+          "hasTest": true
+        },
+        {
+          "name": "load-balance-manager.js",
+          "path": "_core/load-balance-manager.js",
+          "hasTest": true
+        },
+        {
+          "name": "router.js",
+          "path": "_core/router.js",
+          "hasTest": true
+        },
+        {
+          "name": "state.js",
+          "path": "_core/state.js",
+          "hasTest": true
+        }
+      ],
+      "coverage": 89
+    },
+    "_pages": {
+      "total": 20,
+      "tested": 20,
+      "files": [
+        {
+          "name": "catalog-manager.js",
+          "path": "_pages/ai-service/catalog/catalog-manager.js",
+          "hasTest": true
+        },
+        {
+          "name": "vercel-api-manager.js",
+          "path": "_pages/ai-service/catalog/vercel-api-manager.js",
+          "hasTest": true
+        },
+        {
+          "name": "catalog-comparator.js",
+          "path": "_pages/ai-service/catalog-comparator.js",
+          "hasTest": true
+        },
+        {
+          "name": "contract-compliance.js",
+          "path": "_pages/ai-service/contract-compliance.js",
+          "hasTest": true
+        },
+        {
+          "name": "cost-analysis.js",
+          "path": "_pages/ai-service/cost-analysis.js",
+          "hasTest": true
+        },
+        {
+          "name": "data-source-manager.js",
+          "path": "_pages/ai-service/data/data-source-manager.js",
+          "hasTest": true
+        },
+        {
+          "name": "data-sources.js",
+          "path": "_pages/ai-service/data-sources.js",
+          "hasTest": true
+        },
+        {
+          "name": "event-handlers.js",
+          "path": "_pages/ai-service/events/event-handlers.js",
+          "hasTest": true
+        },
+        {
+          "name": "index.js",
+          "path": "_pages/ai-service/index.js",
+          "hasTest": true
+        },
+        {
+          "name": "load-balance-enhanced.js",
+          "path": "_pages/ai-service/load-balance-enhanced.js",
+          "hasTest": true
+        },
+        {
+          "name": "load-balance.js",
+          "path": "_pages/ai-service/load-balance.js",
+          "hasTest": true
+        },
+        {
+          "name": "load-balancing.js",
+          "path": "_pages/ai-service/load-balancing.js",
+          "hasTest": true
+        },
+        {
+          "name": "price-standardizer.js",
+          "path": "_pages/ai-service/price-standardizer.js",
+          "hasTest": true
+        },
+        {
+          "name": "provider-config.js",
+          "path": "_pages/ai-service/provider-config.js",
+          "hasTest": true
+        },
+        {
+          "name": "service-status.js",
+          "path": "_pages/ai-service/service-status.js",
+          "hasTest": true
+        },
+        {
+          "name": "ui-renderer.js",
+          "path": "_pages/ai-service/ui/ui-renderer.js",
+          "hasTest": true
+        },
+        {
+          "name": "unified-config.js",
+          "path": "_pages/ai-service/unified-config.js",
+          "hasTest": true
+        },
+        {
+          "name": "index.js",
+          "path": "_pages/billing/index.js",
+          "hasTest": true
+        },
+        {
+          "name": "index.js",
+          "path": "_pages/dashboard/index.js",
+          "hasTest": true
+        },
+        {
+          "name": "index.js",
+          "path": "_pages/user/index.js",
+          "hasTest": true
+        }
+      ],
+      "coverage": 100
+    },
+    "_app": {
+      "total": 7,
+      "tested": 7,
+      "files": [
+        {
+          "name": "app.js",
+          "path": "_app/app.js",
+          "hasTest": true
+        },
+        {
+          "name": "bootstrap.js",
+          "path": "_app/bootstrap.js",
+          "hasTest": true
+        },
+        {
+          "name": "config.js",
+          "path": "_app/config.js",
+          "hasTest": true
+        },
+        {
+          "name": "lazy-loader.js",
+          "path": "_app/lazy-loader.js",
+          "hasTest": true
+        },
+        {
+          "name": "cost-analysis.js",
+          "path": "_app/modules/cost-analysis.js",
+          "hasTest": true
+        },
+        {
+          "name": "load-balance.js",
+          "path": "_app/modules/load-balance.js",
+          "hasTest": true
+        },
+        {
+          "name": "unified-config.js",
+          "path": "_app/modules/unified-config.js",
+          "hasTest": true
+        }
+      ],
+      "coverage": 100
+    },
+    "_utils": {
+      "total": 7,
+      "tested": 3,
+      "files": [
+        {
+          "name": "auto-rollback.js",
+          "path": "_utils/auto-rollback.js",
+          "hasTest": false
+        },
+        {
+          "name": "enhanced-error-handler.js",
+          "path": "_utils/enhanced-error-handler.js",
+          "hasTest": false
+        },
+        {
+          "name": "feature-flags.js",
+          "path": "_utils/feature-flags.js",
+          "hasTest": false
+        },
+        {
+          "name": "log-stats.js",
+          "path": "_utils/log-stats.js",
+          "hasTest": true
+        },
+        {
+          "name": "logger.js",
+          "path": "_utils/logger.js",
+          "hasTest": true
+        },
+        {
+          "name": "performance-monitor.js",
+          "path": "_utils/performance-monitor.js",
+          "hasTest": false
+        },
+        {
+          "name": "secure-api-key-manager.js",
+          "path": "_utils/secure-api-key-manager.js",
+          "hasTest": true
+        }
+      ],
+      "coverage": 43
+    }
+  },
+  "summary": {
+    "totalFiles": 43,
+    "testedFiles": 38,
+    "coverage": 88
+  }
+}

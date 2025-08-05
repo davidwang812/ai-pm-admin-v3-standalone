@@ -3,6 +3,8 @@
  * 核心应用类
  */
 
+import { Logger } from '../_utils/logger.js';
+
 export class App {
   constructor(config) {
     this.config = config;
@@ -13,6 +15,9 @@ export class App {
       currentRoute: null
     };
     
+    // 创建应用级别的logger
+    this.logger = new Logger('App');
+    
     // 绑定到全局
     window.adminV3App = this;
   }
@@ -21,7 +26,7 @@ export class App {
    * 初始化应用
    */
   async init() {
-    console.log('🚀 V3 App initializing...');
+    this.logger.info('🚀 V3 App initializing...');
     
     try {
       // Step 1: 加载核心模块
@@ -36,10 +41,10 @@ export class App {
       // Step 4: 渲染初始界面
       await this.renderInitialView();
       
-      console.log('✅ V3 App initialized successfully');
+      this.logger.info('✅ V3 App initialized successfully');
       
     } catch (error) {
-      console.error('❌ App initialization failed:', error);
+      this.logger.error('❌ App initialization failed:', error);
       throw error;
     }
   }

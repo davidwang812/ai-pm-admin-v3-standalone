@@ -8,6 +8,7 @@ import { CatalogManager } from './catalog/catalog-manager.js';
 import { VercelApiManager } from './catalog/vercel-api-manager.js';
 import { UnifiedConfig } from './unified-config.js';
 import { LoadBalance } from './load-balance.js';
+import { LoadBalanceEnhanced } from './load-balance-enhanced.js';
 import { CostAnalysis } from './cost-analysis.js';
 import { DataSources } from './data-sources.js';
 
@@ -37,6 +38,7 @@ export class AIServicePage {
       catalog: new CatalogManager(this.app),
       unified: new UnifiedConfig(this.app),
       balance: new LoadBalance(this.app),
+      balanceEnhanced: new LoadBalanceEnhanced(this.app),
       cost: new CostAnalysis(this.app),
       dataSources: new DataSources(this.app)
     };
@@ -131,6 +133,7 @@ export class AIServicePage {
         '<button class="tab-btn ' + (this.currentTab === 'providers' ? 'active' : '') + '" data-tab="providers">服务商配置</button>' +
         '<button class="tab-btn ' + (this.currentTab === 'unified' ? 'active' : '') + '" data-tab="unified">统一配置</button>' +
         '<button class="tab-btn ' + (this.currentTab === 'balance' ? 'active' : '') + '" data-tab="balance">负载均衡</button>' +
+        '<button class="tab-btn ' + (this.currentTab === 'balanceEnhanced' ? 'active' : '') + '" data-tab="balanceEnhanced">负载均衡Pro</button>' +
         '<button class="tab-btn ' + (this.currentTab === 'cost' ? 'active' : '') + '" data-tab="cost">成本分析</button>' +
         '<button class="tab-btn ' + (this.currentTab === 'catalog' ? 'active' : '') + '" data-tab="catalog">提供商目录</button>' +
         '<button class="tab-btn ' + (this.currentTab === 'dataSources' ? 'active' : '') + '" data-tab="dataSources">数据源</button>' +

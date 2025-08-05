@@ -1,0 +1,395 @@
+{
+  "totalTests": 58,
+  "passed": 54,
+  "failed": 4,
+  "skipped": 0,
+  "startTime": "2025-08-05T06:24:12.911Z",
+  "endTime": "2025-08-05T06:24:12.968Z",
+  "categories": {
+    "core": {
+      "total": 5,
+      "passed": 5,
+      "failed": 0
+    },
+    "deployment": {
+      "total": 1,
+      "passed": 1,
+      "failed": 0
+    },
+    "app": {
+      "total": 2,
+      "passed": 2,
+      "failed": 0
+    },
+    "pages": {
+      "total": 6,
+      "passed": 6,
+      "failed": 0
+    },
+    "styles": {
+      "total": 3,
+      "passed": 3,
+      "failed": 0
+    },
+    "test": {
+      "total": 4,
+      "passed": 4,
+      "failed": 0
+    },
+    "docs": {
+      "total": 4,
+      "passed": 3,
+      "failed": 1
+    }
+  },
+  "details": [
+    {
+      "name": "文件存在: index.html",
+      "status": "pass",
+      "details": "",
+      "timestamp": "2025-08-05T06:24:12.916Z"
+    },
+    {
+      "name": "文件存在: package.json",
+      "status": "pass",
+      "details": "",
+      "timestamp": "2025-08-05T06:24:12.917Z"
+    },
+    {
+      "name": "文件存在: vercel.json",
+      "status": "pass",
+      "details": "",
+      "timestamp": "2025-08-05T06:24:12.917Z"
+    },
+    {
+      "name": "文件存在: _app/bootstrap.js",
+      "status": "pass",
+      "details": "",
+      "timestamp": "2025-08-05T06:24:12.918Z"
+    },
+    {
+      "name": "文件存在: _app/app.js",
+      "status": "pass",
+      "details": "",
+      "timestamp": "2025-08-05T06:24:12.919Z"
+    },
+    {
+      "name": "文件存在: _core/router.js",
+      "status": "pass",
+      "details": "",
+      "timestamp": "2025-08-05T06:24:12.920Z"
+    },
+    {
+      "name": "文件存在: _core/api-client.js",
+      "status": "pass",
+      "details": "",
+      "timestamp": "2025-08-05T06:24:12.921Z"
+    },
+    {
+      "name": "文件存在: _core/load-balance-manager.js",
+      "status": "pass",
+      "details": "",
+      "timestamp": "2025-08-05T06:24:12.921Z"
+    },
+    {
+      "name": "文件存在: _pages/ai-service/index.js",
+      "status": "pass",
+      "details": "",
+      "timestamp": "2025-08-05T06:24:12.922Z"
+    },
+    {
+      "name": "文件存在: _pages/ai-service/provider-config.js",
+      "status": "pass",
+      "details": "",
+      "timestamp": "2025-08-05T06:24:12.923Z"
+    },
+    {
+      "name": "文件存在: _pages/ai-service/unified-config.js",
+      "status": "pass",
+      "details": "",
+      "timestamp": "2025-08-05T06:24:12.924Z"
+    },
+    {
+      "name": "文件存在: _pages/ai-service/load-balance.js",
+      "status": "pass",
+      "details": "",
+      "timestamp": "2025-08-05T06:24:12.925Z"
+    },
+    {
+      "name": "文件存在: _pages/ai-service/load-balance-enhanced.js",
+      "status": "pass",
+      "details": "",
+      "timestamp": "2025-08-05T06:24:12.926Z"
+    },
+    {
+      "name": "文件存在: _pages/ai-service/cost-analysis.js",
+      "status": "pass",
+      "details": "",
+      "timestamp": "2025-08-05T06:24:12.927Z"
+    },
+    {
+      "name": "文件存在: _styles/layout.css",
+      "status": "pass",
+      "details": "",
+      "timestamp": "2025-08-05T06:24:12.928Z"
+    },
+    {
+      "name": "文件存在: _styles/ai-service.css",
+      "status": "pass",
+      "details": "",
+      "timestamp": "2025-08-05T06:24:12.928Z"
+    },
+    {
+      "name": "文件存在: _styles/load-balance-enhanced.css",
+      "status": "pass",
+      "details": "",
+      "timestamp": "2025-08-05T06:24:12.929Z"
+    },
+    {
+      "name": "文件存在: jest.config.js",
+      "status": "pass",
+      "details": "",
+      "timestamp": "2025-08-05T06:24:12.929Z"
+    },
+    {
+      "name": "文件存在: __tests__/setup/test-utils.js",
+      "status": "pass",
+      "details": "",
+      "timestamp": "2025-08-05T06:24:12.930Z"
+    },
+    {
+      "name": "文件存在: __tests__/core/api-client.test.js",
+      "status": "pass",
+      "details": "",
+      "timestamp": "2025-08-05T06:24:12.931Z"
+    },
+    {
+      "name": "文件存在: __tests__/core/router.test.js",
+      "status": "pass",
+      "details": "",
+      "timestamp": "2025-08-05T06:24:12.932Z"
+    },
+    {
+      "name": "文件存在: CLAUDE.md",
+      "status": "fail",
+      "details": "文件不存在",
+      "timestamp": "2025-08-05T06:24:12.932Z"
+    },
+    {
+      "name": "文件存在: AI_SERVICE_COMPREHENSIVE_ANALYSIS.md",
+      "status": "pass",
+      "details": "",
+      "timestamp": "2025-08-05T06:24:12.933Z"
+    },
+    {
+      "name": "文件存在: LOAD_BALANCE_FIX_SUMMARY.md",
+      "status": "pass",
+      "details": "",
+      "timestamp": "2025-08-05T06:24:12.933Z"
+    },
+    {
+      "name": "文件存在: TEST_FRAMEWORK_SUMMARY.md",
+      "status": "pass",
+      "details": "",
+      "timestamp": "2025-08-05T06:24:12.934Z"
+    },
+    {
+      "name": "依赖安装: jose (认证库)",
+      "status": "pass",
+      "details": "",
+      "timestamp": "2025-08-05T06:24:12.936Z"
+    },
+    {
+      "name": "依赖安装: jest (测试框架)",
+      "status": "pass",
+      "details": "",
+      "timestamp": "2025-08-05T06:24:12.936Z"
+    },
+    {
+      "name": "依赖安装: vercel (部署工具)",
+      "status": "pass",
+      "details": "",
+      "timestamp": "2025-08-05T06:24:12.936Z"
+    },
+    {
+      "name": "Node版本要求",
+      "status": "pass",
+      "details": "要求: >=18.0.0",
+      "timestamp": "2025-08-05T06:24:12.936Z"
+    },
+    {
+      "name": "Jest配置",
+      "status": "pass",
+      "details": "测试环境: jsdom",
+      "timestamp": "2025-08-05T06:24:12.938Z"
+    },
+    {
+      "name": "测试覆盖率阈值",
+      "status": "pass",
+      "details": "要求: 80%",
+      "timestamp": "2025-08-05T06:24:12.938Z"
+    },
+    {
+      "name": "Vercel配置",
+      "status": "pass",
+      "details": "配置了 0 个函数",
+      "timestamp": "2025-08-05T06:24:12.939Z"
+    },
+    {
+      "name": "Console语句检查: _app/app.js",
+      "status": "fail",
+      "details": "发现 45 个console语句",
+      "timestamp": "2025-08-05T06:24:12.941Z"
+    },
+    {
+      "name": "Console语句检查: _core/api-client.js",
+      "status": "pass",
+      "details": "发现 8 个console语句",
+      "timestamp": "2025-08-05T06:24:12.943Z"
+    },
+    {
+      "name": "Console语句检查: _core/router.js",
+      "status": "fail",
+      "details": "发现 60 个console语句",
+      "timestamp": "2025-08-05T06:24:12.944Z"
+    },
+    {
+      "name": "Console语句检查: _pages/ai-service/provider-config.js",
+      "status": "fail",
+      "details": "发现 39 个console语句",
+      "timestamp": "2025-08-05T06:24:12.947Z"
+    },
+    {
+      "name": "TODO注释检查: _app/app.js",
+      "status": "pass",
+      "details": "无TODO注释",
+      "timestamp": "2025-08-05T06:24:12.948Z"
+    },
+    {
+      "name": "TODO注释检查: _core/api-client.js",
+      "status": "pass",
+      "details": "无TODO注释",
+      "timestamp": "2025-08-05T06:24:12.950Z"
+    },
+    {
+      "name": "TODO注释检查: _core/router.js",
+      "status": "pass",
+      "details": "无TODO注释",
+      "timestamp": "2025-08-05T06:24:12.952Z"
+    },
+    {
+      "name": "TODO注释检查: _pages/ai-service/provider-config.js",
+      "status": "pass",
+      "details": "无TODO注释",
+      "timestamp": "2025-08-05T06:24:12.955Z"
+    },
+    {
+      "name": "安全检查: _app/app.js",
+      "status": "pass",
+      "details": "未发现敏感信息",
+      "timestamp": "2025-08-05T06:24:12.957Z"
+    },
+    {
+      "name": "安全检查: _core/api-client.js",
+      "status": "pass",
+      "details": "未发现敏感信息",
+      "timestamp": "2025-08-05T06:24:12.958Z"
+    },
+    {
+      "name": "安全检查: _pages/ai-service/provider-config.js",
+      "status": "pass",
+      "details": "未发现敏感信息",
+      "timestamp": "2025-08-05T06:24:12.961Z"
+    },
+    {
+      "name": ".gitignore包含: .env",
+      "status": "pass",
+      "details": "",
+      "timestamp": "2025-08-05T06:24:12.963Z"
+    },
+    {
+      "name": ".gitignore包含: node_modules",
+      "status": "pass",
+      "details": "",
+      "timestamp": "2025-08-05T06:24:12.963Z"
+    },
+    {
+      "name": ".gitignore包含: *.log",
+      "status": "pass",
+      "details": "",
+      "timestamp": "2025-08-05T06:24:12.963Z"
+    },
+    {
+      "name": ".gitignore包含: .DS_Store",
+      "status": "pass",
+      "details": "",
+      "timestamp": "2025-08-05T06:24:12.963Z"
+    },
+    {
+      "name": "服务商列表API契约",
+      "status": "pass",
+      "details": "契约符合",
+      "timestamp": "2025-08-05T06:24:12.963Z"
+    },
+    {
+      "name": "成本分析API契约",
+      "status": "pass",
+      "details": "契约符合",
+      "timestamp": "2025-08-05T06:24:12.963Z"
+    },
+    {
+      "name": "负载均衡API契约",
+      "status": "pass",
+      "details": "契约符合",
+      "timestamp": "2025-08-05T06:24:12.963Z"
+    },
+    {
+      "name": "文件大小: index.html",
+      "status": "pass",
+      "details": "3.73KB / 10KB",
+      "timestamp": "2025-08-05T06:24:12.964Z"
+    },
+    {
+      "name": "文件大小: _app/app.js",
+      "status": "pass",
+      "details": "15.54KB / 50KB",
+      "timestamp": "2025-08-05T06:24:12.965Z"
+    },
+    {
+      "name": "文件大小: _core/api-client.js",
+      "status": "pass",
+      "details": "8.17KB / 30KB",
+      "timestamp": "2025-08-05T06:24:12.966Z"
+    },
+    {
+      "name": "文件大小: _styles/layout.css",
+      "status": "pass",
+      "details": "6.54KB / 20KB",
+      "timestamp": "2025-08-05T06:24:12.966Z"
+    },
+    {
+      "name": "ES6特性使用: import/export",
+      "status": "pass",
+      "details": "已使用",
+      "timestamp": "2025-08-05T06:24:12.968Z"
+    },
+    {
+      "name": "ES6特性使用: async/await",
+      "status": "pass",
+      "details": "已使用",
+      "timestamp": "2025-08-05T06:24:12.968Z"
+    },
+    {
+      "name": "ES6特性使用: 箭头函数",
+      "status": "pass",
+      "details": "已使用",
+      "timestamp": "2025-08-05T06:24:12.968Z"
+    },
+    {
+      "name": "ES6特性使用: 模板字符串",
+      "status": "pass",
+      "details": "已使用",
+      "timestamp": "2025-08-05T06:24:12.968Z"
+    }
+  ]
+}

@@ -1,0 +1,36 @@
+{
+  "total": 1,
+  "byType": {
+    "TODO": 1,
+    "FIXME": 0,
+    "HACK": 0,
+    "NOTE": 0,
+    "XXX": 0
+  },
+  "byPriority": {
+    "high": [],
+    "medium": [
+      {
+        "file": "_utils/logger.js",
+        "line": 160,
+        "type": "TODO",
+        "text": "实现远程日志API调用",
+        "priority": "medium",
+        "code": "// TODO: 实现远程日志API调用"
+      }
+    ],
+    "low": []
+  },
+  "byFile": {
+    "_utils/logger.js": [
+      {
+        "file": "_utils/logger.js",
+        "line": 160,
+        "type": "TODO",
+        "text": "实现远程日志API调用",
+        "priority": "medium",
+        "code": "// TODO: 实现远程日志API调用"
+      }
+    ]
+  }
+}
