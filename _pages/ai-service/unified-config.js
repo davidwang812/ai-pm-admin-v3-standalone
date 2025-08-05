@@ -1,10 +1,17 @@
 // Unified Configuration Module - Advanced Provider & AI Service Management
+import { ContractCompliance } from './contract-compliance.js';
+
 export class UnifiedConfig {
   constructor(app) {
     this.app = app;
     this.providers = {};
     this.currentConfig = {};
     this.isSaving = false; // 防重复保存标志
+    
+    // 初始化契约合规性管理器
+    this.contractCompliance = new ContractCompliance();
+    
+    console.log('✅ 契约合规性管理器已加载 - Contract Development Principles Loaded');
   }
 
   getDefaultConfig() {
@@ -94,15 +101,38 @@ export class UnifiedConfig {
     let config = this.getDefaultConfig();
     let providers = {};
     
-    // First, try to load from localStorage (it may have newer data)
-    const savedConfig = localStorage.getItem('unified_config');
-    if (savedConfig) {
-      try {
-        const parsedConfig = JSON.parse(savedConfig);
-        config = { ...config, ...parsedConfig };
-        console.log('📋 Loaded unified config from localStorage');
-      } catch (e) {
-        console.error('Failed to parse saved config:', e);
+    // First, try to load from database (契约合规 - 数据库为主)
+    try {
+      if (this.app && this.app.api && typeof this.app.api.getSystemConfig === 'function') {
+        console.log('📡 尝试从数据库加载统一配置...');
+        const dbResult = await this.app.api.getSystemConfig('unified_ai_config');
+        
+        if (dbResult && dbResult.success && dbResult.config_value) {
+          const dbConfig = JSON.parse(dbResult.config_value);
+          config = { ...config, ...dbConfig };
+          
+          // 同步更新本地缓存
+          localStorage.setItem('unified_config', JSON.stringify(dbConfig));
+          console.log('✅ 已从数据库加载配置并同步到本地缓存');
+        } else {
+          console.log('ℹ️ 数据库中暂无配置，尝试本地缓存...');
+        }
+      }
+    } catch (dbError) {
+      console.warn('⚠️ 数据库加载失败，使用本地缓存:', dbError.message);
+    }
+    
+    // Fallback: load from localStorage (降级处理)
+    if (!config.lastUpdated) {
+      const savedConfig = localStorage.getItem('unified_config');
+      if (savedConfig) {
+        try {
+          const parsedConfig = JSON.parse(savedConfig);
+          config = { ...config, ...parsedConfig };
+          console.log('📋 Loaded unified config from localStorage fallback');
+        } catch (e) {
+          console.error('Failed to parse saved config:', e);
+        }
       }
     }
     
@@ -174,6 +204,39 @@ export class UnifiedConfig {
       }
     } catch (error) {
       console.log('ℹ️ API not available, using localStorage data:', error.message);
+    }
+    
+    // 契约合规性检查和配置迁移
+    console.log('🔍 正在进行契约合规性检查...');
+    const complianceResult = this.contractCompliance.validateContractCompliance(config);
+    
+    if (!complianceResult.isCompliant) {
+      console.warn('⚠️ 配置不符合数据库契约，开始自动迁移...');
+      console.log('❌ 合规性错误:', complianceResult.errors);
+      console.log('⚠️ 合规性警告:', complianceResult.warnings);
+      
+      // 自动迁移到契约合规格式
+      config = this.contractCompliance.migrateFromOldConfig(config);
+      
+      // 保存迁移后的配置
+      try {
+        localStorage.setItem('unified_config', JSON.stringify(config));
+        console.log('✅ 配置已迁移到契约合规格式');
+        
+        // 如果有app.showToast，显示迁移提示
+        if (this.app && this.app.showToast) {
+          this.app.showToast('info', '🔄 配置已自动升级到契约合规格式');
+        }
+      } catch (error) {
+        console.error('❌ 迁移配置保存失败:', error);
+      }
+    } else {
+      console.log(`✅ 配置符合契约要求 (合规度: ${complianceResult.complianceScore}%)`);
+    }
+    
+    // 显示合规性建议
+    if (complianceResult.recommendations.length > 0) {
+      console.log('💡 合规性建议:', complianceResult.recommendations);
     }
     
     this.currentConfig = config;
@@ -797,7 +860,41 @@ export class UnifiedConfig {
       
       console.log('📋 Config to save:', config);
       
-      // Save to localStorage first as backup - ensure data integrity
+      // 契约合规性验证
+      console.log('🔍 保存前进行契约合规性验证...');
+      const complianceResult = this.contractCompliance.validateContractCompliance(config);
+      
+      if (!complianceResult.isCompliant) {
+        console.warn('⚠️ 配置不符合契约，自动修复后保存...');
+        config = this.contractCompliance.buildContractCompliantConfig(config);
+        config.lastUpdated = new Date().toISOString();
+      }
+      
+      // Save to database first (契约合规 - 数据库为主)
+      let savedToDatabase = false;
+      try {
+        if (this.app && this.app.api && typeof this.app.api.saveSystemConfig === 'function') {
+          console.log('📡 尝试保存配置到数据库...');
+          const dbResult = await this.app.api.saveSystemConfig({
+            config_key: 'unified_ai_config',
+            config_value: JSON.stringify(config),
+            config_type: 'json',
+            environment: this.getEnvironment(),
+            description: 'AI服务统一配置 - 符合数据表契约'
+          });
+          
+          if (dbResult && dbResult.success) {
+            savedToDatabase = true;
+            console.log('✅ 配置已成功保存到数据库');
+          } else {
+            console.warn('⚠️ 数据库保存失败:', dbResult?.message || '未知错误');
+          }
+        }
+      } catch (dbError) {
+        console.error('❌ 数据库保存异常:', dbError);
+      }
+      
+      // Save to localStorage as backup/cache - ensure data integrity
       try {
         localStorage.setItem('unified_config', JSON.stringify(config));
         this.currentConfig = config;
@@ -822,67 +919,14 @@ export class UnifiedConfig {
         return;
       }
       
-      // Try to save via API to database
-      let savedToDatabase = false;
-      try {
-        if (this.app && this.app.api && typeof this.app.api.saveUnifiedConfig === 'function') {
-          console.log('📡 Attempting to save to database via API...');
-          const response = await this.app.api.saveUnifiedConfig(config);
-          console.log('📡 API response:', response);
-          
-          // Check different possible success indicators
-          // Some APIs return {success: true}, others return {status: 'success'}, 
-          // and some just return the data without error
-          if (response && (
-            response.success === true || 
-            response.status === 'success' || 
-            response.status === 200 ||
-            response.code === 200 ||
-            response.code === 0 ||
-            (response.data && !response.error && !response.message?.includes('error'))
-          )) {
-            savedToDatabase = true;
-            if (this.app.showToast) {
-              this.app.showToast('success', '✅ 统一配置已保存到数据库');
-            }
-            console.log('✅ Configuration saved to database successfully');
-            return;
-          } else if (!response) {
-            // If no response or empty response, might still be successful for some APIs
-            console.log('⚠️ Empty API response, assuming success');
-            savedToDatabase = true;
-            if (this.app.showToast) {
-              this.app.showToast('success', '✅ 统一配置已保存');
-            }
-            return;
-          } else {
-            console.warn('⚠️ API returned response without clear success indicator:', response);
-            // If response has no error field, might still be successful
-            if (!response.error && !response.errorCode && !response.errorMessage) {
-              console.log('ℹ️ No error in response, treating as success');
-              savedToDatabase = true;
-              if (this.app.showToast) {
-                this.app.showToast('success', '✅ 统一配置已保存');
-              }
-              return;
-            }
-          }
-        } else {
-          console.log('⚠️ API not available or saveUnifiedConfig method missing');
-        }
-      } catch (apiError) {
-        console.error('❌ Failed to save to database:', apiError);
-        console.error('Error details:', {
-          message: apiError.message,
-          stack: apiError.stack,
-          response: apiError.response
-        });
-      }
-      
       // Show appropriate message based on save result
-      if (!savedToDatabase) {
+      if (savedToDatabase) {
         if (this.app && this.app.showToast) {
-          this.app.showToast('warning', '⚠️ 配置已保存到本地（数据库不可用）');
+          this.app.showToast('success', `✅ 配置已保存到数据库 (合规度: ${complianceResult.complianceScore}%)`);
+        }
+      } else {
+        if (this.app && this.app.showToast) {
+          this.app.showToast('warning', '⚠️ 配置已保存到本地缓存（数据库不可用）');
         } else {
           console.log('⚠️ Configuration saved to localStorage only (database unavailable)');
         }
@@ -932,6 +976,29 @@ export class UnifiedConfig {
       
       this.app.showToast('success', '✅ 配置已重置为默认值');
     }
+  }
+
+  /**
+   * 获取当前环境
+   */
+  getEnvironment() {
+    // 检查是否在生产环境
+    if (typeof window !== 'undefined') {
+      const hostname = window.location.hostname;
+      if (hostname.includes('vercel.app') || hostname.includes('railway.app')) {
+        return 'prod';
+      }
+      if (hostname === 'localhost' || hostname === '127.0.0.1') {
+        return 'dev';
+      }
+    }
+    
+    // 检查环境变量
+    if (typeof process !== 'undefined' && process.env) {
+      return process.env.NODE_ENV || 'dev';
+    }
+    
+    return 'dev';
   }
 
   /**
