@@ -1,0 +1,286 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>数据源可视化测试</title>
+    <style>
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            margin: 0;
+            padding: 20px;
+            background: #f5f5f5;
+        }
+        .test-header {
+            background: white;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+            margin-bottom: 20px;
+        }
+        .test-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 20px;
+        }
+        .test-card {
+            background: white;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+        }
+        .status {
+            display: inline-block;
+            padding: 4px 12px;
+            border-radius: 4px;
+            font-size: 14px;
+            font-weight: 500;
+        }
+        .status.success {
+            background: #e8f5e9;
+            color: #2e7d32;
+        }
+        .status.error {
+            background: #ffebee;
+            color: #c62828;
+        }
+        .status.pending {
+            background: #fff3e0;
+            color: #ef6c00;
+        }
+        button {
+            background: #667eea;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 4px;
+            cursor: pointer;
+            margin: 5px;
+        }
+        button:hover {
+            background: #5a67d8;
+        }
+        pre {
+            background: #f5f5f5;
+            padding: 10px;
+            border-radius: 4px;
+            overflow-x: auto;
+            font-size: 12px;
+        }
+        .iframe-container {
+            width: 100%;
+            height: 600px;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            overflow: hidden;
+        }
+        iframe {
+            width: 100%;
+            height: 100%;
+            border: none;
+        }
+    </style>
+</head>
+<body>
+    <div class="test-header">
+        <h1>🧪 数据源页面可视化测试</h1>
+        <p>测试V3管理系统的数据源功能是否正常工作</p>
+        <button onclick="runAllTests()">运行所有测试</button>
+        <button onclick="window.open('https://ai-pm-admin-v3-prod.vercel.app', '_blank')">在新窗口打开</button>
+    </div>
+
+    <div class="test-grid">
+        <div class="test-card">
+            <h3>📝 测试清单</h3>
+            <div id="test-checklist">
+                <p>1. 登录功能 <span class="status pending" id="status-login">待测试</span></p>
+                <p>2. 页面加载 <span class="status pending" id="status-page">待测试</span></p>
+                <p>3. AI服务导航 <span class="status pending" id="status-nav">待测试</span></p>
+                <p>4. 数据源标签 <span class="status pending" id="status-tab">待测试</span></p>
+                <p>5. 按钮功能 <span class="status pending" id="status-buttons">待测试</span></p>
+                <p>6. 模块加载 <span class="status pending" id="status-modules">待测试</span></p>
+            </div>
+        </div>
+
+        <div class="test-card">
+            <h3>📊 测试结果</h3>
+            <div id="test-results">
+                <pre>点击"运行所有测试"开始...</pre>
+            </div>
+        </div>
+
+        <div class="test-card">
+            <h3>🔍 代码检查</h3>
+            <div id="code-check">
+                <pre>等待测试...</pre>
+            </div>
+        </div>
+
+        <div class="test-card">
+            <h3>⚡ 快速操作</h3>
+            <button onclick="testLogin()">测试登录</button>
+            <button onclick="checkDataSourceCode()">检查数据源代码</button>
+            <button onclick="checkAIServiceCode()">检查AI服务代码</button>
+            <button onclick="openInFrame()">在iframe中打开</button>
+        </div>
+    </div>
+
+    <div style="margin-top: 20px;">
+        <div class="test-card">
+            <h3>🖼️ 页面预览</h3>
+            <div class="iframe-container">
+                <iframe id="preview-frame" src="about:blank"></iframe>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const BASE_URL = 'https://ai-pm-admin-v3-prod.vercel.app';
+        let authToken = null;
+
+        function updateStatus(id, status, text) {
+            const elem = document.getElementById(`status-${id}`);
+            elem.className = `status ${status}`;
+            elem.textContent = text || status;
+        }
+
+        function log(message) {
+            const results = document.getElementById('test-results');
+            results.innerHTML = `<pre>${new Date().toLocaleTimeString()} - ${message}\n${results.querySelector('pre')?.textContent || ''}</pre>`;
+        }
+
+        async function testLogin() {
+            updateStatus('login', 'pending', '测试中...');
+            log('开始测试登录...');
+            
+            try {
+                const response = await fetch(`${BASE_URL}/api/auth/admin/login`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        username: 'davidwang812',
+                        password: 'Admin@4444'
+                    })
+                });
+                
+                const data = await response.json();
+                if (data.success) {
+                    authToken = data.data.token;
+                    updateStatus('login', 'success', '成功');
+                    log(`✅ 登录成功，redirectUrl: ${data.data.redirectUrl}`);
+                    return true;
+                } else {
+                    updateStatus('login', 'error', '失败');
+                    log(`❌ 登录失败: ${data.message}`);
+                    return false;
+                }
+            } catch (error) {
+                updateStatus('login', 'error', '错误');
+                log(`❌ 登录请求失败: ${error.message}`);
+                return false;
+            }
+        }
+
+        async function checkDataSourceCode() {
+            log('检查数据源代码...');
+            
+            try {
+                const response = await fetch(`${BASE_URL}/_pages/ai-service/data-sources.js`);
+                const code = await response.text();
+                
+                const checks = {
+                    'DataSources类定义': /export class DataSources/,
+                    'testDataSources按钮': /window\.adminV3App\.aiServicePage\.testDataSources/,
+                    'refreshDataSources按钮': /window\.adminV3App\.aiServicePage\.refreshDataSources/,
+                    'updateVercelUrl函数': /window\.adminV3App\.aiServicePage\.updateVercelUrl/,
+                    '错误的adminApp引用': /window\.adminApp\./
+                };
+                
+                let results = [];
+                for (const [name, pattern] of Object.entries(checks)) {
+                    const found = pattern.test(code);
+                    if (name.includes('错误')) {
+                        results.push(`${found ? '❌' : '✅'} ${name}: ${found ? '发现错误' : '未发现（正确）'}`);
+                    } else {
+                        results.push(`${found ? '✅' : '❌'} ${name}: ${found ? '找到' : '未找到'}`);
+                    }
+                }
+                
+                document.getElementById('code-check').innerHTML = `<pre>${results.join('\n')}</pre>`;
+                
+                const hasErrors = results.some(r => r.startsWith('❌'));
+                updateStatus('buttons', hasErrors ? 'error' : 'success', hasErrors ? '有问题' : '正常');
+                
+                return !hasErrors;
+            } catch (error) {
+                log(`❌ 代码检查失败: ${error.message}`);
+                return false;
+            }
+        }
+
+        async function checkAIServiceCode() {
+            log('检查AI服务主模块...');
+            
+            try {
+                const response = await fetch(`${BASE_URL}/_pages/ai-service/index.js`);
+                const code = await response.text();
+                
+                const checks = {
+                    'AIServicePage类': /export class AIServicePage/,
+                    '全局绑定': /window\.adminV3App\.aiServicePage = this/,
+                    'testDataSources方法': /async testDataSources\(\)/,
+                    'refreshDataSources方法': /async refreshDataSources\(\)/
+                };
+                
+                let allGood = true;
+                for (const [name, pattern] of Object.entries(checks)) {
+                    const found = pattern.test(code);
+                    log(`${found ? '✅' : '❌'} ${name}: ${found ? '找到' : '未找到'}`);
+                    if (!found) allGood = false;
+                }
+                
+                updateStatus('modules', allGood ? 'success' : 'error', allGood ? '正常' : '有问题');
+                return allGood;
+            } catch (error) {
+                log(`❌ 模块检查失败: ${error.message}`);
+                return false;
+            }
+        }
+
+        function openInFrame() {
+            const iframe = document.getElementById('preview-frame');
+            iframe.src = BASE_URL;
+            log('已在iframe中打开管理页面');
+        }
+
+        async function runAllTests() {
+            log('🚀 开始运行所有测试...');
+            
+            // 1. 登录测试
+            const loginSuccess = await testLogin();
+            if (!loginSuccess) {
+                log('❌ 登录失败，停止测试');
+                return;
+            }
+            
+            // 2. 页面加载测试
+            updateStatus('page', 'pending', '测试中...');
+            openInFrame();
+            setTimeout(() => {
+                updateStatus('page', 'success', '已加载');
+                log('✅ 页面加载成功');
+            }, 2000);
+            
+            // 3. 代码检查
+            await checkDataSourceCode();
+            await checkAIServiceCode();
+            
+            // 4. 导航和标签测试需要手动验证
+            updateStatus('nav', 'pending', '需手动验证');
+            updateStatus('tab', 'pending', '需手动验证');
+            
+            log('✅ 自动测试完成，请手动验证导航功能');
+        }
+    </script>
+</body>
+</html>

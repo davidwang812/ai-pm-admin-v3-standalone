@@ -137,17 +137,29 @@ export class UnifiedConfig {
         }
         
         if (apiConfigData) {
-          // Check if API data is newer
+          // Check if API data is newer AND valid
           const localLastUpdated = config.lastUpdated ? new Date(config.lastUpdated).getTime() : 0;
-          const remoteLastUpdated = apiLastUpdated ? new Date(apiLastUpdated).getTime() : Date.now();
+          const remoteLastUpdated = apiLastUpdated ? new Date(apiLastUpdated).getTime() : 0;
           
-          if (!savedConfig || remoteLastUpdated > localLastUpdated) {
-            config = { ...config, ...apiConfigData };
-            // Save API data to localStorage for next time
-            localStorage.setItem('unified_config', JSON.stringify(config));
-            console.log('📋 Using newer config from API and saved to localStorage');
+          // Only use API data if:
+          // 1. No local config exists, OR
+          // 2. API data has a valid timestamp AND is newer than local
+          if (!savedConfig || (remoteLastUpdated > 0 && remoteLastUpdated > localLastUpdated)) {
+            // Verify API data has essential structure before using it
+            if (apiConfigData.globalParams || apiConfigData.aiServices) {
+              config = { ...config, ...apiConfigData };
+              // Add timestamp if missing
+              if (!config.lastUpdated) {
+                config.lastUpdated = new Date().toISOString();
+              }
+              // Save API data to localStorage for next time
+              localStorage.setItem('unified_config', JSON.stringify(config));
+              console.log('📋 Using newer config from API and saved to localStorage');
+            } else {
+              console.warn('⚠️ API config data missing essential structure, keeping local config');
+            }
           } else {
-            console.log('📋 Local config is newer, keeping it');
+            console.log('📋 Local config is newer or API timestamp invalid, keeping local config');
           }
         }
       }
@@ -183,6 +195,9 @@ export class UnifiedConfig {
             </button>
             <button class="btn btn-default" id="btn-export-unified">
               📤 导出配置
+            </button>
+            <button class="btn btn-info" id="btn-force-load-local" title="从本地存储强制重新加载配置">
+              💾 从本地加载
             </button>
           </div>
         </div>
@@ -599,6 +614,7 @@ export class UnifiedConfig {
     this.bindButton('btn-reset-unified', () => this.resetConfig());
     this.bindButton('btn-sync-providers', () => this.syncProviders());
     this.bindButton('btn-export-unified', () => this.exportConfig());
+    this.bindButton('btn-force-load-local', () => this.forceLoadFromLocalStorage());
     
     // Table change events
     this.bindTableEvents();
@@ -781,9 +797,30 @@ export class UnifiedConfig {
       
       console.log('📋 Config to save:', config);
       
-      // Save to localStorage first as backup
-      localStorage.setItem('unified_config', JSON.stringify(config));
-      this.currentConfig = config;
+      // Save to localStorage first as backup - ensure data integrity
+      try {
+        localStorage.setItem('unified_config', JSON.stringify(config));
+        this.currentConfig = config;
+        console.log('✅ Configuration saved to localStorage successfully');
+        
+        // Verify the save worked by reading it back
+        const verifyConfig = localStorage.getItem('unified_config');
+        if (!verifyConfig) {
+          throw new Error('localStorage save verification failed - data not found');
+        }
+        const parsedVerify = JSON.parse(verifyConfig);
+        if (!parsedVerify.lastUpdated || parsedVerify.lastUpdated !== config.lastUpdated) {
+          throw new Error('localStorage save verification failed - data mismatch');
+        }
+        console.log('✅ localStorage save verification passed');
+        
+      } catch (saveError) {
+        console.error('❌ Critical: Failed to save to localStorage:', saveError);
+        if (this.app.showToast) {
+          this.app.showToast('error', '❌ 配置保存失败: ' + saveError.message);
+        }
+        return;
+      }
       
       // Try to save via API to database
       let savedToDatabase = false;
@@ -877,25 +914,60 @@ export class UnifiedConfig {
     }
   }
 
-  resetConfig() {
-    if (confirm('确定要重置为默认配置吗？')) {
+  async resetConfig() {
+    if (confirm('确定要重置为默认配置吗？这将清除所有自定义设置。')) {
       const defaultConfig = this.getDefaultConfig();
-      document.getElementById('system-prompt').value = defaultConfig.systemPrompt;
-      document.getElementById('temperature').value = defaultConfig.temperature;
-      document.getElementById('temperature-value').textContent = defaultConfig.temperature;
-      document.getElementById('max-tokens').value = defaultConfig.maxTokens;
-      document.getElementById('top-p').value = defaultConfig.topP;
-      document.getElementById('top-p-value').textContent = defaultConfig.topP;
-      document.getElementById('frequency-penalty').value = defaultConfig.frequencyPenalty;
-      document.getElementById('frequency-penalty-value').textContent = defaultConfig.frequencyPenalty;
-      document.getElementById('presence-penalty').value = defaultConfig.presencePenalty;
-      document.getElementById('presence-penalty-value').textContent = defaultConfig.presencePenalty;
-      document.getElementById('stream-enabled').checked = defaultConfig.stream;
+      // Ensure timestamp for proper versioning
+      defaultConfig.lastUpdated = new Date().toISOString();
       
-      // Clear role configs
-      document.querySelector('#role-config-table tbody').innerHTML = '';
+      this.currentConfig = defaultConfig;
+      localStorage.setItem('unified_config', JSON.stringify(defaultConfig));
       
-      this.app.showToast('info', '已重置为默认配置');
+      console.log('🔄 Configuration reset to defaults:', defaultConfig);
+      
+      // Force refresh the current page
+      if (window.adminV3App && window.adminV3App.router) {
+        window.adminV3App.router.handleRoute();
+      }
+      
+      this.app.showToast('success', '✅ 配置已重置为默认值');
+    }
+  }
+
+  /**
+   * 强制从localStorage重新加载配置
+   */
+  forceLoadFromLocalStorage() {
+    console.log('🔄 Force loading config from localStorage...');
+    const savedConfig = localStorage.getItem('unified_config');
+    if (savedConfig) {
+      try {
+        const parsedConfig = JSON.parse(savedConfig);
+        this.currentConfig = parsedConfig;
+        console.log('✅ Configuration force-loaded from localStorage');
+        
+        // Force refresh the current page
+        if (window.adminV3App && window.adminV3App.router) {
+          window.adminV3App.router.handleRoute();
+        }
+        
+        if (this.app.showToast) {
+          this.app.showToast('success', '✅ 配置已从本地存储重新加载');
+        }
+        return true;
+      } catch (error) {
+        console.error('❌ Failed to parse localStorage config:', error);
+        if (this.app.showToast) {
+          this.app.showToast('error', '❌ 本地存储配置解析失败');
+        }
+        return false;
+      }
+    } else {
+      console.warn('⚠️ No config found in localStorage');
+      if (this.app.showToast) {
+        this.app.showToast('warning', '⚠️ 本地存储中没有找到配置');
+      }
+      return false;
     }
   }
 
