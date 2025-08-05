@@ -254,7 +254,7 @@ export class UnifiedConfig {
           <div class="empty-icon">🤖</div>
           <div class="empty-title">暂无配置的服务商</div>
           <div class="empty-desc">请先在"服务商配置"页面添加AI服务商</div>
-          <button class="btn btn-primary" onclick="window.adminApp.router.navigate('/admin-v2/ai-service?tab=provider-config')">
+          <button class="btn btn-primary" onclick="window.adminV3App.router.navigate('/admin-v2/ai-service?tab=provider-config')">
             ➕ 去添加服务商
           </button>
         </div>
@@ -307,7 +307,7 @@ export class UnifiedConfig {
                            ${isAssigned && serviceConfig.enabled ? 'checked' : ''}>
                     <span class="slider-xs"></span>
                   </label>
-                  <button class="btn btn-xs" onclick="window.adminApp.aiServicePage.modules.unifiedConfig.editPrompt('${service}', '${provider.type}', '${provider.id}')">
+                  <button class="btn btn-xs" onclick="window.adminV3App.aiServicePage.modules.unifiedConfig.editPrompt('${service}', '${provider.type}', '${provider.id}')">
                     ✏️
                   </button>
                 </div>
@@ -517,7 +517,7 @@ export class UnifiedConfig {
             <button class="btn btn-secondary" onclick="document.getElementById('prompt-edit-modal').remove()">
               取消
             </button>
-            <button class="btn btn-primary" onclick="window.adminApp.aiServicePage.modules.unifiedConfig.savePrompt('${service}', '${providerType}', '${providerId}')">
+            <button class="btn btn-primary" onclick="window.adminV3App.aiServicePage.modules.unifiedConfig.savePrompt('${service}', '${providerType}', '${providerId}')">
               保存
             </button>
           </div>
@@ -936,7 +936,7 @@ export class UnifiedConfig {
       <td><textarea class="form-control role-prompt" rows="2">你是一个专业的助手</textarea></td>
       <td><input type="number" value="0.7" class="form-control role-temperature" min="0" max="2" step="0.1"></td>
       <td>
-        <button class="btn btn-danger btn-sm" onclick="window.adminApp.removeRole(${index})">删除</button>
+        <button class="btn btn-danger btn-sm" onclick="window.adminV3App.removeRole(${index})">删除</button>
       </td>
     `;
     

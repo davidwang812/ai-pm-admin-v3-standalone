@@ -236,17 +236,17 @@ export class ProviderConfig {
         <td>${createdAt}</td>
         <td>
           <div class="action-buttons">
-            <button class="btn btn-sm btn-primary" onclick="window.adminApp.aiServicePage.modules.providers.editProvider('${provider.type}', '${provider.id}')">
+            <button class="btn btn-sm btn-primary" onclick="window.adminV3App.aiServicePage.modules.providers.editProvider('${provider.type}', '${provider.id}')">
               ✏️ 编辑
             </button>
             <button class="btn btn-sm ${provider.enabled ? 'btn-warning' : 'btn-success'}" 
-                    onclick="window.adminApp.aiServicePage.modules.providers.toggleProvider('${provider.type}', '${provider.id}', ${!provider.enabled})">
+                    onclick="window.adminV3App.aiServicePage.modules.providers.toggleProvider('${provider.type}', '${provider.id}', ${!provider.enabled})">
               ${provider.enabled ? '🚫 禁用' : '✅ 启用'}
             </button>
-            <button class="btn btn-sm btn-info" onclick="window.adminApp.aiServicePage.modules.providers.testProvider('${provider.type}', '${provider.id}')">
+            <button class="btn btn-sm btn-info" onclick="window.adminV3App.aiServicePage.modules.providers.testProvider('${provider.type}', '${provider.id}')">
               🧪 测试
             </button>
-            <button class="btn btn-sm btn-danger" onclick="window.adminApp.aiServicePage.modules.providers.deleteProvider('${provider.type}', '${provider.id}')">
+            <button class="btn btn-sm btn-danger" onclick="window.adminV3App.aiServicePage.modules.providers.deleteProvider('${provider.type}', '${provider.id}')">
               🗑️ 删除
             </button>
           </div>
@@ -261,7 +261,7 @@ export class ProviderConfig {
         <div class="empty-icon">📭</div>
         <h3>尚未配置服务商</h3>
         <p>点击"添加服务商"按钮开始配置AI服务</p>
-        <button class="btn btn-primary" onclick="window.adminApp.aiServicePage.modules.providers.showAddDialog()">
+        <button class="btn btn-primary" onclick="window.adminV3App.aiServicePage.modules.providers.showAddDialog()">
           ➕ 添加第一个服务商
         </button>
       </div>
@@ -506,7 +506,7 @@ export class ProviderConfig {
               <form id="provider-form">
                 <div class="form-group">
                   <label>服务商类型 <span class="required">*</span></label>
-                  <select name="type" required class="form-control" onchange="window.adminApp.aiServicePage.modules.providers.onProviderTypeChange()">
+                  <select name="type" required class="form-control" onchange="window.adminV3App.aiServicePage.modules.providers.onProviderTypeChange()">
                     <option value="">请选择服务商类型</option>
                     ${providerOptions}
                   </select>
@@ -555,7 +555,7 @@ export class ProviderConfig {
               <button class="btn btn-secondary" onclick="document.getElementById('provider-modal').remove()">
                 取消
               </button>
-              <button class="btn btn-primary" onclick="window.adminApp.aiServicePage.modules.providers.saveProvider()">
+              <button class="btn btn-primary" onclick="window.adminV3App.aiServicePage.modules.providers.saveProvider()">
                 保存
               </button>
             </div>
@@ -722,7 +722,7 @@ export class ProviderConfig {
             <button class="btn btn-secondary" onclick="document.getElementById('provider-modal').remove()">
               取消
             </button>
-            <button class="btn btn-primary" onclick="window.adminApp.aiServicePage.modules.providers.updateProvider()">
+            <button class="btn btn-primary" onclick="window.adminV3App.aiServicePage.modules.providers.updateProvider()">
               更新
             </button>
           </div>

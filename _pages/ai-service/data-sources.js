@@ -64,10 +64,10 @@ export class DataSources {
         <div class="data-sources-header">
           <h3>📊 数据源管理</h3>
           <div class="header-actions">
-            <button class="btn btn-primary" onclick="window.adminApp.aiServicePage.testDataSources()">
+            <button class="btn btn-primary" onclick="window.adminV3App.aiServicePage.testDataSources()">
               🧪 测试连接
             </button>
-            <button class="btn btn-default" onclick="window.adminApp.aiServicePage.refreshDataSources()">
+            <button class="btn btn-default" onclick="window.adminV3App.aiServicePage.refreshDataSources()">
               🔄 刷新数据
             </button>
           </div>
@@ -90,14 +90,14 @@ export class DataSources {
                       class="detail-input" 
                       value="${this.dataSourceConfig.vercel.url || ''}"
                       placeholder="https://your-vercel-app.vercel.app"
-                      onchange="window.adminApp.aiServicePage.updateVercelUrl(this.value)"
+                      onchange="window.adminV3App.aiServicePage.updateVercelUrl(this.value)"
                       style="flex: 1; padding: 4px 8px; border: 1px solid #d9d9d9; border-radius: 4px; margin: 4px 0;">
                   </div>
                   <div class="detail-item" style="width: 100%; margin-top: 8px;">
-                    <button class="btn btn-sm btn-default" onclick="window.adminApp.aiServicePage.testVercelConnection()">
+                    <button class="btn btn-sm btn-default" onclick="window.adminV3App.aiServicePage.testVercelConnection()">
                       🧪 测试连接
                     </button>
-                    <button class="btn btn-sm btn-default" onclick="window.adminApp.aiServicePage.deployVercel()">
+                    <button class="btn btn-sm btn-default" onclick="window.adminV3App.aiServicePage.deployVercel()">
                       🚀 部署指南
                     </button>
                   </div>
@@ -116,7 +116,7 @@ export class DataSources {
                 <label class="toggle-switch">
                   <input type="checkbox" 
                     ${this.dataSourceConfig[source.id].enabled ? 'checked' : ''}
-                    onchange="window.adminApp.aiServicePage.toggleDataSource('${source.id}', this.checked)"
+                    onchange="window.adminV3App.aiServicePage.toggleDataSource('${source.id}', this.checked)"
                     ${source.id === 'vercel' && !this.dataSourceConfig.vercel.url ? 'disabled' : ''}>
                   <span class="toggle-slider ${this.dataSourceConfig[source.id].enabled ? 'active' : ''}"></span>
                 </label>
