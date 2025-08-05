@@ -1,0 +1,20 @@
+{
+  "name": "ai-pm-admin-v3-standalone",
+  "version": "3.0.0",
+  "description": "AI Product Manager Admin V3 - Standalone Version",
+  "private": true,
+  "scripts": {
+    "dev": "vercel dev",
+    "build": "echo 'No build required'",
+    "start": "vercel"
+  },
+  "dependencies": {
+    "jose": "^5.2.0"
+  },
+  "devDependencies": {
+    "vercel": "^44.0.0"
+  },
+  "engines": {
+    "node": ">=18.0.0"
+  }
+}
