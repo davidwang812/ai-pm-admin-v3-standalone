@@ -272,8 +272,7 @@ export class ContractCompliance {
             isCompliant: errors.length === 0,
             errors,
             warnings,
-            complianceScore: this.calculateComplianceScore(config),
-            recommendations: this.getComplianceRecommendations(config)
+            complianceScore: this.calculateComplianceScore(config)
         };
     }
 
