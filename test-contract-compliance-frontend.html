@@ -1,0 +1,489 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>🧪 Contract Compliance Frontend Test</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            margin: 0;
+            padding: 20px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: #333;
+        }
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 12px;
+            padding: 30px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+        }
+        .header {
+            text-align: center;
+            margin-bottom: 30px;
+            padding-bottom: 20px;
+            border-bottom: 2px solid #e9ecef;
+        }
+        .test-section {
+            margin: 20px 0;
+            padding: 20px;
+            border: 1px solid #dee2e6;
+            border-radius: 8px;
+            background: #f8f9fa;
+        }
+        .test-result {
+            padding: 10px;
+            margin: 10px 0;
+            border-radius: 4px;
+            font-family: monospace;
+        }
+        .success {
+            background: #d4edda;
+            border: 1px solid #c3e6cb;
+            color: #155724;
+        }
+        .error {
+            background: #f8d7da;
+            border: 1px solid #f5c6cb;
+            color: #721c24;
+        }
+        .info {
+            background: #d1ecf1;
+            border: 1px solid #bee5eb;
+            color: #0c5460;
+        }
+        button {
+            background: #007bff;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 4px;
+            cursor: pointer;
+            margin: 5px;
+        }
+        button:hover {
+            background: #0056b3;
+        }
+        .json-display {
+            background: #f8f9fa;
+            border: 1px solid #dee2e6;
+            border-radius: 4px;
+            padding: 15px;
+            margin: 10px 0;
+            white-space: pre-wrap;
+            font-family: monospace;
+            font-size: 12px;
+            overflow-x: auto;
+        }
+        .status-badge {
+            display: inline-block;
+            padding: 4px 8px;
+            border-radius: 12px;
+            font-size: 12px;
+            font-weight: bold;
+            margin: 2px;
+        }
+        .compliant {
+            background: #28a745;
+            color: white;
+        }
+        .non-compliant {
+            background: #dc3545;
+            color: white;
+        }
+        .deprecated {
+            background: #ffc107;
+            color: #212529;
+        }
+        .planned {
+            background: #17a2b8;
+            color: white;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🧪 Contract Compliance Frontend Test</h1>
+            <p>测试契约合规性模块的前端功能实现</p>
+        </div>
+
+        <div class="test-section">
+            <h3>📋 Test 1: ContractCompliance Module Import</h3>
+            <button onclick="testModuleImport()">测试模块导入</button>
+            <div id="import-result"></div>
+        </div>
+
+        <div class="test-section">
+            <h3>📊 Test 2: AI Service Contracts</h3>
+            <button onclick="testServiceContracts()">测试服务契约定义</button>
+            <div id="contracts-result"></div>
+        </div>
+
+        <div class="test-section">
+            <h3>🔧 Test 3: Contract Compliant Configuration</h3>
+            <button onclick="testContractCompliantConfig()">测试合规配置构建</button>
+            <div id="config-result"></div>
+        </div>
+
+        <div class="test-section">
+            <h3>✅ Test 4: Configuration Validation</h3>
+            <button onclick="testConfigValidation()">测试配置验证</button>
+            <div id="validation-result"></div>
+        </div>
+
+        <div class="test-section">
+            <h3>🔄 Test 5: Old Config Migration</h3>
+            <button onclick="testConfigMigration()">测试配置迁移</button>
+            <div id="migration-result"></div>
+        </div>
+
+        <div class="test-section">
+            <h3>📈 Test 6: Compliance Score</h3>
+            <button onclick="testComplianceScore()">测试合规性评分</button>
+            <div id="score-result"></div>
+        </div>
+
+        <div class="test-section">
+            <h3>🎯 Final Test Result</h3>
+            <button onclick="runAllTests()">运行所有测试</button>
+            <div id="final-result"></div>
+        </div>
+    </div>
+
+    <script type="module">
+        // Import ContractCompliance from the deployed module
+        let ContractCompliance;
+        let contractManager;
+
+        // Test results storage
+        const testResults = {};
+
+        // Utility functions
+        function displayResult(elementId, content, type = 'info') {
+            const element = document.getElementById(elementId);
+            element.innerHTML = `<div class="test-result ${type}">${content}</div>`;
+        }
+
+        function formatJSON(obj) {
+            return JSON.stringify(obj, null, 2);
+        }
+
+        // Test 1: Module Import
+        window.testModuleImport = async function() {
+            try {
+                // Import the ContractCompliance module
+                const module = await import('https://ai-pm-admin-v3-prod.vercel.app/_pages/ai-service/contract-compliance.js');
+                ContractCompliance = module.ContractCompliance;
+                contractManager = new ContractCompliance();
+                
+                const result = `
+✅ 模块导入成功!
+- ContractCompliance class: ${typeof ContractCompliance}
+- Instance created: ${contractManager instanceof ContractCompliance}
+- Contract version: ${contractManager.contractVersion}
+- Last updated: ${contractManager.lastUpdated}
+                `;
+                
+                displayResult('import-result', result, 'success');
+                testResults.import = true;
+            } catch (error) {
+                displayResult('import-result', `❌ 模块导入失败: ${error.message}`, 'error');
+                testResults.import = false;
+            }
+        };
+
+        // Test 2: Service Contracts
+        window.testServiceContracts = function() {
+            if (!contractManager) {
+                displayResult('contracts-result', '❌ 请先运行模块导入测试', 'error');
+                return;
+            }
+
+            try {
+                const contracts = contractManager.getAIServiceContracts();
+                const deprecated = contractManager.getDeprecatedServices();
+                const providers = contractManager.getSupportedProviders();
+                
+                let result = `✅ 服务契约测试通过!\n\n`;
+                
+                // Active services
+                result += `📋 活跃服务 (${Object.keys(contracts).length}):\n`;
+                for (const [key, contract] of Object.entries(contracts)) {
+                    const statusBadge = contract.status === 'active' ? 
+                        `<span class="status-badge compliant">活跃</span>` :
+                        `<span class="status-badge planned">计划中</span>`;
+                    result += `  • ${contract.displayName} (${contract.contractType}) ${statusBadge}\n`;
+                }
+                
+                // Deprecated services
+                result += `\n⚠️  废弃服务 (${Object.keys(deprecated).length}):\n`;
+                for (const [key, service] of Object.entries(deprecated)) {
+                    result += `  • ${service.displayName} - ${service.reason}\n`;
+                }
+                
+                // Providers
+                result += `\n🔗 支持的提供商 (${Object.keys(providers).length}):\n`;
+                for (const [key, provider] of Object.entries(providers)) {
+                    result += `  • ${provider.displayName} - 支持服务: ${provider.supportedServices.join(', ')}\n`;
+                }
+                
+                displayResult('contracts-result', `<div class="json-display">${result}</div>`, 'success');
+                testResults.contracts = true;
+            } catch (error) {
+                displayResult('contracts-result', `❌ 服务契约测试失败: ${error.message}`, 'error');
+                testResults.contracts = false;
+            }
+        };
+
+        // Test 3: Contract Compliant Configuration
+        window.testContractCompliantConfig = function() {
+            if (!contractManager) {
+                displayResult('config-result', '❌ 请先运行模块导入测试', 'error');
+                return;
+            }
+
+            try {
+                // Test with a sample current config
+                const currentConfig = {
+                    globalParams: { temperature: 0.8, topP: 0.95, maxTokens: 1500 },
+                    aiServices: {
+                        questionAI: { enabled: true, provider: 'openai', prompt: 'Test prompt' },
+                        translationAI: { enabled: true, provider: 'google', prompt: 'Translation prompt' }
+                    }
+                };
+                
+                const compliantConfig = contractManager.buildContractCompliantConfig(currentConfig);
+                
+                let result = `✅ 合规配置构建成功!\n\n`;
+                result += `📊 配置概览:\n`;
+                result += `  • 活跃服务: ${Object.keys(compliantConfig.aiServices).length}\n`;
+                result += `  • 计划服务: ${Object.keys(compliantConfig.plannedServices).length}\n`;
+                result += `  • 废弃服务: ${Object.keys(compliantConfig.deprecatedServices).length}\n`;
+                result += `  • 合规状态: ${compliantConfig.contractInfo.complianceStatus}\n`;
+                result += `  • 契约版本: ${compliantConfig.contractInfo.version}\n\n`;
+                
+                result += `🔧 示例服务配置:\n`;
+                const firstService = Object.values(compliantConfig.aiServices)[0];
+                if (firstService) {
+                    result += `${formatJSON(firstService)}`;
+                }
+                
+                displayResult('config-result', `<div class="json-display">${result}</div>`, 'success');
+                testResults.config = true;
+            } catch (error) {
+                displayResult('config-result', `❌ 合规配置构建失败: ${error.message}`, 'error');
+                testResults.config = false;
+            }
+        };
+
+        // Test 4: Configuration Validation
+        window.testConfigValidation = function() {
+            if (!contractManager) {
+                displayResult('validation-result', '❌ 请先运行模块导入测试', 'error');
+                return;
+            }
+
+            try {
+                // Test with compliant config
+                const compliantConfig = {
+                    aiServices: {
+                        questionAI: { service_type: 'question', provider: 'openai' },
+                        assistantAI: { service_type: 'assist', provider: 'moonshot' },
+                        drawingAI: { service_type: 'draw', provider: 'google' }
+                    }
+                };
+                
+                // Test with non-compliant config
+                const nonCompliantConfig = {
+                    aiServices: {
+                        invalidAI: { service_type: 'invalid', provider: 'unknown' },
+                        translationAI: { service_type: 'translation', provider: 'google' }
+                    }
+                };
+                
+                const compliantValidation = contractManager.validateContractCompliance(compliantConfig);
+                const nonCompliantValidation = contractManager.validateContractCompliance(nonCompliantConfig);
+                
+                let result = `✅ 配置验证测试完成!\n\n`;
+                
+                result += `📋 合规配置验证:\n`;
+                result += `  • 合规状态: ${compliantValidation.isCompliant ? '✅ 合规' : '❌ 不合规'}\n`;
+                result += `  • 错误数量: ${compliantValidation.errors.length}\n`;
+                result += `  • 警告数量: ${compliantValidation.warnings.length}\n`;
+                result += `  • 合规分数: ${compliantValidation.complianceScore}/100\n\n`;
+                
+                result += `⚠️  非合规配置验证:\n`;
+                result += `  • 合规状态: ${nonCompliantValidation.isCompliant ? '✅ 合规' : '❌ 不合规'}\n`;
+                result += `  • 错误数量: ${nonCompliantValidation.errors.length}\n`;
+                result += `  • 警告数量: ${nonCompliantValidation.warnings.length}\n`;
+                result += `  • 合规分数: ${nonCompliantValidation.complianceScore}/100\n`;
+                
+                if (nonCompliantValidation.errors.length > 0) {
+                    result += `\n❌ 发现的错误:\n`;
+                    nonCompliantValidation.errors.forEach(error => {
+                        result += `  • ${error}\n`;
+                    });
+                }
+                
+                displayResult('validation-result', `<div class="json-display">${result}</div>`, 'info');
+                testResults.validation = true;
+            } catch (error) {
+                displayResult('validation-result', `❌ 配置验证失败: ${error.message}`, 'error');
+                testResults.validation = false;
+            }
+        };
+
+        // Test 5: Config Migration
+        window.testConfigMigration = function() {
+            if (!contractManager) {
+                displayResult('migration-result', '❌ 请先运行模块导入测试', 'error');
+                return;
+            }
+
+            try {
+                const oldConfig = {
+                    aiServices: {
+                        translationAI: { enabled: true, provider: 'google', prompt: 'Translate this' },
+                        ratingAI: { enabled: false, provider: 'openai', prompt: 'Rate this' },
+                        questionAI: { enabled: true, provider: 'openai', prompt: 'Answer this' }
+                    }
+                };
+                
+                const migratedConfig = contractManager.migrateFromOldConfig(oldConfig);
+                
+                let result = `✅ 配置迁移测试完成!\n\n`;
+                
+                result += `📊 迁移结果概览:\n`;
+                result += `  • 迁移后活跃服务: ${Object.keys(migratedConfig.aiServices).length}\n`;
+                result += `  • 迁移后废弃服务: ${Object.keys(migratedConfig.deprecatedServices).length}\n`;
+                result += `  • 迁移后计划服务: ${Object.keys(migratedConfig.plannedServices).length}\n\n`;
+                
+                result += `🔄 废弃服务处理:\n`;
+                for (const [key, service] of Object.entries(migratedConfig.deprecatedServices)) {
+                    result += `  • ${key}: ${service.reason}\n`;
+                    result += `    迁移到: ${service.autoMigrateTo}\n`;
+                }
+                
+                displayResult('migration-result', `<div class="json-display">${result}</div>`, 'success');
+                testResults.migration = true;
+            } catch (error) {
+                displayResult('migration-result', `❌ 配置迁移失败: ${error.message}`, 'error');
+                testResults.migration = false;
+            }
+        };
+
+        // Test 6: Compliance Score
+        window.testComplianceScore = function() {
+            if (!contractManager) {
+                displayResult('score-result', '❌ 请先运行模块导入测试', 'error');
+                return;
+            }
+
+            try {
+                const configs = [
+                    {
+                        name: '完全合规配置',
+                        config: {
+                            aiServices: {
+                                questionAI: { service_id: 1, service_name: 'question_ai', service_type: 'question', provider: 'openai' },
+                                assistantAI: { service_id: 2, service_name: 'assistant_ai', service_type: 'assist', provider: 'moonshot' },
+                                drawingAI: { service_id: 3, service_name: 'drawing_ai', service_type: 'draw', provider: 'google' }
+                            }
+                        }
+                    },
+                    {
+                        name: '部分合规配置',
+                        config: {
+                            aiServices: {
+                                questionAI: { service_type: 'question', provider: 'openai' },
+                                invalidAI: { service_type: 'invalid', provider: 'unknown' }
+                            }
+                        }
+                    },
+                    {
+                        name: '不合规配置',
+                        config: {
+                            aiServices: {
+                                randomAI: { service_type: 'random', provider: 'fake' }
+                            }
+                        }
+                    }
+                ];
+                
+                let result = `✅ 合规性评分测试完成!\n\n`;
+                
+                configs.forEach(({ name, config }) => {
+                    const score = contractManager.calculateComplianceScore(config);
+                    const validation = contractManager.validateContractCompliance(config);
+                    const recommendations = contractManager.getComplianceRecommendations(config);
+                    
+                    result += `📊 ${name}:\n`;
+                    result += `  • 合规分数: ${score}/100\n`;
+                    result += `  • 合规状态: ${validation.isCompliant ? '✅ 合规' : '❌ 不合规'}\n`;
+                    result += `  • 建议数量: ${recommendations.length}\n\n`;
+                });
+                
+                displayResult('score-result', `<div class="json-display">${result}</div>`, 'info');
+                testResults.score = true;
+            } catch (error) {
+                displayResult('score-result', `❌ 合规性评分失败: ${error.message}`, 'error');
+                testResults.score = false;
+            }
+        };
+
+        // Run All Tests
+        window.runAllTests = async function() {
+            displayResult('final-result', '🔄 正在运行所有测试...', 'info');
+            
+            await testModuleImport();
+            await new Promise(resolve => setTimeout(resolve, 500));
+            
+            testServiceContracts();
+            await new Promise(resolve => setTimeout(resolve, 500));
+            
+            testContractCompliantConfig();
+            await new Promise(resolve => setTimeout(resolve, 500));
+            
+            testConfigValidation();
+            await new Promise(resolve => setTimeout(resolve, 500));
+            
+            testConfigMigration();
+            await new Promise(resolve => setTimeout(resolve, 500));
+            
+            testComplianceScore();
+            await new Promise(resolve => setTimeout(resolve, 500));
+            
+            // Calculate final results
+            const totalTests = Object.keys(testResults).length;
+            const passedTests = Object.values(testResults).filter(result => result === true).length;
+            const successRate = ((passedTests / totalTests) * 100).toFixed(1);
+            
+            let finalResult = `🎯 测试完成!\n\n`;
+            finalResult += `📊 测试结果统计:\n`;
+            finalResult += `  • 总测试数: ${totalTests}\n`;
+            finalResult += `  • 通过测试: ${passedTests}\n`;
+            finalResult += `  • 失败测试: ${totalTests - passedTests}\n`;
+            finalResult += `  • 成功率: ${successRate}%\n\n`;
+            
+            finalResult += `📋 详细结果:\n`;
+            Object.entries(testResults).forEach(([test, result]) => {
+                finalResult += `  • ${test}: ${result ? '✅ 通过' : '❌ 失败'}\n`;
+            });
+            
+            if (successRate >= 90) {
+                finalResult += `\n🎉 契约合规性实现功能完整，可以投入使用!`;
+                displayResult('final-result', `<div class="json-display">${finalResult}</div>`, 'success');
+            } else if (successRate >= 70) {
+                finalResult += `\n⚠️  大部分功能正常，建议修复失败的测试项目。`;
+                displayResult('final-result', `<div class="json-display">${finalResult}</div>`, 'info');
+            } else {
+                finalResult += `\n❌ 存在重要问题，需要立即修复。`;
+                displayResult('final-result', `<div class="json-display">${finalResult}</div>`, 'error');
+            }
+        };
+    </script>
+</body>
+</html>
