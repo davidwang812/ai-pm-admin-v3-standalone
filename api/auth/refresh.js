@@ -3,36 +3,60 @@
  * 代理到Railway后端
  */
 
-export default async function handler(req, res) {
+export const config = {
+  runtime: 'edge',
+};
+
+export default async function handler(request) {
   // 处理OPTIONS请求（CORS预检）
-  if (req.method === 'OPTIONS') {
-    res.setHeader('Access-Control-Allow-Credentials', 'true');
-    res.setHeader('Access-Control-Allow-Origin', '*');
-    res.setHeader('Access-Control-Allow-Methods', 'GET,OPTIONS,PATCH,DELETE,POST,PUT');
-    res.setHeader('Access-Control-Allow-Headers', 'X-CSRF-Token, X-Requested-With, Accept, Accept-Version, Content-Length, Content-MD5, Content-Type, Date, X-Api-Version, Authorization');
-    return res.status(200).end();
-  }
-
-  // 设置CORS头
-  res.setHeader('Access-Control-Allow-Credentials', 'true');
-  res.setHeader('Access-Control-Allow-Origin', '*');
-
-  // 只允许POST请求
-  if (req.method !== 'POST') {
-    return res.status(405).json({ 
-      success: false, 
-      message: 'Method not allowed' 
+  if (request.method === 'OPTIONS') {
+    return new Response(null, {
+      status: 200,
+      headers: {
+        'Access-Control-Allow-Credentials': 'true',
+        'Access-Control-Allow-Origin': '*',
+        'Access-Control-Allow-Methods': 'GET,OPTIONS,PATCH,DELETE,POST,PUT',
+        'Access-Control-Allow-Headers': 'X-CSRF-Token, X-Requested-With, Accept, Accept-Version, Content-Length, Content-MD5, Content-Type, Date, X-Api-Version, Authorization'
+      }
     });
   }
 
+  // 只允许POST请求
+  if (request.method !== 'POST') {
+    return new Response(
+      JSON.stringify({ 
+        success: false, 
+        message: 'Method not allowed' 
+      }),
+      {
+        status: 405,
+        headers: {
+          'Content-Type': 'application/json',
+          'Access-Control-Allow-Origin': '*'
+        }
+      }
+    );
+  }
+
   try {
-    const { refreshToken } = req.body;
+    // 解析请求体
+    const body = await request.json();
+    const { refreshToken } = body;
 
     if (!refreshToken) {
-      return res.status(400).json({
-        success: false,
-        message: 'Refresh token is required'
-      });
+      return new Response(
+        JSON.stringify({
+          success: false,
+          message: 'Refresh token is required'
+        }),
+        {
+          status: 400,
+          headers: {
+            'Content-Type': 'application/json',
+            'Access-Control-Allow-Origin': '*'
+          }
+        }
+      );
     }
 
     console.log('🔐 Proxying token refresh request to Railway backend...');
@@ -55,20 +79,33 @@ export default async function handler(req, res) {
     const data = await response.json();
 
     // 转发响应
-    res.status(response.status).json(data);
+    return new Response(
+      JSON.stringify(data),
+      {
+        status: response.status,
+        headers: {
+          'Content-Type': 'application/json',
+          'Access-Control-Allow-Origin': '*'
+        }
+      }
+    );
 
   } catch (error) {
     console.error('Refresh proxy error:', error);
     
-    return res.status(500).json({
-      success: false,
-      message: 'Failed to refresh token',
-      error: error.message
-    });
+    return new Response(
+      JSON.stringify({
+        success: false,
+        message: 'Failed to refresh token',
+        error: error.message
+      }),
+      {
+        status: 500,
+        headers: {
+          'Content-Type': 'application/json',
+          'Access-Control-Allow-Origin': '*'
+        }
+      }
+    );
   }
-}
-
-// 配置Edge Runtime
-export const config = {
-  runtime: 'edge',
 }

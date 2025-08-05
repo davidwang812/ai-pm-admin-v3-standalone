@@ -3,31 +3,44 @@
  * 代理到Railway后端
  */
 
-export default async function handler(req, res) {
+export const config = {
+  runtime: 'edge',
+};
+
+export default async function handler(request) {
   // 处理OPTIONS请求（CORS预检）
-  if (req.method === 'OPTIONS') {
-    res.setHeader('Access-Control-Allow-Credentials', 'true');
-    res.setHeader('Access-Control-Allow-Origin', '*');
-    res.setHeader('Access-Control-Allow-Methods', 'GET,OPTIONS,PATCH,DELETE,POST,PUT');
-    res.setHeader('Access-Control-Allow-Headers', 'X-CSRF-Token, X-Requested-With, Accept, Accept-Version, Content-Length, Content-MD5, Content-Type, Date, X-Api-Version, Authorization');
-    return res.status(200).end();
+  if (request.method === 'OPTIONS') {
+    return new Response(null, {
+      status: 200,
+      headers: {
+        'Access-Control-Allow-Credentials': 'true',
+        'Access-Control-Allow-Origin': '*',
+        'Access-Control-Allow-Methods': 'GET,OPTIONS,PATCH,DELETE,POST,PUT',
+        'Access-Control-Allow-Headers': 'X-CSRF-Token, X-Requested-With, Accept, Accept-Version, Content-Length, Content-MD5, Content-Type, Date, X-Api-Version, Authorization'
+      }
+    });
   }
 
-  // 设置CORS头
-  res.setHeader('Access-Control-Allow-Credentials', 'true');
-  res.setHeader('Access-Control-Allow-Origin', '*');
-
   // 只允许POST请求
-  if (req.method !== 'POST') {
-    return res.status(405).json({ 
-      success: false, 
-      message: 'Method not allowed' 
-    });
+  if (request.method !== 'POST') {
+    return new Response(
+      JSON.stringify({ 
+        success: false, 
+        message: 'Method not allowed' 
+      }),
+      {
+        status: 405,
+        headers: {
+          'Content-Type': 'application/json',
+          'Access-Control-Allow-Origin': '*'
+        }
+      }
+    );
   }
 
   try {
     // 获取Authorization header
-    const authHeader = req.headers.authorization;
+    const authHeader = request.headers.get('authorization');
     
     console.log('🔐 Proxying admin logout request to Railway backend...');
 
@@ -53,20 +66,33 @@ export default async function handler(req, res) {
     const data = await response.json();
 
     // 转发响应
-    res.status(response.status).json(data);
+    return new Response(
+      JSON.stringify(data),
+      {
+        status: response.status,
+        headers: {
+          'Content-Type': 'application/json',
+          'Access-Control-Allow-Origin': '*'
+        }
+      }
+    );
 
   } catch (error) {
     console.error('Logout proxy error:', error);
     
     // 即使logout失败，也返回成功，让前端清理本地状态
-    return res.status(200).json({
-      success: true,
-      message: 'Logged out successfully'
-    });
+    return new Response(
+      JSON.stringify({
+        success: true,
+        message: 'Logged out successfully'
+      }),
+      {
+        status: 200,
+        headers: {
+          'Content-Type': 'application/json',
+          'Access-Control-Allow-Origin': '*'
+        }
+      }
+    );
   }
-}
-
-// 配置Edge Runtime
-export const config = {
-  runtime: 'edge',
 }

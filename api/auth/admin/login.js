@@ -3,39 +3,61 @@
  * 代理到Railway后端，解决无痕浏览器跨域问题
  */
 
-export default async function handler(req, res) {
+export const config = {
+  runtime: 'edge',
+};
+
+export default async function handler(request) {
   // 处理OPTIONS请求（CORS预检）
-  if (req.method === 'OPTIONS') {
-    res.setHeader('Access-Control-Allow-Credentials', 'true');
-    res.setHeader('Access-Control-Allow-Origin', '*');
-    res.setHeader('Access-Control-Allow-Methods', 'GET,OPTIONS,PATCH,DELETE,POST,PUT');
-    res.setHeader('Access-Control-Allow-Headers', 'X-CSRF-Token, X-Requested-With, Accept, Accept-Version, Content-Length, Content-MD5, Content-Type, Date, X-Api-Version, Authorization');
-    return res.status(200).end();
-  }
-
-  // 设置CORS头
-  res.setHeader('Access-Control-Allow-Credentials', 'true');
-  res.setHeader('Access-Control-Allow-Origin', '*');
-  res.setHeader('Access-Control-Allow-Methods', 'GET,OPTIONS,PATCH,DELETE,POST,PUT');
-  res.setHeader('Access-Control-Allow-Headers', 'X-CSRF-Token, X-Requested-With, Accept, Accept-Version, Content-Length, Content-MD5, Content-Type, Date, X-Api-Version, Authorization');
-
-  // 只允许POST请求
-  if (req.method !== 'POST') {
-    return res.status(405).json({ 
-      success: false, 
-      message: 'Method not allowed' 
+  if (request.method === 'OPTIONS') {
+    return new Response(null, {
+      status: 200,
+      headers: {
+        'Access-Control-Allow-Credentials': 'true',
+        'Access-Control-Allow-Origin': '*',
+        'Access-Control-Allow-Methods': 'GET,OPTIONS,PATCH,DELETE,POST,PUT',
+        'Access-Control-Allow-Headers': 'X-CSRF-Token, X-Requested-With, Accept, Accept-Version, Content-Length, Content-MD5, Content-Type, Date, X-Api-Version, Authorization'
+      }
     });
   }
 
+  // 只允许POST请求
+  if (request.method !== 'POST') {
+    return new Response(
+      JSON.stringify({ 
+        success: false, 
+        message: 'Method not allowed' 
+      }),
+      {
+        status: 405,
+        headers: {
+          'Content-Type': 'application/json',
+          'Access-Control-Allow-Origin': '*'
+        }
+      }
+    );
+  }
+
   try {
-    const { username, password } = req.body;
+    // 解析请求体
+    const body = await request.json();
+    const { username, password } = body;
 
     // 验证输入
     if (!username || !password) {
-      return res.status(400).json({
-        success: false,
-        message: 'Username and password are required'
-      });
+      return new Response(
+        JSON.stringify({
+          success: false,
+          message: 'Username and password are required'
+        }),
+        {
+          status: 400,
+          headers: {
+            'Content-Type': 'application/json',
+            'Access-Control-Allow-Origin': '*'
+          }
+        }
+      );
     }
 
     console.log('🔐 Proxying admin login request to Railway backend...');
@@ -49,8 +71,8 @@ export default async function handler(req, res) {
         'Content-Type': 'application/json',
         'Accept': 'application/json',
         // 转发原始请求的headers（如果需要）
-        'X-Forwarded-For': req.headers['x-forwarded-for'] || req.connection?.remoteAddress || 'unknown',
-        'X-Original-Host': req.headers.host || 'unknown'
+        'X-Forwarded-For': request.headers.get('x-forwarded-for') || 'unknown',
+        'X-Original-Host': request.headers.get('host') || 'unknown'
       },
       body: JSON.stringify({
         username,
@@ -61,56 +83,84 @@ export default async function handler(req, res) {
     // 获取响应数据
     const data = await response.json();
 
-    // 转发响应状态码
-    res.status(response.status);
-
     // 如果是成功响应，确保返回格式正确
     if (response.ok && data.success) {
       console.log('✅ Admin login proxy successful');
       
       // 确保响应包含必要的字段
-      return res.json({
-        success: true,
-        data: {
-          user: data.data?.user || {
-            id: 'super-admin',
-            username: username,
-            email: 'admin@example.com',
-            isAdmin: true,
-            isSuperAdmin: true
-          },
-          token: data.data?.token || data.token,
-          redirectUrl: data.data?.redirectUrl || '/admin/dashboard-full.html'
+      return new Response(
+        JSON.stringify({
+          success: true,
+          data: {
+            user: data.data?.user || {
+              id: 'super-admin',
+              username: username,
+              email: 'admin@example.com',
+              isAdmin: true,
+              isSuperAdmin: true
+            },
+            token: data.data?.token || data.token,
+            redirectUrl: data.data?.redirectUrl || '/admin/dashboard-full.html'
+          }
+        }),
+        {
+          status: 200,
+          headers: {
+            'Content-Type': 'application/json',
+            'Access-Control-Allow-Origin': '*'
+          }
         }
-      });
+      );
     }
 
     // 转发错误响应
     console.log('❌ Admin login proxy failed:', response.status, data.message);
-    return res.json(data);
+    return new Response(
+      JSON.stringify(data),
+      {
+        status: response.status,
+        headers: {
+          'Content-Type': 'application/json',
+          'Access-Control-Allow-Origin': '*'
+        }
+      }
+    );
 
   } catch (error) {
     console.error('Proxy error:', error);
     
     // 如果Railway不可用，返回友好的错误信息
     if (error.name === 'FetchError' || error.code === 'ECONNREFUSED') {
-      return res.status(503).json({
-        success: false,
-        message: 'Backend service temporarily unavailable. Please try again later.',
-        error: 'SERVICE_UNAVAILABLE'
-      });
+      return new Response(
+        JSON.stringify({
+          success: false,
+          message: 'Backend service temporarily unavailable. Please try again later.',
+          error: 'SERVICE_UNAVAILABLE'
+        }),
+        {
+          status: 503,
+          headers: {
+            'Content-Type': 'application/json',
+            'Access-Control-Allow-Origin': '*'
+          }
+        }
+      );
     }
 
     // 其他错误
-    return res.status(500).json({
-      success: false,
-      message: 'Internal server error',
-      error: error.message
-    });
+    return new Response(
+      JSON.stringify({
+        success: false,
+        message: 'Internal server error',
+        error: error.message
+      }),
+      {
+        status: 500,
+        headers: {
+          'Content-Type': 'application/json',
+          'Access-Control-Allow-Origin': '*'
+        }
+      }
+    );
   }
-}
-
-// 配置Edge Runtime
-export const config = {
-  runtime: 'edge',
 }
