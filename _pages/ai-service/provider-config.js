@@ -5,6 +5,41 @@ export class ProviderConfig {
     this.providers = {};
     this.providerTypes = ['openai', 'anthropic', 'google', 'azure', 'grok', 'moonshot', 'meta', 'qwen', 'deepseek', 'custom'];
     this.currentEditProvider = null;
+    
+    // 数据库契约映射 - 符合 AI_SERVICES 表结构
+    this.serviceTypeMapping = {
+      'openai': 'question',     // OpenAI主要用于问答
+      'anthropic': 'question',  // Anthropic主要用于问答  
+      'google': 'draw',         // Google主要用于绘图
+      'moonshot': 'assist',     // Moonshot主要用于协助
+      'azure': 'question',      // Azure主要用于问答
+      'grok': 'assist',         // Grok用于协助
+      'meta': 'assist',         // Meta用于协助
+      'qwen': 'question',       // Qwen用于问答
+      'deepseek': 'assist',     // DeepSeek用于协助
+      'custom': 'assist'        // 自定义默认为协助
+    };
+    
+    // 状态枚举映射 - 符合数据库契约
+    this.statusMapping = {
+      true: 'active',           // enabled: true -> active
+      false: 'inactive',        // enabled: false -> inactive
+      'maintenance': 'maintenance' // 维护状态
+    };
+    
+    // 默认成本配置 - 符合 cost_per_token 字段
+    this.defaultCosts = {
+      'openai': 0.01,
+      'anthropic': 0.012,
+      'google': 0.008,
+      'moonshot': 0.009,
+      'azure': 0.01,
+      'grok': 0.005,
+      'meta': 0.003,
+      'qwen': 0.002,
+      'deepseek': 0.001,
+      'custom': 0.01
+    };
   }
   
   async render() {
@@ -70,6 +105,9 @@ export class ProviderConfig {
         this.providers = response.providers || {};
         console.log('✅ Loaded providers from API:', Object.keys(this.providers));
         
+        // 执行数据迁移以确保契约兼容性
+        this.migrateProvidersToContractFormat();
+        
         // Save to localStorage for offline access
         localStorage.setItem('admin_providers', JSON.stringify(this.providers));
         
@@ -92,6 +130,8 @@ export class ProviderConfig {
         
         if (hasData) {
           this.providers = parsedProviders;
+          // 执行数据迁移以确保契约兼容性
+          this.migrateProvidersToContractFormat();
           console.log('📋 Using cached providers from localStorage:', Object.keys(this.providers));
           return { success: true, providers: this.providers, offline: true };
         }
@@ -170,18 +210,16 @@ export class ProviderConfig {
   }
   
   renderProviderTable() {
-    // Flatten all providers into a single list
+    // Flatten all providers into a single list with contract compliance
     const allProviders = [];
     
     Object.keys(this.providers).forEach(type => {
       const typeProviders = this.providers[type];
       if (Array.isArray(typeProviders)) {
         typeProviders.forEach(provider => {
-          allProviders.push({
-            ...provider,
-            type: type,
-            typeName: this.getProviderTypeName(type)
-          });
+          // 构建符合契约的提供商数据
+          const contractProvider = this.buildContractCompliantProvider(provider, type);
+          allProviders.push(contractProvider);
         });
       }
     });
@@ -196,9 +234,11 @@ export class ProviderConfig {
           <thead>
             <tr>
               <th>服务商类型</th>
+              <th>服务类型</th>
               <th>配置名称</th>
               <th>API密钥</th>
               <th>模型配置</th>
+              <th>成本/Token</th>
               <th>状态</th>
               <th>创建时间</th>
               <th>操作</th>
@@ -213,22 +253,39 @@ export class ProviderConfig {
   }
   
   renderProviderRow(provider) {
-    const statusClass = provider.enabled ? 'status-active' : 'status-inactive';
-    const statusText = provider.enabled ? '🟢 启用' : '🔴 禁用';
-    const models = Array.isArray(provider.models) ? provider.models.join(', ') : '未配置';
-    const createdAt = provider.createdAt ? new Date(provider.createdAt).toLocaleString('zh-CN') : '未知';
+    // 使用契约状态和类型
+    const statusClass = provider.status === 'active' ? 'status-active' : 'status-inactive';
+    const statusText = provider.status === 'active' ? '🟢 启用' : 
+                      provider.status === 'maintenance' ? '🟡 维护' : '🔴 禁用';
+    
+    const models = Array.isArray(provider.config_params?.models) ? 
+                   provider.config_params.models.join(', ') : '未配置';
+    const createdAt = provider.created_at ? 
+                      new Date(provider.created_at).toLocaleString('zh-CN') : '未知';
+    
+    // 服务类型徽章
+    const serviceTypeBadge = this.getServiceTypeBadge(provider.service_type);
+    
+    // 成本显示
+    const costDisplay = `$${provider.cost_per_token.toFixed(4)}/1K`;
     
     return `
-      <tr data-provider-id="${provider.id}" data-provider-type="${provider.type}">
+      <tr data-provider-id="${provider.service_id}" data-provider-type="${provider.provider}" data-service-type="${provider.service_type}">
         <td>
           <span class="provider-type-badge">${provider.typeName}</span>
         </td>
-        <td>${provider.name || '未命名'}</td>
         <td>
-          <span class="api-key-masked">${provider.apiKey || '未配置'}</span>
+          <span class="service-type-badge service-${provider.service_type}">${serviceTypeBadge}</span>
+        </td>
+        <td>${provider.service_name || '未命名'}</td>
+        <td>
+          <span class="api-key-masked">${provider.config_params?.apiKey || '未配置'}</span>
         </td>
         <td>
           <span class="models-list">${models}</span>
+        </td>
+        <td>
+          <span class="cost-display">${costDisplay}</span>
         </td>
         <td>
           <span class="${statusClass}">${statusText}</span>
@@ -236,23 +293,76 @@ export class ProviderConfig {
         <td>${createdAt}</td>
         <td>
           <div class="action-buttons">
-            <button class="btn btn-sm btn-primary" onclick="window.adminV3App.aiServicePage.modules.providers.editProvider('${provider.type}', '${provider.id}')">
+            <button class="btn btn-sm btn-primary" onclick="window.adminV3App.aiServicePage.modules.providers.editProvider('${provider.provider}', '${provider.service_id}')">
               ✏️ 编辑
             </button>
-            <button class="btn btn-sm ${provider.enabled ? 'btn-warning' : 'btn-success'}" 
-                    onclick="window.adminV3App.aiServicePage.modules.providers.toggleProvider('${provider.type}', '${provider.id}', ${!provider.enabled})">
-              ${provider.enabled ? '🚫 禁用' : '✅ 启用'}
+            <button class="btn btn-sm ${provider.status === 'active' ? 'btn-warning' : 'btn-success'}" 
+                    onclick="window.adminV3App.aiServicePage.modules.providers.toggleProvider('${provider.provider}', '${provider.service_id}', '${provider.status === 'active' ? 'inactive' : 'active'}')">
+              ${provider.status === 'active' ? '🚫 禁用' : '✅ 启用'}
             </button>
-            <button class="btn btn-sm btn-info" onclick="window.adminV3App.aiServicePage.modules.providers.testProvider('${provider.type}', '${provider.id}')">
+            <button class="btn btn-sm btn-info" onclick="window.adminV3App.aiServicePage.modules.providers.testProvider('${provider.provider}', '${provider.service_id}')">
               🧪 测试
             </button>
-            <button class="btn btn-sm btn-danger" onclick="window.adminV3App.aiServicePage.modules.providers.deleteProvider('${provider.type}', '${provider.id}')">
+            <button class="btn btn-sm btn-danger" onclick="window.adminV3App.aiServicePage.modules.providers.deleteProvider('${provider.provider}', '${provider.service_id}')">
               🗑️ 删除
             </button>
           </div>
         </td>
       </tr>
     `;
+  }
+  
+  /**
+   * 获取服务类型徽章
+   */
+  getServiceTypeBadge(serviceType) {
+    const badges = {
+      question: '❓ 问答',
+      assist: '🤝 协助', 
+      draw: '🎨 绘图',
+      voice: '🎵 语音',
+      video: '🎬 视频'
+    };
+    return badges[serviceType] || '🔧 未知';
+  }
+  
+  /**
+   * 数据迁移：将现有提供商数据转换为契约兼容格式
+   */
+  migrateProvidersToContractFormat() {
+    console.log('🔄 开始迁移提供商数据到契约格式...');
+    
+    let migrationCount = 0;
+    Object.keys(this.providers).forEach(type => {
+      const typeProviders = this.providers[type];
+      if (Array.isArray(typeProviders)) {
+        for (let i = 0; i < typeProviders.length; i++) {
+          const provider = typeProviders[i];
+          
+          // 检查是否需要迁移（没有config_params或service_type字段）
+          if (!provider.config_params || !provider.service_type) {
+            console.log(`🔄 迁移提供商: ${provider.name || provider.id}`);
+            
+            // 构建契约兼容的提供商数据
+            const migratedProvider = this.buildContractCompliantProvider(provider, type);
+            
+            // 替换原有数据
+            typeProviders[i] = migratedProvider;
+            migrationCount++;
+          }
+        }
+      }
+    });
+    
+    if (migrationCount > 0) {
+      // 保存迁移后的数据
+      localStorage.setItem('admin_providers', JSON.stringify(this.providers));
+      console.log(`✅ 完成 ${migrationCount} 个提供商的数据迁移`);
+    } else {
+      console.log('✅ 所有提供商数据已符合契约格式');
+    }
+    
+    return migrationCount;
   }
   
   renderEmptyState() {
@@ -295,6 +405,87 @@ export class ProviderConfig {
       custom: '自定义'
     };
     return names[type] || type;
+  }
+  
+  /**
+   * 构建符合数据库契约的提供商数据结构
+   * 符合 AI_SERVICES 表字段定义
+   */
+  buildContractCompliantProvider(provider, type) {
+    const now = new Date().toISOString();
+    
+    return {
+      // AI_SERVICES 表必需字段
+      service_id: provider.id || Date.now(),                    // bigint service_id PK
+      service_name: provider.name || `${type}_service`,         // varchar service_name UK  
+      service_type: this.serviceTypeMapping[type] || 'assist',  // varchar service_type
+      provider: type,                                           // varchar provider
+      api_endpoint: provider.endpoint || this.getDefaultEndpoint(type), // varchar api_endpoint
+      config_params: {                                          // json config_params
+        apiKey: provider.apiKey,
+        endpoint: provider.endpoint || '',
+        models: provider.models || [],
+        priority: provider.priority || 0,
+        temperature: 0.7,  // 默认参数
+        topP: 0.9,
+        maxTokens: 2000
+      },
+      status: this.statusMapping[provider.enabled] || 'inactive', // enum status
+      priority: provider.priority || 0,                          // int priority
+      cost_per_token: provider.cost_per_token || this.defaultCosts[type] || 0.01, // decimal cost_per_token
+      created_at: provider.createdAt || now,                     // timestamp created_at
+      updated_at: now,                                           // timestamp updated_at
+      
+      // 扩展字段 (向后兼容)
+      id: provider.id,
+      name: provider.name,
+      apiKey: provider.apiKey,
+      endpoint: provider.endpoint,
+      models: provider.models,
+      enabled: provider.enabled,
+      type: type,
+      typeName: this.getProviderTypeName(type)
+    };
+  }
+  
+  /**
+   * 获取默认API端点
+   */
+  getDefaultEndpoint(providerType) {
+    const endpoints = {
+      openai: 'https://api.openai.com/v1/chat/completions',
+      anthropic: 'https://api.anthropic.com/v1/messages',
+      google: 'https://generativelanguage.googleapis.com/v1/models',
+      moonshot: 'https://api.moonshot.cn/v1/chat/completions',
+      azure: 'https://api.openai.azure.com/openai/deployments',
+      grok: 'https://api.x.ai/v1/chat/completions',
+      meta: 'https://api.llama-api.com/v1/chat/completions',
+      qwen: 'https://dashscope.aliyuncs.com/api/v1/services/aigc/text-generation/generation',
+      deepseek: 'https://api.deepseek.com/v1/chat/completions',
+      custom: ''
+    };
+    return endpoints[providerType] || '';
+  }
+  
+  /**
+   * 从契约数据构建显示数据
+   */
+  parseContractCompliantProvider(contractData) {
+    return {
+      id: contractData.service_id,
+      name: contractData.service_name,
+      apiKey: contractData.config_params?.apiKey || '未配置',
+      endpoint: contractData.config_params?.endpoint || contractData.api_endpoint || '',  
+      models: contractData.config_params?.models || [],
+      enabled: contractData.status === 'active',
+      priority: contractData.priority || 0,
+      cost_per_token: contractData.cost_per_token || 0.01,
+      createdAt: contractData.created_at,
+      updatedAt: contractData.updated_at,
+      type: contractData.provider,
+      service_type: contractData.service_type,
+      status: contractData.status
+    };
   }
   
   // Helper method to find provider by type and id
@@ -549,6 +740,13 @@ export class ProviderConfig {
                   <label>优先级（数字越大优先级越高）</label>
                   <input type="number" name="priority" value="0" min="0" max="100" class="form-control">
                 </div>
+                
+                <div class="form-group">
+                  <label>成本/Token（美元）</label>
+                  <input type="number" name="cost_per_token" step="0.0001" min="0" class="form-control" 
+                         placeholder="将根据服务商类型自动设置默认值">
+                  <small class="text-muted">留空使用默认成本配置</small>
+                </div>
               </form>
             </div>
             <div class="modal-footer">
@@ -595,13 +793,23 @@ export class ProviderConfig {
       }
     }
     
+    const enabled = formData.get('enabled') === 'on';
+    const priority = parseInt(formData.get('priority') || '0');
+    const costPerToken = parseFloat(formData.get('cost_per_token')) || this.defaultCosts[type] || 0.01;
+    
     const data = {
       name: formData.get('name'),
       apiKey: formData.get('apiKey'),
       endpoint: formData.get('endpoint') || '',
       models: models,
-      enabled: formData.get('enabled') === 'on',
-      priority: parseInt(formData.get('priority') || '0')
+      enabled: enabled,
+      priority: priority,
+      cost_per_token: costPerToken,
+      
+      // 契约字段
+      service_type: this.serviceTypeMapping[type] || 'assist',
+      status: enabled ? 'active' : 'inactive',
+      updated_at: new Date().toISOString()
     };
     
     // Validation
@@ -634,14 +842,17 @@ export class ProviderConfig {
         this.providers[type] = [];
       }
       
-      // Generate a unique ID
+      // Generate a unique ID and build contract-compliant provider
       const newId = Date.now();
-      const newProvider = {
+      const baseProvider = {
         id: newId,
         type: type,
         ...data,
         createdAt: new Date().toISOString()
       };
+      
+      // 构建符合契约的提供商数据
+      const newProvider = this.buildContractCompliantProvider(baseProvider, type);
       
       this.providers[type].push(newProvider);
       
@@ -716,6 +927,24 @@ export class ProviderConfig {
                 <label>优先级</label>
                 <input type="number" name="priority" value="${provider.priority || 0}" min="0" max="100" class="form-control">
               </div>
+              
+              <div class="form-group">
+                <label>成本/Token（美元）</label>
+                <input type="number" name="cost_per_token" step="0.0001" min="0" 
+                       value="${provider.cost_per_token || this.defaultCosts[type] || 0.01}" 
+                       class="form-control">
+              </div>
+              
+              <div class="form-group">
+                <label>服务类型</label>
+                <select name="service_type" class="form-control">
+                  <option value="question" ${provider.service_type === 'question' ? 'selected' : ''}>❓ 问答服务</option>
+                  <option value="assist" ${provider.service_type === 'assist' ? 'selected' : ''}>🤝 协助服务</option>
+                  <option value="draw" ${provider.service_type === 'draw' ? 'selected' : ''}>🎨 绘图服务</option>
+                  <option value="voice" ${provider.service_type === 'voice' ? 'selected' : ''}>🎵 语音服务</option>
+                  <option value="video" ${provider.service_type === 'video' ? 'selected' : ''}>🎬 视频服务</option>
+                </select>
+              </div>
             </form>
           </div>
           <div class="modal-footer">
@@ -740,12 +969,21 @@ export class ProviderConfig {
     if (!form) return;
     
     const formData = new FormData(form);
+    const enabled = formData.get('enabled') === 'on';
+    const serviceType = formData.get('service_type') || this.serviceTypeMapping[this.currentEditProvider.type];
+    
     const updates = {
       name: formData.get('name'),
       endpoint: formData.get('endpoint') || '',
       models: formData.get('models') ? formData.get('models').split(',').map(m => m.trim()) : [],
-      enabled: formData.get('enabled') === 'on',
-      priority: parseInt(formData.get('priority') || '0')
+      enabled: enabled,
+      priority: parseInt(formData.get('priority') || '0'),
+      cost_per_token: parseFloat(formData.get('cost_per_token')) || 0.01,
+      
+      // 契约字段
+      service_type: serviceType,
+      status: enabled ? 'active' : 'inactive',
+      updated_at: new Date().toISOString()
     };
     
     // Only include apiKey if provided
@@ -780,8 +1018,25 @@ export class ProviderConfig {
         return;
       }
       
-      // Apply updates to the provider
+      // Apply updates to the provider with contract compliance
       Object.assign(provider, updates);
+      
+      // 重构config_params为JSON结构
+      if (!provider.config_params) {
+        provider.config_params = {};
+      }
+      
+      // 将分散的配置整合到config_params中
+      provider.config_params = {
+        ...provider.config_params,
+        apiKey: updates.apiKey || provider.apiKey,
+        endpoint: updates.endpoint || provider.endpoint,
+        models: updates.models || provider.models || [],
+        priority: updates.priority || provider.priority || 0,
+        temperature: provider.config_params.temperature || 0.7,
+        topP: provider.config_params.topP || 0.9,
+        maxTokens: provider.config_params.maxTokens || 2000
+      };
       
       // Save back to localStorage
       localStorage.setItem('admin_providers', JSON.stringify(this.providers));
@@ -797,13 +1052,18 @@ export class ProviderConfig {
     }
   }
   
-  async toggleProvider(type, id, enable) {
+  async toggleProvider(type, id, newStatus) {
     try {
       // Try API first
       try {
-        const response = await this.app.api.updateProvider(`${type}/${id}`, { enabled: enable });
+        const updateData = { 
+          status: newStatus,
+          enabled: newStatus === 'active', // 保持向后兼容
+          updated_at: new Date().toISOString()
+        };
+        const response = await this.app.api.updateProvider(`${type}/${id}`, updateData);
         if (response.success) {
-          this.app.showToast('success', enable ? '服务商已启用' : '服务商已禁用');
+          this.app.showToast('success', newStatus === 'active' ? '服务商已启用' : '服务商已禁用');
           await this.refreshProviders();
           return;
         }
@@ -818,13 +1078,17 @@ export class ProviderConfig {
         return;
       }
       
-      // Update the provider in local data
-      provider.enabled = enable;
+      // Update the provider with contract-compliant status
+      provider.enabled = newStatus === 'active';
+      provider.status = newStatus;
+      provider.updated_at = new Date().toISOString();
       
       // Save back to localStorage
       localStorage.setItem('admin_providers', JSON.stringify(this.providers));
       
-      this.app.showToast('success', `${enable ? '✅ 已启用' : '🚫 已禁用'} ${provider.name} (離線模式)`);
+      const statusText = newStatus === 'active' ? '✅ 已启用' : 
+                        newStatus === 'maintenance' ? '🔧 维护模式' : '🚫 已禁用';
+      this.app.showToast('success', `${statusText} ${provider.name} (離線模式)`);
       
       // Refresh the display
       await this.refreshProviders();
@@ -1151,6 +1415,42 @@ style.textContent = `
   
   .mt-2 {
     margin-top: 8px !important;
+  }
+  
+  .service-type-badge {
+    display: inline-block;
+    padding: 2px 6px;
+    border-radius: 3px;
+    font-size: 11px;
+    font-weight: 500;
+    color: white;
+  }
+  
+  .service-question {
+    background: #1890ff;
+  }
+  
+  .service-assist {
+    background: #52c41a;
+  }
+  
+  .service-draw {
+    background: #722ed1;
+  }
+  
+  .service-voice {
+    background: #fa8c16;
+  }
+  
+  .service-video {
+    background: #eb2f96;
+  }
+  
+  .cost-display {
+    font-family: monospace;
+    font-size: 12px;
+    color: #1890ff;
+    font-weight: 500;
   }
 `;
 

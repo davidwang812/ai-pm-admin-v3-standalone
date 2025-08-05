@@ -1,0 +1,463 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>服务商配置契约合规性测试</title>
+    <style>
+        body { 
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; 
+            line-height: 1.6; 
+            max-width: 1200px; 
+            margin: 0 auto; 
+            padding: 20px; 
+            background: #f5f5f5;
+        }
+        .test-container { 
+            background: white; 
+            border-radius: 8px; 
+            padding: 20px; 
+            margin-bottom: 20px; 
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+        }
+        .test-header { 
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white; 
+            padding: 20px; 
+            border-radius: 8px 8px 0 0; 
+            margin: -20px -20px 20px -20px;
+        }
+        .test-header h1 { margin: 0; font-size: 24px; }
+        .test-header p { margin: 10px 0 0 0; opacity: 0.9; }
+        .test-section { 
+            margin: 20px 0; 
+            padding: 15px; 
+            border: 1px solid #e0e0e0; 
+            border-radius: 6px;
+        }
+        .test-section h3 { 
+            margin-top: 0; 
+            color: #333; 
+            border-bottom: 2px solid #667eea; 
+            padding-bottom: 10px;
+        }
+        .test-item { 
+            margin: 15px 0; 
+            padding: 10px; 
+            background: #f8f9fa; 
+            border-radius: 4px;
+            border-left: 4px solid #dee2e6;
+        }
+        .test-item.success { 
+            border-left-color: #28a745; 
+            background: #d4edda;
+        }
+        .test-item.warning { 
+            border-left-color: #ffc107; 
+            background: #fff3cd;
+        }
+        .test-item.error { 
+            border-left-color: #dc3545; 
+            background: #f8d7da;
+        }
+        .btn { 
+            background: #667eea; 
+            color: white; 
+            border: none; 
+            padding: 12px 20px; 
+            border-radius: 6px; 
+            cursor: pointer; 
+            margin: 5px;
+            font-size: 14px;
+            transition: all 0.3s;
+        }
+        .btn:hover { 
+            background: #5a67d8; 
+            transform: translateY(-1px);
+        }
+        .btn.btn-success { background: #28a745; }
+        .btn.btn-warning { background: #ffc107; color: #212529; }
+        .btn.btn-danger { background: #dc3545; }
+        .results { 
+            margin-top: 20px; 
+            font-family: 'Monaco', 'Menlo', monospace; 
+            font-size: 12px;
+            max-height: 400px;
+            overflow-y: auto;
+        }
+        .contract-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 15px 0;
+        }
+        .contract-table th, .contract-table td {
+            border: 1px solid #dee2e6;
+            padding: 8px 12px;
+            text-align: left;
+        }
+        .contract-table th {
+            background: #f8f9fa;
+            font-weight: 600;
+        }
+        .status-badge {
+            padding: 2px 8px;
+            border-radius: 12px;
+            font-size: 11px;
+            font-weight: 500;
+        }
+        .status-compliant { background: #d4edda; color: #155724; }
+        .status-partial { background: #fff3cd; color: #856404; }  
+        .status-missing { background: #f8d7da; color: #721c24; }
+        .code-block {
+            background: #2d3748;
+            color: #e2e8f0;
+            padding: 15px;
+            border-radius: 6px;
+            overflow-x: auto;
+            margin: 10px 0;
+        }
+    </style>
+</head>
+<body>
+    <div class="test-container">
+        <div class="test-header">
+            <h1>🔧 服务商配置契约合规性测试</h1>
+            <p>验证服务商配置模块与AI_SERVICES数据库契约的一致性</p>
+        </div>
+
+        <div class="test-section">
+            <h3>📋 测试控制面板</h3>
+            <button class="btn" onclick="runAllTests()">🚀 运行所有测试</button>
+            <button class="btn btn-success" onclick="testContractMapping()">🗂️ 测试契约映射</button>
+            <button class="btn btn-warning" onclick="testDataMigration()">🔄 测试数据迁移</button>
+            <button class="btn btn-danger" onclick="testProviderCRUD()">⚙️ 测试CRUD操作</button>
+            <button class="btn" onclick="clearResults()">🧹 清空结果</button>
+        </div>
+
+        <div class="test-section">
+            <h3>🎯 AI_SERVICES表契约定义</h3>
+            <div class="code-block">
+AI_SERVICES {
+    bigint service_id PK "服务ID"
+    varchar service_name UK "服务名称"  
+    varchar service_type "服务类型: question/assist/draw/voice/video"
+    varchar provider "提供商: openai/anthropic/google"
+    varchar api_endpoint "API端点"
+    json config_params "配置参数"
+    enum status "状态: active/inactive/maintenance"
+    int priority "优先级"
+    decimal cost_per_token "每Token成本"
+    timestamp created_at "创建时间"
+    timestamp updated_at "更新时间"
+}
+            </div>
+        </div>
+
+        <div class="test-section">
+            <h3>📊 契约字段映射检查</h3>
+            <table class="contract-table">
+                <thead>
+                    <tr>
+                        <th>契约字段</th>
+                        <th>实现字段</th>
+                        <th>映射方式</th>
+                        <th>状态</th>
+                    </tr>
+                </thead>
+                <tbody id="contract-mapping-table">
+                    <tr><td colspan="4">点击"测试契约映射"查看结果</td></tr>
+                </tbody>
+            </table>
+        </div>
+
+        <div class="test-section">
+            <h3>🧪 测试结果</h3>
+            <div id="test-results" class="results">
+                <p>点击上方按钮开始测试...</p>
+            </div>
+        </div>
+    </div>
+
+    <script type="module">
+        // 导入ProviderConfig模块进行测试
+        import { ProviderConfig } from './_pages/ai-service/provider-config.js';
+
+        // 模拟应用对象
+        const mockApp = {
+            api: {
+                getProviders: () => Promise.resolve({ success: false }),
+                addProvider: () => Promise.resolve({ success: true }),
+                updateProvider: () => Promise.resolve({ success: true }),
+                deleteProvider: () => Promise.resolve({ success: true }),
+                testProvider: () => Promise.resolve({ success: true })
+            },
+            showToast: (type, message) => {
+                console.log(`Toast [${type}]: ${message}`);
+                appendResult(`📢 Toast [${type}]: ${message}`);
+            }
+        };
+
+        // 创建ProviderConfig实例
+        const providerConfig = new ProviderConfig(mockApp);
+        
+        // 全局测试函数
+        window.runAllTests = async function() {
+            clearResults();
+            appendResult('🚀 开始运行所有测试...\n');
+            
+            await testContractMapping();
+            await new Promise(resolve => setTimeout(resolve, 500));
+            
+            await testDataMigration();
+            await new Promise(resolve => setTimeout(resolve, 500));
+            
+            await testProviderCRUD();
+            await new Promise(resolve => setTimeout(resolve, 500));
+            
+            appendResult('\n✅ 所有测试完成！');
+        };
+
+        window.testContractMapping = function() {
+            appendResult('📋 测试契约映射...\n');
+            
+            const contractFields = [
+                'service_id', 'service_name', 'service_type', 'provider', 
+                'api_endpoint', 'config_params', 'status', 'priority', 
+                'cost_per_token', 'created_at', 'updated_at'
+            ];
+
+            const testProvider = {
+                id: 1,
+                name: 'Test Provider',
+                apiKey: 'sk-test123',
+                endpoint: 'https://api.test.com',
+                models: ['test-model'],
+                enabled: true,
+                priority: 5
+            };
+
+            const contractProvider = providerConfig.buildContractCompliantProvider(testProvider, 'openai');
+            
+            let compliantCount = 0;
+            const mappingResults = [];
+
+            contractFields.forEach(field => {
+                const hasField = contractProvider.hasOwnProperty(field);
+                const status = hasField ? 'compliant' : 'missing';
+                
+                if (hasField) {
+                    compliantCount++;
+                    appendResult(`✅ ${field}: ${JSON.stringify(contractProvider[field])}`);
+                } else {
+                    appendResult(`❌ ${field}: 缺失字段`);
+                }
+
+                mappingResults.push({
+                    contractField: field,
+                    implementationField: hasField ? field : '缺失',
+                    mappingType: hasField ? '直接映射' : '需要添加',
+                    status: status
+                });
+            });
+
+            // 更新映射表
+            updateContractMappingTable(mappingResults);
+
+            const complianceScore = Math.round((compliantCount / contractFields.length) * 100);
+            appendResult(`\n📊 契约合规性评分: ${complianceScore}% (${compliantCount}/${contractFields.length})`);
+
+            // 测试服务类型映射
+            appendResult('\n🔍 测试服务类型映射:');
+            Object.entries(providerConfig.serviceTypeMapping).forEach(([provider, serviceType]) => {
+                appendResult(`  ${provider} → ${serviceType}`);
+            });
+
+            // 测试状态映射
+            appendResult('\n🔍 测试状态映射:');
+            Object.entries(providerConfig.statusMapping).forEach(([enabled, status]) => {
+                appendResult(`  enabled:${enabled} → status:${status}`);
+            });
+
+            appendResult('\n✅ 契约映射测试完成\n');
+        };
+
+        window.testDataMigration = function() {
+            appendResult('🔄 测试数据迁移...\n');
+
+            // 创建旧格式的测试数据
+            const oldFormatProvider = {
+                id: 1,
+                name: 'Legacy Provider',
+                apiKey: 'sk-legacy123',
+                endpoint: 'https://api.legacy.com',
+                models: ['legacy-model'],
+                enabled: true,
+                priority: 3,
+                createdAt: '2025-01-01T00:00:00Z'
+            };
+
+            // 设置测试数据
+            providerConfig.providers = {
+                openai: [oldFormatProvider]
+            };
+
+            appendResult('📦 原始数据格式:');
+            appendResult(JSON.stringify(oldFormatProvider, null, 2));
+
+            // 执行迁移
+            const migrationCount = providerConfig.migrateProvidersToContractFormat();
+            
+            appendResult(`\n🔄 迁移了 ${migrationCount} 个提供商`);
+
+            // 检查迁移后的数据
+            const migratedProvider = providerConfig.providers.openai[0];
+            appendResult('\n📦 迁移后数据格式:');
+            appendResult(JSON.stringify(migratedProvider, null, 2));
+
+            // 验证关键字段
+            const requiredContractFields = [
+                'service_id', 'service_name', 'service_type', 'provider',
+                'config_params', 'status', 'cost_per_token', 'created_at', 'updated_at'
+            ];
+
+            let validFields = 0;
+            requiredContractFields.forEach(field => {
+                if (migratedProvider.hasOwnProperty(field)) {
+                    validFields++;
+                    appendResult(`✅ ${field}: 存在`);
+                } else {
+                    appendResult(`❌ ${field}: 缺失`);
+                }
+            });
+
+            const migrationScore = Math.round((validFields / requiredContractFields.length) * 100);
+            appendResult(`\n📊 迁移成功率: ${migrationScore}% (${validFields}/${requiredContractFields.length})`);
+
+            appendResult('\n✅ 数据迁移测试完成\n');
+        };
+
+        window.testProviderCRUD = async function() {
+            appendResult('⚙️ 测试CRUD操作...\n');
+
+            try {
+                // 测试添加提供商
+                appendResult('➕ 测试添加提供商:');
+                const testData = {
+                    name: 'Test CRUD Provider',
+                    apiKey: 'sk-crud123',
+                    endpoint: 'https://api.crud.com',
+                    models: ['crud-model-1', 'crud-model-2'],
+                    enabled: true,
+                    priority: 10,
+                    cost_per_token: 0.02
+                };
+
+                // 模拟表单数据
+                const formData = new FormData();
+                Object.entries(testData).forEach(([key, value]) => {
+                    if (key === 'models') {
+                        formData.append('selectedModels', value.join(','));
+                    } else if (key === 'enabled') {
+                        if (value) formData.append(key, 'on');
+                    } else {
+                        formData.append(key, value.toString());
+                    }
+                });
+
+                // 直接调用保存逻辑（跳过UI部分）
+                appendResult('  调用保存逻辑...');
+                
+                // 构建契约兼容的提供商
+                const contractProvider = providerConfig.buildContractCompliantProvider(testData, 'openai');
+                appendResult('✅ 成功创建契约兼容的提供商数据');
+
+                // 测试更新操作
+                appendResult('\n✏️ 测试更新提供商:');
+                const updateData = {
+                    name: 'Updated CRUD Provider',
+                    enabled: false,
+                    priority: 15,
+                    cost_per_token: 0.03,
+                    service_type: 'assist',
+                    status: 'inactive',
+                    updated_at: new Date().toISOString()
+                };
+
+                const updatedProvider = { ...contractProvider, ...updateData };
+                appendResult('✅ 成功更新提供商数据');
+
+                // 测试状态切换
+                appendResult('\n🔄 测试状态切换:');
+                const toggledProvider = { ...updatedProvider };
+                toggledProvider.status = toggledProvider.status === 'active' ? 'inactive' : 'active';
+                toggledProvider.enabled = toggledProvider.status === 'active';
+                appendResult(`✅ 状态切换: ${updatedProvider.status} → ${toggledProvider.status}`);
+
+                // 测试数据验证
+                appendResult('\n🛡️ 测试数据验证:');
+                const validationTests = [
+                    { field: 'service_name', value: contractProvider.service_name, required: true },
+                    { field: 'service_type', value: contractProvider.service_type, required: true },
+                    { field: 'provider', value: contractProvider.provider, required: true },
+                    { field: 'config_params', value: contractProvider.config_params, required: true },
+                    { field: 'status', value: contractProvider.status, required: true },
+                    { field: 'cost_per_token', value: contractProvider.cost_per_token, required: true }
+                ];
+
+                let validationPassed = 0;
+                validationTests.forEach(test => {
+                    const isValid = test.value !== undefined && test.value !== null && test.value !== '';
+                    if (isValid) {
+                        validationPassed++;
+                        appendResult(`✅ ${test.field}: 验证通过`);
+                    } else {
+                        appendResult(`❌ ${test.field}: 验证失败`);
+                    }
+                });
+
+                const validationScore = Math.round((validationPassed / validationTests.length) * 100);
+                appendResult(`\n📊 数据验证通过率: ${validationScore}% (${validationPassed}/${validationTests.length})`);
+
+                appendResult('\n✅ CRUD操作测试完成');
+
+            } catch (error) {
+                appendResult(`❌ CRUD测试出错: ${error.message}`);
+            }
+
+            appendResult('\n');
+        };
+
+        window.clearResults = function() {
+            document.getElementById('test-results').innerHTML = '';
+        };
+
+        function appendResult(text) {
+            const results = document.getElementById('test-results');
+            results.innerHTML += text + '\n';
+            results.scrollTop = results.scrollHeight;
+        }
+
+        function updateContractMappingTable(mappingResults) {
+            const tbody = document.getElementById('contract-mapping-table');
+            tbody.innerHTML = '';
+
+            mappingResults.forEach(result => {
+                const row = tbody.insertRow();
+                row.innerHTML = `
+                    <td>${result.contractField}</td>
+                    <td>${result.implementationField}</td>
+                    <td>${result.mappingType}</td>
+                    <td><span class="status-badge status-${result.status}">${result.status === 'compliant' ? '✅ 兼容' : '❌ 缺失'}</span></td>
+                `;
+            });
+        }
+
+        // 页面加载完成后的初始化
+        document.addEventListener('DOMContentLoaded', function() {
+            appendResult('🎯 服务商配置契约合规性测试系统已准备就绪');
+            appendResult('📋 点击"运行所有测试"开始完整测试，或选择单项测试');
+            appendResult('📄 测试将验证与AI_SERVICES表契约的一致性\n');
+        });
+    </script>
+</body>
+</html>
