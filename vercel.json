@@ -1,18 +1,4 @@
 {
   "version": 2,
-  "buildCommand": "",
-  "installCommand": "",
-  "outputDirectory": ".",
-  "functions": {
-    "api/auth/*.js": {
-      "maxDuration": 10
-    }
-  },
-  "rewrites": [
-    {
-      "source": "/api/:path*",
-      "destination": "/api/:path*"
-    }
-  ],
   "public": true
 }
