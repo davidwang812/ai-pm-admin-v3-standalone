@@ -393,8 +393,8 @@ export class AIServicePage {
       }
     }
     
-    // 清理其他资源
-    this.modules.clear();
+    // 清理其他资源 - modules是对象不是Map
+    this.modules = {};
     
     console.log('✅ AI Service page destroyed');
   }

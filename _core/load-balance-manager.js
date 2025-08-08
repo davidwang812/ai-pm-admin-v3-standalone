@@ -5,7 +5,8 @@
 
 export class LoadBalanceManager {
   constructor(apiClient) {
-    this.api = apiClient;
+    // 如果没有传入apiClient，创建一个包装器
+    this.api = apiClient || this.createApiWrapper();
     
     // 负载均衡策略
     this.strategies = {
@@ -34,6 +35,31 @@ export class LoadBalanceManager {
     
     // 初始化
     this.initialize();
+  }
+
+  /**
+   * 创建API包装器（当没有提供apiClient时使用）
+   */
+  createApiWrapper() {
+    console.warn('LoadBalanceManager: No apiClient provided, using fallback wrapper');
+    return {
+      get: async (url) => {
+        console.warn(`LoadBalanceManager: GET ${url} - using mock response`);
+        return { success: false, error: 'No API client configured' };
+      },
+      post: async (url, data) => {
+        console.warn(`LoadBalanceManager: POST ${url} - using mock response`);
+        return { success: false, error: 'No API client configured' };
+      },
+      put: async (url, data) => {
+        console.warn(`LoadBalanceManager: PUT ${url} - using mock response`);
+        return { success: false, error: 'No API client configured' };
+      },
+      delete: async (url) => {
+        console.warn(`LoadBalanceManager: DELETE ${url} - using mock response`);
+        return { success: false, error: 'No API client configured' };
+      }
+    };
   }
 
   /**
