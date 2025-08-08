@@ -483,9 +483,6 @@ export function withTimer(name, fn, tags = {}) {
   };
 }
 
-// 导出
-if (typeof module !== 'undefined' && module.exports) {
-  module.exports = { PerformanceMonitor, performanceMonitor, monitorFunction, withTimer };
-}
-
-export { PerformanceMonitor, performanceMonitor };
+// ES6 模块导出
+export { PerformanceMonitor, performanceMonitor, monitorFunction, withTimer };
+export default performanceMonitor;
