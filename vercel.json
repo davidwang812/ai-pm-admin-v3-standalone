@@ -1,9 +1,10 @@
 {
   "version": 2,
   "public": true,
-  "buildCommand": "",
-  "installCommand": "",
-  "outputDirectory": ".",
+  "framework": null,
+  "buildCommand": "npm run build",
+  "installCommand": "npm install",
+  "outputDirectory": "dist",
   "github": {
     "enabled": false
   },

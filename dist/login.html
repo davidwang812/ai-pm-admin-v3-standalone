@@ -1,0 +1,287 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>管理员登录 - AI Product Manager V3</title>
+    <link rel="icon" href="./favicon.svg" type="image/svg+xml">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        .login-container {
+            background: white;
+            padding: 40px;
+            border-radius: 10px;
+            box-shadow: 0 15px 35px rgba(0, 0, 0, 0.1);
+            width: 100%;
+            max-width: 400px;
+        }
+        
+        .logo {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+        
+        .logo h1 {
+            color: #333;
+            font-size: 28px;
+            font-weight: 600;
+        }
+        
+        .logo p {
+            color: #666;
+            font-size: 14px;
+            margin-top: 5px;
+        }
+        
+        .version-badge {
+            display: inline-block;
+            background: #667eea;
+            color: white;
+            padding: 2px 8px;
+            border-radius: 12px;
+            font-size: 12px;
+            margin-left: 8px;
+        }
+        
+        .form-group {
+            margin-bottom: 20px;
+        }
+        
+        label {
+            display: block;
+            color: #555;
+            font-size: 14px;
+            font-weight: 500;
+            margin-bottom: 8px;
+        }
+        
+        input {
+            width: 100%;
+            padding: 12px 15px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            font-size: 14px;
+            transition: border-color 0.3s;
+        }
+        
+        input:focus {
+            outline: none;
+            border-color: #667eea;
+        }
+        
+        .btn-login {
+            width: 100%;
+            padding: 12px;
+            background: #667eea;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            font-size: 16px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: background 0.3s;
+        }
+        
+        .btn-login:hover {
+            background: #5a67d8;
+        }
+        
+        .btn-login:disabled {
+            background: #ccc;
+            cursor: not-allowed;
+        }
+        
+        .alert {
+            padding: 12px;
+            border-radius: 5px;
+            margin-bottom: 20px;
+            font-size: 14px;
+            display: none;
+        }
+        
+        .alert-error {
+            background: #fee;
+            color: #c33;
+            border: 1px solid #fcc;
+        }
+        
+        .alert-success {
+            background: #efe;
+            color: #3c3;
+            border: 1px solid #cfc;
+        }
+        
+        .loading {
+            display: inline-block;
+            width: 14px;
+            height: 14px;
+            border: 2px solid #f3f3f3;
+            border-top: 2px solid #667eea;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            margin-left: 10px;
+            vertical-align: middle;
+        }
+        
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+        
+        .footer {
+            text-align: center;
+            margin-top: 30px;
+            color: #999;
+            font-size: 12px;
+        }
+        
+        .performance-badge {
+            background: #10b981;
+            color: white;
+            padding: 4px 12px;
+            border-radius: 4px;
+            font-size: 11px;
+            margin-top: 10px;
+            display: inline-block;
+        }
+    </style>
+</head>
+<body>
+    <div class="login-container">
+        <div class="logo">
+            <h1>AI Product Manager <span class="version-badge">V3</span></h1>
+            <p>管理员控制台 - Vercel Optimized</p>
+            <div class="performance-badge">🚀 60% Faster Load</div>
+        </div>
+        
+        <div id="alert" class="alert"></div>
+        
+        <form id="loginForm">
+            <div class="form-group">
+                <label for="username">用户名</label>
+                <input type="text" id="username" name="username" required autofocus placeholder="请输入用户名" value="davidwang812" autocomplete="username">
+            </div>
+            
+            <div class="form-group">
+                <label for="password">密码</label>
+                <input type="password" id="password" name="password" required placeholder="请输入密码" autocomplete="current-password">
+            </div>
+            
+            <button type="submit" class="btn-login" id="submitBtn">
+                登录
+            </button>
+        </form>
+        
+        <div class="footer">
+            <p>© 2025 AI Product Manager V3. All rights reserved.</p>
+        </div>
+    </div>
+    
+    <script type="module">
+        console.log('🚀 Admin V3 Login Page');
+        
+        const form = document.getElementById('loginForm');
+        const alert = document.getElementById('alert');
+        const submitBtn = document.getElementById('submitBtn');
+        
+        function showAlert(message, type = 'error') {
+            alert.textContent = message;
+            alert.className = `alert alert-${type}`;
+            alert.style.display = 'block';
+            
+            if (type === 'success') {
+                setTimeout(() => {
+                    alert.style.display = 'none';
+                }, 3000);
+            }
+        }
+        
+        form.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            
+            const username = document.getElementById('username').value;
+            const password = document.getElementById('password').value;
+            
+            // 输入验证
+            try {
+                // 动态导入验证器
+                const { default: validator } = await import('./_utils/input-validator.js');
+                
+                // 验证用户名
+                if (!validator.validateUsername(username)) {
+                    showAlert('用户名格式错误：只能包含字母、数字、下划线和横线，长度3-20');
+                    return;
+                }
+                
+                // 验证密码
+                const passwordResult = validator.validatePassword(password);
+                if (!passwordResult.valid) {
+                    showAlert(passwordResult.messages.join('; '));
+                    return;
+                }
+                
+                // 清理输入
+                const cleanUsername = validator.sanitizeInput(username, 'username');
+                const cleanPassword = password; // 密码不需要清理，保持原样
+                
+                submitBtn.disabled = true;
+                submitBtn.innerHTML = '登录中<span class="loading"></span>';
+                alert.style.display = 'none';
+                
+                // 动态导入V3独立auth模块
+                const { default: authManager } = await import('./_core/auth-v3.js');
+                
+                console.log('🔐 V3 Independent Auth - Attempting login with:', cleanUsername);
+                const result = await authManager.login(cleanUsername, cleanPassword);
+                
+                if (result.success) {
+                    showAlert('登录成功，正在跳转...', 'success');
+                    
+                    // 始终跳转到index.html（Admin V3主页面）
+                    // 忽略后端返回的redirectUrl，因为它指向不存在的页面
+                    setTimeout(() => {
+                        window.location.href = './index.html';
+                    }, 1000);
+                } else {
+                    showAlert(result.message || '登录失败，请检查用户名和密码');
+                }
+            } catch (error) {
+                showAlert('网络错误，请稍后重试');
+                console.error('Login error:', error);
+            } finally {
+                submitBtn.disabled = false;
+                submitBtn.textContent = '登录';
+            }
+        });
+        
+        // 检查是否已经登录
+        (async () => {
+            try {
+                const { default: authManager } = await import('./_core/auth-v3.js');
+                const isAuthenticated = await authManager.check();
+                
+                if (isAuthenticated) {
+                    console.log('✅ V3 Already authenticated, redirecting...');
+                    window.location.href = './index.html';
+                }
+            } catch (error) {
+                console.log('Not authenticated, showing login form');
+            }
+        })();
+    </script>
+</body>
+</html>

@@ -1,0 +1,113 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI Product Manager - Admin V3</title>
+    <link rel="icon" href="./favicon.svg" type="image/svg+xml">
+    <link rel="shortcut icon" href="./favicon.ico">
+    
+    <!-- 注释掉V2的样式文件，因为Vercel部署中没有admin-v2目录 -->
+    <!-- <link rel="stylesheet" href="/admin-v2/css/variables.css">
+    <link rel="stylesheet" href="/admin-v2/css/main.css">
+    <link rel="stylesheet" href="/admin-v2/css/modal.css"> -->
+    
+    <!-- V3 布局样式 -->
+    <link rel="stylesheet" href="./_styles/layout.css">
+    <!-- AI服务页面样式 -->
+    <link rel="stylesheet" href="./_styles/ai-service.css">
+    <!-- 增强版负载均衡样式 -->
+    <link rel="stylesheet" href="./_styles/load-balance-enhanced.css">
+    
+    <!-- 初始加载样式 -->
+    <style>
+        #loading-screen {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            min-height: 100vh;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+        }
+        
+        #loading-screen h3 {
+            font-size: 24px;
+            margin-bottom: 8px;
+        }
+        
+        #loading-screen p {
+            opacity: 0.9;
+            margin-bottom: 24px;
+        }
+        
+        #loading-screen .loading-spinner {
+            border-color: rgba(255, 255, 255, 0.3);
+            border-top-color: white;
+        }
+    </style>
+    
+    <!-- Chart.js for data visualization -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+</head>
+<body>
+    <div id="app" class="app-container">
+        <!-- Initial loading message -->
+        <div id="loading-screen" style="padding: 20px; text-align: center;">
+            <h3>🚀 Admin V3 (Vercel Optimized)</h3>
+            <p>正在初始化...</p>
+            <div style="margin-top: 20px;">
+                <div class="loading-spinner"></div>
+            </div>
+        </div>
+        
+        <!-- Main content container for router -->
+        <div id="app-content" style="display: none;">
+            <!-- Router content will be rendered here -->
+        </div>
+    </div>
+    
+    <!-- V3 Bootstrap Module -->
+    <script type="module">
+        console.log('🚀 Admin-v3 (Vercel Optimized) starting...');
+        
+        // Dynamic import with error handling
+        import('./_app/bootstrap.js').then(module => {
+            console.log('✅ V3 Bootstrap loaded');
+            // Bootstrap will auto-initialize
+        }).catch(err => {
+            console.error('❌ V3 Bootstrap error:', err);
+            document.getElementById('app').innerHTML = `
+                <div style="padding: 40px; text-align: center;">
+                    <h2>加載失敗</h2>
+                    <p>${err.message}</p>
+                    <button onclick="location.reload()" style="
+                        padding: 8px 16px;
+                        background: #667eea;
+                        color: white;
+                        border: none;
+                        border-radius: 4px;
+                        cursor: pointer;
+                    ">重新加載</button>
+                </div>
+            `;
+        });
+    </script>
+    
+    <style>
+        .loading-spinner {
+            width: 40px;
+            height: 40px;
+            margin: 20px auto;
+            border: 4px solid #e2e8f0;
+            border-top-color: #667eea;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+        }
+        
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+    </style>
+</body>
+</html>

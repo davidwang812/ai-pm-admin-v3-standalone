@@ -4,5 +4,27 @@
 node_modules
 .env
 .env.*
-dist
+# dist目录现在需要被跟踪，因为Vercel需要它
+# dist
 build
+
+# 冗余文件 - 不要追踪
+test.html
+index-test.html
+admin.html
+standalone.html
+_core/auth-old.js
+_core/auth-config.js
+_pages/ai-service/load-balance.js
+_pages/ai-service/load-balance-enhanced.js
+_pages/ai-service/load-balancing.js
+_pages/ai-service/cost-analysis.js
+_pages/ai-service/unified-config.js
+_pages/billing/*.test.js
+_pages/user/*.test.js
+cleanup.sh
+deploy.sh
+deploy-public.sh
+disable-vercel-auth.sh
+fix-navigation-error.md
+admin-v3-standalone/

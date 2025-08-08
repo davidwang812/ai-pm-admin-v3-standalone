@@ -4,3 +4,27 @@ node_modules
 .git
 *.log
 .env.local
+
+# 冗余文件 - 不要部署到Vercel
+test.html
+index-test.html
+admin.html
+standalone.html
+_core/auth-old.js
+_core/auth-config.js
+_pages/ai-service/load-balance.js
+_pages/ai-service/load-balance-enhanced.js
+_pages/ai-service/load-balancing.js
+_pages/ai-service/cost-analysis.js
+_pages/ai-service/unified-config.js
+_pages/billing/*.test.js
+_pages/user/*.test.js
+*.test.js
+**/*.test.js
+cleanup.sh
+deploy.sh
+deploy-public.sh
+disable-vercel-auth.sh
+fix-navigation-error.md
+admin-v3-standalone/
+*.sh

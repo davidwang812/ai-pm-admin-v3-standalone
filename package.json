@@ -5,7 +5,7 @@
   "private": true,
   "scripts": {
     "dev": "vercel dev",
-    "build": "echo 'No build required'",
+    "build": "mkdir -p dist && cp -r *.html _* api dist/ 2>/dev/null || true",
     "start": "vercel",
     "test": "jest",
     "test:watch": "jest --watch",
