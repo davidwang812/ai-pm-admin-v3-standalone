@@ -112,6 +112,34 @@ class PerformanceMonitor {
   }
 
   /**
+   * 标记性能时间点
+   */
+  mark(markName, tags = {}) {
+    if (typeof performance !== 'undefined' && performance.mark) {
+      try {
+        performance.mark(markName);
+      } catch (e) {
+        // 某些环境可能不支持performance.mark
+      }
+    }
+    // 记录到metrics中
+    this.record(`mark.${markName}`, performance.now(), tags);
+  }
+
+  /**
+   * 测量两个标记之间的时间
+   */
+  measure(measureName, startMark, endMark) {
+    if (typeof performance !== 'undefined' && performance.measure) {
+      try {
+        performance.measure(measureName, startMark, endMark);
+      } catch (e) {
+        // 某些环境可能不支持performance.measure
+      }
+    }
+  }
+
+  /**
    * 开始计时
    */
   startTimer(timerName, tags = {}) {
