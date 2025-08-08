@@ -179,7 +179,8 @@ export class Router {
     this.navigatingTo = path;
     
     console.log(`🔄 Navigating to: ${path}`);
-    console.log('Available routes:', Array.from(this.routes.keys()));
+    console.log('📍 Current route:', this.currentRoute);
+    console.log('📋 Available routes:', Array.from(this.routes.keys()));
     
     // 执行前置守卫
     const canNavigate = await this.runBeforeEachHooks(path, this.currentRoute);
@@ -405,7 +406,9 @@ export class Router {
       return null;
     }
     
-    console.log('🎨 Rendering component, type:', typeof component);
+    console.log('🎨 Rendering component for route:', route.path);
+    console.log('   Component type:', typeof component);
+    console.log('   Component name:', component.name || 'Anonymous');
     
     // 清空内容
     this.contentElement.innerHTML = '';
@@ -415,7 +418,7 @@ export class Router {
     // 根据组件类型渲染
     if (typeof component === 'function' && component.prototype && component.prototype.render) {
       // 类组件（构造函数） - 必须先检查这个，因为类也是函数
-      console.log('📝 Rendering class component');
+      console.log('📝 Rendering class component:', component.name);
       // 传递app实例作为第一个参数（如果有的话）
       const app = window.adminV3App || null;
       const instance = new component(app);
@@ -608,15 +611,30 @@ export class Router {
    * 更新导航激活状态
    */
   updateActiveNavItem(path) {
+    console.log(`🎯 Updating active nav for path: ${path}`);
+    
     // 移除所有激活状态
-    document.querySelectorAll('.nav-item').forEach(item => {
+    const allNavItems = document.querySelectorAll('.nav-item');
+    console.log(`📋 Found ${allNavItems.length} nav items`);
+    allNavItems.forEach(item => {
       item.classList.remove('active');
+      console.log(`  Removed active from: ${item.getAttribute('href')}`);
     });
     
-    // 添加当前激活状态
-    const activeLink = document.querySelector(`.nav-item[href="#${path}"]`);
+    // 添加当前激活状态 - 修正选择器
+    // 注意：HTML结构是 <a href="#/dashboard" class="nav-item">
+    const activeLink = document.querySelector(`a.nav-item[href="#${path}"]`);
     if (activeLink) {
       activeLink.classList.add('active');
+      console.log(`✅ Added active to: ${activeLink.getAttribute('href')}`);
+    } else {
+      console.warn(`⚠️ No nav item found for path: #${path}`);
+      // 尝试其他可能的选择器
+      const altLink = document.querySelector(`a[href="#${path}"]`);
+      if (altLink && altLink.classList.contains('nav-item')) {
+        altLink.classList.add('active');
+        console.log(`✅ Added active to (alt): ${altLink.getAttribute('href')}`);
+      }
     }
   }
 
