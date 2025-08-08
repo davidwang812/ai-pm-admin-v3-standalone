@@ -853,7 +853,7 @@ export class UnifiedConfig {
       });
       
       // 合并配置，保留服务商分配信息
-      const config = {
+      let config = {
         ...this.currentConfig,
         globalParams,
         aiServices,

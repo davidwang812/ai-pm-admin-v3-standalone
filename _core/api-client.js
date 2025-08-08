@@ -99,8 +99,18 @@ export class ApiClient {
     return this.post('/admin/load-balance', config);
   }
   
-  async getCostAnalysis(dateRange) {
-    return this.get(`/admin/cost-analysis?range=${dateRange}`);
+  async getCostAnalysis(dateRange = 'month') {
+    try {
+      const response = await this.get(`/admin/cost-analysis?range=${dateRange}`);
+      return response;
+    } catch (error) {
+      console.error('Get cost analysis error:', error);
+      return {
+        success: false,
+        data: null,
+        message: error.message
+      };
+    }
   }
   
   /**
@@ -302,6 +312,43 @@ export class ApiClient {
     }
     
     return cached.data;
+  }
+
+  /**
+   * 测试数据源连接
+   */
+  async testDataSource(dataSource) {
+    try {
+      const response = await this.post('/admin/test-datasource', {
+        url: dataSource.url,
+        name: dataSource.name,
+        type: dataSource.type
+      });
+      return response;
+    } catch (error) {
+      console.error('Test data source error:', error);
+      return {
+        success: false,
+        message: error.message || '连接测试失败'
+      };
+    }
+  }
+  
+  /**
+   * 获取负载均衡仪表板数据
+   */
+  async getLoadBalancingDashboard() {
+    try {
+      const response = await this.get('/admin/load-balancing/dashboard');
+      return response;
+    } catch (error) {
+      console.error('Get load balancing dashboard error:', error);
+      return {
+        success: false,
+        data: null,
+        message: error.message
+      };
+    }
   }
 
   /**

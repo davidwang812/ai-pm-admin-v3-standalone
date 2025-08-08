@@ -208,15 +208,13 @@ export class DataSources {
   async testDataSources() {
     this.addLog('开始测试数据源连接...');
     
-    // Helper function to create timeout promise
-    const fetchWithTimeout = (url, options = {}, timeout = 10000) => {
-      return Promise.race([
-        fetch(url, options),
-        new Promise((_, reject) => 
-          setTimeout(() => reject(new Error('请求超时')), timeout)
-        )
-      ]);
-    };
+    // 使用后端API代理，避免CORS问题
+    const api = this.app?.api || window.adminV3App?.api;
+    
+    if (!api || !api.testDataSource) {
+      this.addLog('❌ API客户端未初始化或缺少testDataSource方法');
+      return;
+    }
     
     for (const source of this.dataSources) {
       const config = this.dataSourceConfig[source.id];
@@ -226,85 +224,28 @@ export class DataSources {
       }
       
       try {
+        this.addLog(`测试 ${config.name}...`);
         const startTime = Date.now();
-        let success = false;
         
-        // Test actual connection based on source type
-        switch (source.id) {
-          case 'openrouter':
-            // Test OpenRouter API
-            const openrouterResponse = await fetchWithTimeout(source.url, {
-              method: 'GET',
-              headers: {
-                'Accept': 'application/json'
-              }
-            });
-            success = openrouterResponse.ok;
-            if (success) {
-              const data = await openrouterResponse.json();
-              const modelCount = data.data ? data.data.length : 0;
-              this.addLog(`✅ ${config.name} 连接成功 (${Date.now() - startTime}ms) - ${modelCount} 个模型`);
-            } else {
-              throw new Error(`HTTP ${openrouterResponse.status}`);
-            }
-            break;
-            
-          case 'litellm':
-            // Test LiteLLM JSON
-            const litellmResponse = await fetchWithTimeout(source.url, {
-              method: 'GET',
-              headers: {
-                'Accept': 'application/json'
-              }
-            });
-            success = litellmResponse.ok;
-            if (success) {
-              const data = await litellmResponse.json();
-              const modelCount = Object.keys(data).length;
-              this.addLog(`✅ ${config.name} 连接成功 (${Date.now() - startTime}ms) - ${modelCount} 个模型`);
-            } else {
-              throw new Error(`HTTP ${litellmResponse.status}`);
-            }
-            break;
-            
-          case 'vercel':
-            // Test Vercel Data Fetcher
-            if (!this.dataSourceConfig.vercel.url || this.dataSourceConfig.vercel.url === 'https://vercel-data-fetcher.vercel.app') {
-              this.addLog(`⚠️ ${config.name} 未配置或使用默认URL，跳过测试`);
-              continue;
-            }
-            const vercelUrl = this.dataSourceConfig.vercel.url.endsWith('/') ? 
-              `${this.dataSourceConfig.vercel.url}api/fetch-openrouter` : 
-              `${this.dataSourceConfig.vercel.url}/api/fetch-openrouter`;
-            const vercelResponse = await fetchWithTimeout(vercelUrl, {
-              method: 'GET',
-              headers: {
-                'Accept': 'application/json'
-              }
-            });
-            success = vercelResponse.ok;
-            if (success) {
-              const data = await vercelResponse.json();
-              if (data.success && data.models) {
-                this.addLog(`✅ ${config.name} 连接成功 (${Date.now() - startTime}ms) - ${data.models.length} 个模型`);
-              } else {
-                throw new Error('返回数据格式不正确');
-              }
-            } else {
-              throw new Error(`HTTP ${vercelResponse.status}`);
-            }
-            break;
-            
-          default:
-            this.addLog(`⚠️ 未知数据源类型: ${source.id}`);
-        }
+        // 通过后端API测试
+        const result = await api.testDataSource({
+          url: source.url,
+          name: source.name,
+          type: source.type
+        });
         
-      } catch (error) {
-        if (error.message === '请求超时') {
-          this.addLog(`❌ ${config.name} 连接超时 (10秒)`);
+        const duration = Date.now() - startTime;
+        
+        if (result.success) {
+          this.addLog(`✅ ${config.name}: 连接成功 (${duration}ms)`);
+          if (result.modelCount) {
+            this.addLog(`   发现 ${result.modelCount} 个模型`);
+          }
         } else {
-          this.addLog(`❌ ${config.name} 连接失败: ${error.message}`);
+          this.addLog(`❌ ${config.name}: ${result.message || '连接失败'}`);
         }
+      } catch (error) {
+        this.addLog(`❌ ${config.name}: 测试异常 - ${error.message}`);
       }
     }
     

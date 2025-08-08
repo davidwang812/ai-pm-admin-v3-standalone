@@ -138,8 +138,8 @@ class Bootstrap {
       // Vercel部署，连接到Railway后端
       return 'https://aiproductmanager-production.up.railway.app/api';
     } else if (isLocal) {
-      // 本地开发
-      return 'http://localhost:3001/api';
+      // 本地开发 - 使用环境变量或默认值
+      return window.LOCAL_API_URL || 'http://localhost:3001/api';
     } else {
       // Railway或其他部署
       return window.location.origin + '/api';
