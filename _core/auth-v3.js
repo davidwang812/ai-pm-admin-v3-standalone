@@ -6,6 +6,8 @@
 
 export class AuthManagerV3 {
   constructor() {
+    console.log('🔐 Auth Manager V3 initializing...');
+    
     this.tokenKey = 'admin_token_v3';
     this.refreshTokenKey = 'admin_refresh_token_v3';
     this.userKey = 'admin_user_v3';
@@ -13,6 +15,10 @@ export class AuthManagerV3 {
     this.user = null;
     this.token = null;
     this.refreshTimer = null;
+    
+    // 立即检测环境并显示API端点
+    const apiEndpoint = this.getApiEndpoint();
+    console.log('✅ Auth Manager initialized with API:', apiEndpoint);
     
     // 初始化时加载存储的认证信息
     this.loadStoredAuth();
@@ -69,7 +75,13 @@ export class AuthManagerV3 {
     try {
       console.log('🔐 V3 Independent Authentication...');
       
-      const response = await fetch('/api/auth/admin/login', {
+      // 获取正确的API端点
+      const apiEndpoint = this.getApiEndpoint();
+      const loginUrl = `${apiEndpoint}/auth/admin/login`;
+      
+      console.log('🔗 Login URL:', loginUrl);
+      
+      const response = await fetch(loginUrl, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json'
@@ -130,7 +142,12 @@ export class AuthManagerV3 {
   async logout() {
     try {
       if (this.token) {
-        await fetch('/api/auth/admin/logout', {
+        const apiEndpoint = this.getApiEndpoint();
+        const logoutUrl = `${apiEndpoint}/auth/admin/logout`;
+        
+        console.log('🔗 Logout URL:', logoutUrl);
+        
+        await fetch(logoutUrl, {
           method: 'POST',
           headers: {
             'Authorization': `Bearer ${this.token}`
@@ -194,7 +211,12 @@ export class AuthManagerV3 {
     // 只有在必要时才验证token
     console.log('🔍 Verifying token with backend...');
     try {
-      const response = await fetch('/api/auth/verify', {
+      const apiEndpoint = this.getApiEndpoint();
+      const verifyUrl = `${apiEndpoint}/auth/verify`;
+      
+      console.log('🔗 Verify URL:', verifyUrl);
+      
+      const response = await fetch(verifyUrl, {
         method: 'GET',
         headers: {
           'Authorization': `Bearer ${this.token}`
@@ -233,7 +255,12 @@ export class AuthManagerV3 {
     try {
       console.log('🔄 V3 Refreshing token...');
       
-      const response = await fetch('/api/auth/refresh', {
+      const apiEndpoint = this.getApiEndpoint();
+      const refreshUrl = `${apiEndpoint}/auth/refresh`;
+      
+      console.log('🔗 Refresh URL:', refreshUrl);
+      
+      const response = await fetch(refreshUrl, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json'
@@ -401,6 +428,40 @@ export class AuthManagerV3 {
    */
   isAdmin() {
     return this.user && (this.user.isAdmin || this.user.isSuperAdmin);
+  }
+
+  /**
+   * 获取API端点
+   */
+  getApiEndpoint() {
+    // 检查是否在Vercel环境
+    const hostname = window.location.hostname;
+    const isVercel = hostname.includes('vercel.app');
+    const isLocal = hostname === 'localhost' || hostname === '127.0.0.1';
+    
+    console.log('🌍 Environment Detection:');
+    console.log('   Hostname:', hostname);
+    console.log('   Is Vercel:', isVercel);
+    console.log('   Is Local:', isLocal);
+    
+    let apiEndpoint;
+    
+    if (isVercel) {
+      // Vercel部署，连接到Railway后端
+      apiEndpoint = 'https://aiproductmanager-production.up.railway.app/api';
+      console.log('🚀 Using Railway backend for Vercel deployment');
+    } else if (isLocal) {
+      // 本地开发
+      apiEndpoint = 'http://localhost:3001/api';
+      console.log('🏠 Using local development server');
+    } else {
+      // Railway部署，使用相对路径
+      apiEndpoint = '/api';
+      console.log('🚂 Using Railway relative paths');
+    }
+    
+    console.log('🔗 Final API Endpoint:', apiEndpoint);
+    return apiEndpoint;
   }
 }
 
