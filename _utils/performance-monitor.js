@@ -461,6 +461,65 @@ class PerformanceMonitor {
   }
 
   /**
+   * 获取性能报告 (兼容方法)
+   */
+  getReport(timeRange = 300000) { // 默认5分钟
+    // 收集Web Vitals数据
+    const webVitals = {};
+    
+    // 获取FCP (First Contentful Paint)
+    const fcpStats = this.getStats('web_vitals.fcp', timeRange);
+    if (fcpStats) {
+      webVitals.fcp = fcpStats.latest || fcpStats.avg;
+    }
+    
+    // 获取LCP (Largest Contentful Paint)
+    const lcpStats = this.getStats('web_vitals.lcp', timeRange);
+    if (lcpStats) {
+      webVitals.lcp = lcpStats.latest || lcpStats.avg;
+    }
+    
+    // 获取CLS (Cumulative Layout Shift)
+    const clsStats = this.getStats('web_vitals.cls', timeRange);
+    if (clsStats) {
+      webVitals.cls = clsStats.latest || clsStats.avg;
+    }
+    
+    // 创建简化报告
+    const report = {
+      timestamp: new Date().toISOString(),
+      webVitals,
+      metrics: {},
+      summary: {
+        totalMetrics: this.metrics.size,
+        activeAlerts: this.getActiveAlerts().length
+      }
+    };
+    
+    // 添加关键指标
+    const keyMetrics = [
+      'bootstrap.loadTime',
+      'api.response_time',
+      'memory.js_heap_used',
+      'error.count'
+    ];
+    
+    for (const metricName of keyMetrics) {
+      const stats = this.getStats(metricName, timeRange);
+      if (stats) {
+        report.metrics[metricName] = {
+          avg: stats.avg,
+          min: stats.min,
+          max: stats.max,
+          latest: stats.latest
+        };
+      }
+    }
+    
+    return report;
+  }
+
+  /**
    * 清理历史数据
    */
   cleanup(maxAge = 3600000) { // 1小时
