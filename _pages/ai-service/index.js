@@ -19,7 +19,26 @@ export class AIServicePage {
     
     // Ensure app has necessary properties
     if (!this.app.api) {
+      console.warn('AIServicePage: No API client provided, creating fallback');
       this.app.api = {
+        // Standard REST methods (required by LoadBalanceManager)
+        get: async (url) => {
+          console.warn(`Fallback API GET: ${url}`);
+          return { success: false, error: 'API not available' };
+        },
+        post: async (url, data) => {
+          console.warn(`Fallback API POST: ${url}`);
+          return { success: false, error: 'API not available' };
+        },
+        put: async (url, data) => {
+          console.warn(`Fallback API PUT: ${url}`);
+          return { success: false, error: 'API not available' };
+        },
+        delete: async (url) => {
+          console.warn(`Fallback API DELETE: ${url}`);
+          return { success: false, error: 'API not available' };
+        },
+        // Legacy methods for compatibility
         getProviderCatalog: async () => ({ providers: [], models: [] }),
         getProviders: async () => ({ success: false, providers: {} }),
         getUnifiedConfig: async () => ({ success: false, data: {} }),
