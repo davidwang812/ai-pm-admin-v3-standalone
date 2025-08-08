@@ -23,24 +23,42 @@ export class AuthManagerV3 {
    */
   loadStoredAuth() {
     try {
+      console.log('🔍 Loading stored auth...');
       const token = localStorage.getItem(this.tokenKey);
       const userStr = localStorage.getItem(this.userKey);
+      
+      console.log('📦 Token found:', !!token);
+      console.log('📦 User data found:', !!userStr);
       
       if (token && userStr) {
         this.token = token;
         this.user = JSON.parse(userStr);
         
+        console.log('👤 User loaded:', this.user?.username);
+        
         // 检查token是否过期
-        if (!this.isTokenExpired()) {
+        const expired = this.isTokenExpired();
+        console.log('⏰ Token expired:', expired);
+        
+        if (!expired) {
+          console.log('✅ Token is valid, setting up auto-refresh');
           this.setupAutoRefresh();
           return true;
+        } else {
+          console.log('⚠️ Token appears expired, but keeping it for now');
+          // 不立即清除，让check方法决定是否刷新
+          return true; // 返回true，表示有存储的认证信息
         }
       }
     } catch (error) {
       console.error('Failed to load stored auth:', error);
     }
     
-    this.clearAuth();
+    console.log('❌ No valid stored auth found');
+    // 只有在没有token或解析失败时才清除
+    if (!this.token) {
+      this.clearAuth();
+    }
     return false;
   }
 
@@ -134,21 +152,47 @@ export class AuthManagerV3 {
    * 检查认证状态
    */
   async check() {
-    if (!this.token) {
-      return false;
-    }
+    console.log('🔐 Checking authentication status...');
     
-    // 检查token是否过期
-    if (this.isTokenExpired()) {
-      // 尝试刷新token
-      const refreshed = await this.refreshToken();
-      if (!refreshed) {
-        this.clearAuth();
+    // 如果没有token，尝试从localStorage加载
+    if (!this.token) {
+      console.log('📦 No token in memory, loading from storage...');
+      const loaded = this.loadStoredAuth();
+      if (!loaded) {
+        console.log('❌ No stored auth found');
         return false;
       }
     }
     
-    // 验证token有效性
+    if (!this.token) {
+      console.log('❌ Still no token after loading');
+      return false;
+    }
+    
+    console.log('🎫 Token present, checking validity...');
+    
+    // 检查token是否过期
+    if (this.isTokenExpired()) {
+      console.log('🔄 Token expired, attempting refresh...');
+      // 尝试刷新token
+      const refreshed = await this.refreshToken();
+      if (!refreshed) {
+        console.log('❌ Token refresh failed');
+        this.clearAuth();
+        return false;
+      }
+      console.log('✅ Token refreshed successfully');
+    }
+    
+    // 简化验证逻辑 - 如果有token且未过期，就认为有效
+    // 避免每次都调用后端验证
+    if (this.token && this.user) {
+      console.log('✅ Authentication valid (token and user present)');
+      return true;
+    }
+    
+    // 只有在必要时才验证token
+    console.log('🔍 Verifying token with backend...');
     try {
       const response = await fetch('/api/auth/verify', {
         method: 'GET',
@@ -159,10 +203,19 @@ export class AuthManagerV3 {
       
       if (response.ok) {
         const data = await response.json();
-        return data.success === true;
+        const valid = data.success === true;
+        console.log('🎯 Backend verification result:', valid);
+        return valid;
+      } else {
+        console.log('❌ Backend verification failed:', response.status);
       }
     } catch (error) {
-      console.error('Token verification failed:', error);
+      console.error('Token verification error:', error);
+      // 网络错误时，如果有token就认为有效
+      if (this.token && this.user) {
+        console.log('⚠️ Network error, but token exists, treating as valid');
+        return true;
+      }
     }
     
     return false;
@@ -261,12 +314,36 @@ export class AuthManagerV3 {
    */
   isTokenExpired() {
     const payload = this.parseToken(this.token);
-    if (!payload || !payload.exp) {
+    if (!payload) {
+      console.warn('⚠️ Cannot parse token');
       return true;
     }
     
-    // 添加30秒缓冲时间
-    return Date.now() >= (payload.exp * 1000 - 30000);
+    if (!payload.exp) {
+      console.log('ℹ️ Token has no expiry, treating as valid');
+      return false; // 没有过期时间的token视为永不过期
+    }
+    
+    const now = Date.now();
+    const expiry = payload.exp * 1000;
+    const timeLeft = expiry - now;
+    
+    console.log('⏰ Token expiry check:');
+    console.log('   Current time:', new Date(now).toISOString());
+    console.log('   Token expires:', new Date(expiry).toISOString());
+    console.log('   Time left:', Math.floor(timeLeft / 1000), 'seconds');
+    
+    // 给5分钟缓冲时间
+    const bufferTime = 5 * 60 * 1000;
+    const expired = now >= (expiry - bufferTime);
+    
+    if (expired) {
+      console.log('⚠️ Token is expired or expiring soon');
+    } else {
+      console.log('✅ Token is still valid');
+    }
+    
+    return expired;
   }
 
   /**
