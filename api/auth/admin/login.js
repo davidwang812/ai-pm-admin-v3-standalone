@@ -1,29 +1,19 @@
 /**
- * Vercel Edge Function - Admin Login
- * V3独立认证系统，不依赖Railway后端
+ * Vercel Edge Function - Admin Login Proxy
+ * 代理到Railway后端API进行认证
  * 
- * 契约要求：
- * - 独立认证
- * - 快速响应 (<1秒)
- * - 安全验证
+ * 功能：
+ * - 代理认证请求到Railway
+ * - 处理CORS
+ * - 返回统一格式响应
  */
-
-import { SignJWT } from 'jose';
 
 export const config = {
   runtime: 'edge',
 };
 
-// 简化的认证配置（Edge Runtime兼容）
-const ADMIN_CREDENTIALS = {
-  username: process.env.SUPER_ADMIN_USERNAME || 'davidwang812',
-  password: process.env.SUPER_ADMIN_PASSWORD || 'Admin@4444',
-  email: process.env.SUPER_ADMIN_EMAIL || 'davidwang812@gmail.com'
-};
-
-const JWT_SECRET = new TextEncoder().encode(
-  process.env.JWT_SECRET || 'v3-admin-secret-key-default'
-);
+// Railway API配置
+const RAILWAY_API_URL = process.env.RAILWAY_API_URL || 'https://aiproductmanager-production.up.railway.app';
 
 export default async function handler(request) {
   // 处理OPTIONS请求（CORS预检）
@@ -78,137 +68,40 @@ export default async function handler(request) {
       );
     }
 
-    console.log('🔐 V3 Local Authentication - Validating credentials...');
+    console.log('🔐 Proxying authentication to Railway backend...');
+    console.log('📍 Target:', `${RAILWAY_API_URL}/api/auth/admin/login`);
     
-    // 调试：输出环境变量状态（不输出敏感信息）
-    console.log('🔍 Environment check:', {
-      hasEnvUsername: !!process.env.SUPER_ADMIN_USERNAME,
-      hasEnvPassword: !!process.env.SUPER_ADMIN_PASSWORD,
-      hasEnvJwtSecret: !!process.env.JWT_SECRET,
-      actualUsername: ADMIN_CREDENTIALS.username,
-      usernameMatch: username === ADMIN_CREDENTIALS.username,
-      passwordLength: ADMIN_CREDENTIALS.password?.length,
-      inputPasswordLength: password?.length
+    // 代理请求到Railway后端
+    const backendResponse = await fetch(`${RAILWAY_API_URL}/api/auth/admin/login`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        username,
+        password
+      })
     });
 
-    // 支持多组凭据
-    const VALID_CREDENTIALS = [
-      {
-        username: ADMIN_CREDENTIALS.username,
-        password: ADMIN_CREDENTIALS.password,
-        source: 'environment/default'
-      },
-      {
-        username: 'davidwang812',
-        password: 'Admin@4444',
-        source: 'hardcoded-primary'
-      },
-      {
-        username: 'admin',
-        password: 'admin123',
-        source: 'hardcoded-secondary'
-      },
-      {
-        username: 'test',
-        password: 'test123',
-        source: 'test-account'
-      }
-    ];
-
-    // 查找匹配的凭据
-    const matchedCredential = VALID_CREDENTIALS.find(cred => 
-      username === cred.username && password === cred.password
-    );
-
-    // 本地验证管理员凭据
-    if (matchedCredential) {
-      
-      console.log(`✅ V3 Admin authentication successful (source: ${matchedCredential.source})`);
-      console.log('🔑 Using credential:', {
-        username: matchedCredential.username,
-        source: matchedCredential.source
-      });
-      
-      // 生成JWT Token
-      const token = await new SignJWT({
-        id: 'super-admin-v3',
-        username: ADMIN_CREDENTIALS.username,
-        email: ADMIN_CREDENTIALS.email,
-        isAdmin: true,
-        isSuperAdmin: true,
-        role: 'super_admin'
-      })
-        .setProtectedHeader({ alg: 'HS256' })
-        .setIssuedAt()
-        .setIssuer('ai-pm-v3')
-        .setAudience('admin-panel')
-        .setExpirationTime('2h')
-        .sign(JWT_SECRET);
-      
-      // 生成Refresh Token
-      const refreshToken = await new SignJWT({
-        id: 'super-admin-v3',
-        type: 'refresh'
-      })
-        .setProtectedHeader({ alg: 'HS256' })
-        .setIssuedAt()
-        .setIssuer('ai-pm-v3')
-        .setExpirationTime('7d')
-        .sign(JWT_SECRET);
-      
-      return new Response(
-        JSON.stringify({
-          success: true,
-          data: {
-            user: {
-              id: 'super-admin-v3',
-              username: ADMIN_CREDENTIALS.username,
-              email: ADMIN_CREDENTIALS.email,
-              isAdmin: true,
-              isSuperAdmin: true,
-              role: 'super_admin'
-            },
-            token: token,
-            refreshToken: refreshToken,
-            redirectUrl: '/index.html'
-          }
-        }),
-        {
-          status: 200,
-          headers: {
-            'Content-Type': 'application/json',
-            'Access-Control-Allow-Origin': '*'
-          }
-        }
-      );
-    }
-
-    // 认证失败
-    console.log('❌ V3 Admin authentication failed');
-    console.log('🔍 Failed login attempt:', {
-      inputUsername: username,
-      checkedAgainst: VALID_CREDENTIALS.map(c => ({
-        username: c.username,
-        source: c.source,
-        usernameMatch: username === c.username
-      }))
+    console.log('📡 Backend response status:', backendResponse.status);
+    
+    // 获取后端响应
+    const backendData = await backendResponse.json();
+    console.log('📦 Backend response:', {
+      success: backendData.success,
+      hasData: !!backendData.data,
+      hasToken: !!(backendData.data && backendData.data.token)
     });
     
+    // 直接转发后端响应
     return new Response(
-      JSON.stringify({
-        success: false,
-        message: 'Invalid username or password',
-        debug: {
-          receivedUsername: username,
-          expectedUsernames: VALID_CREDENTIALS.map(c => c.username),
-          timestamp: new Date().toISOString()
-        }
-      }),
+      JSON.stringify(backendData),
       {
-        status: 401,
+        status: backendResponse.status,
         headers: {
           'Content-Type': 'application/json',
-          'Access-Control-Allow-Origin': '*'
+          'Access-Control-Allow-Origin': '*',
+          'Access-Control-Allow-Credentials': 'true'
         }
       }
     );
