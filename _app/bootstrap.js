@@ -116,12 +116,13 @@ class Bootstrap {
     const isLocal = window.location.hostname === 'localhost';
     const isProduction = !isLocal && !window.location.hostname.includes('test');
     
-    config.environment = {
+    // 使用Object.assign来更新environment对象的属性，而不是替换整个对象
+    Object.assign(config.environment, {
       isVercel,
       isLocal,
       isProduction,
       apiEndpoint: this.getApiEndpoint(isVercel, isLocal)
-    };
+    });
     
     // 设置全局配置供其他模块使用
     window.adminV3Config = config;
