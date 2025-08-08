@@ -251,9 +251,10 @@
                 if (result.success) {
                     showAlert('登录成功，正在跳转...', 'success');
                     
-                    // 跳转到指定页面或默认页面
+                    // 始终跳转到index.html（Admin V3主页面）
+                    // 忽略后端返回的redirectUrl，因为它指向不存在的页面
                     setTimeout(() => {
-                        window.location.href = result.redirectUrl || './index.html';
+                        window.location.href = './index.html';
                     }, 1000);
                 } else {
                     showAlert(result.message || '登录失败，请检查用户名和密码');
