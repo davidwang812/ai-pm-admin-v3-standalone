@@ -235,7 +235,7 @@ export class UnifiedConfig {
     }
     
     // 显示合规性建议
-    if (complianceResult.recommendations.length > 0) {
+    if (complianceResult && complianceResult.recommendations && complianceResult.recommendations.length > 0) {
       console.log('💡 合规性建议:', complianceResult.recommendations);
     }
     
