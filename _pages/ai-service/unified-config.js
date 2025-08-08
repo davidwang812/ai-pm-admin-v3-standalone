@@ -234,9 +234,11 @@ export class UnifiedConfig {
       console.log(`✅ 配置符合契约要求 (合规度: ${complianceResult.complianceScore}%)`);
     }
     
-    // 显示合规性建议
-    if (complianceResult && complianceResult.recommendations && complianceResult.recommendations.length > 0) {
-      console.log('💡 合规性建议:', complianceResult.recommendations);
+    // 获取并显示合规性建议
+    const recommendations = this.contractCompliance.getComplianceRecommendations(config, complianceResult);
+    if (recommendations && recommendations.length > 0) {
+      console.log('💡 合规性建议:', recommendations);
+      complianceResult.recommendations = recommendations; // 添加到结果中供后续使用
     }
     
     this.currentConfig = config;

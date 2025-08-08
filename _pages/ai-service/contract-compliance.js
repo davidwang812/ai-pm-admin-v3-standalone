@@ -273,7 +273,7 @@ export class ContractCompliance {
             errors,
             warnings,
             complianceScore: this.calculateComplianceScore(config),
-            recommendations: this.getComplianceRecommendations(config)
+            recommendations: []  // 避免循环调用，recommendations将单独计算
         };
     }
 
@@ -392,13 +392,37 @@ export class ContractCompliance {
     }
 
     /**
-     * 获取合规性建议
+     * 获取合规性建议（独立计算，避免循环调用）
      */
-    getComplianceRecommendations(config) {
+    getComplianceRecommendations(config, validation = null) {
         const recommendations = [];
-        const validation = this.validateContractCompliance(config);
         
-        if (validation.errors.length > 0) {
+        // 如果没有提供validation，直接进行简单检查
+        if (!validation) {
+            // 简单检查必需服务
+            const contracts = this.getAIServiceContracts();
+            const requiredServices = Object.values(contracts).filter(c => c.required);
+            const missingServices = [];
+            
+            for (const service of requiredServices) {
+                if (!config.aiServices?.[service.configKey]) {
+                    missingServices.push(service.displayName);
+                }
+            }
+            
+            if (missingServices.length > 0) {
+                recommendations.push({
+                    type: 'error',
+                    priority: 'high',
+                    message: '添加缺失的必需服务',
+                    actions: missingServices.map(s => `配置 ${s}`)
+                });
+            }
+            
+            return recommendations;
+        }
+        
+        if (validation.errors && validation.errors.length > 0) {
             recommendations.push({
                 type: 'error',
                 priority: 'high',
