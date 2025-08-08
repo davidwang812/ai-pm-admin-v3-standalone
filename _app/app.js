@@ -121,17 +121,46 @@ export class App {
     }
     
     try {
+      console.log('🔍 App: Starting authentication check...');
+      
+      // 确保认证模块已初始化并加载了存储的认证信息
+      console.log('📦 App: Loading stored authentication...');
+      const hasStoredAuth = auth.loadStoredAuth();
+      console.log('📦 App: Has stored auth:', hasStoredAuth);
+      
+      // 执行认证检查
+      console.log('🔐 App: Checking authentication status...');
       this.state.isAuthenticated = await auth.check();
+      console.log('🎯 App: Authentication result:', this.state.isAuthenticated);
+      
       if (this.state.isAuthenticated) {
-        this.state.user = await auth.getUser();
-        console.log('✅ User authenticated:', this.state.user);
+        this.state.user = auth.getUser();
+        console.log('✅ App: User authenticated:', this.state.user?.username);
+        console.log('🎫 App: Token present:', !!auth.getToken());
       } else {
-        console.log('ℹ️ User not authenticated');
+        console.log('ℹ️ App: User not authenticated');
+        console.log('🎫 App: Token in localStorage:', !!localStorage.getItem('admin_token_v3'));
+        console.log('👤 App: User in localStorage:', !!localStorage.getItem('admin_user_v3'));
+        
+        // 如果localStorage有token但認證失敗，嘗試重新檢查
+        if (localStorage.getItem('admin_token_v3')) {
+          console.log('🔄 App: Token exists but auth failed, retrying...');
+          await new Promise(resolve => setTimeout(resolve, 500)); // 等待500ms
+          this.state.isAuthenticated = await auth.check();
+          console.log('🔄 App: Retry authentication result:', this.state.isAuthenticated);
+          
+          if (this.state.isAuthenticated) {
+            this.state.user = auth.getUser();
+            console.log('✅ App: User authenticated on retry:', this.state.user?.username);
+          }
+        }
       }
     } catch (error) {
       console.error('❌ Auth check failed:', error);
       this.state.isAuthenticated = false;
     }
+    
+    console.log('📊 App: Final authentication state:', this.state.isAuthenticated);
   }
 
   /**
@@ -235,13 +264,30 @@ export class App {
    */
   async renderInitialView() {
     const app = document.getElementById('app');
-    if (!app) return;
+    if (!app) {
+      console.error('❌ App container not found');
+      return;
+    }
+    
+    console.log('🎨 App: Starting initial view render...');
+    console.log('🔐 App: Authentication state:', this.state.isAuthenticated);
+    console.log('👤 App: User:', this.state.user);
+    console.log('🎫 App: Token in localStorage:', !!localStorage.getItem('admin_token_v3'));
+    
+    // 如果未认证，但localStorage有token，重新检查认证状态
+    if (!this.state.isAuthenticated && localStorage.getItem('admin_token_v3')) {
+      console.log('🔄 App: Found token but not authenticated, rechecking...');
+      await this.checkAuthentication();
+    }
     
     // 如果未认证，显示登录提示
     if (!this.state.isAuthenticated) {
+      console.log('❌ App: Not authenticated, showing login prompt');
       app.innerHTML = this.renderLoginPrompt();
       return;
     }
+    
+    console.log('✅ App: User is authenticated, rendering main interface...');
     
     // 检查是否bootstrap已经切换了界面
     const loadingScreen = document.getElementById('loading-screen');
@@ -438,6 +484,10 @@ export class App {
    * 渲染登录提示
    */
   renderLoginPrompt() {
+    console.log('🔒 App: Rendering login prompt');
+    console.log('🎫 App: Debug - Token exists:', !!localStorage.getItem('admin_token_v3'));
+    console.log('👤 App: Debug - User exists:', !!localStorage.getItem('admin_user_v3'));
+    
     return `
       <div class="login-prompt-container">
         <div class="login-prompt-card">
@@ -446,8 +496,17 @@ export class App {
           <p class="login-prompt-message">
             您需要登录才能访问管理面板
           </p>
-          <button onclick="window.location.href='./login.html'" class="btn btn-primary" style="width: 100%;">
+          <div style="margin-bottom: 16px; padding: 12px; background: #f3f4f6; border-radius: 6px; font-size: 12px;">
+            <strong>调试信息:</strong><br>
+            Token存在: ${!!localStorage.getItem('admin_token_v3')}<br>
+            用户存在: ${!!localStorage.getItem('admin_user_v3')}<br>
+            认证状态: ${this.state.isAuthenticated}
+          </div>
+          <button onclick="window.location.href='./login.html'" class="btn btn-primary" style="width: 100%; margin-bottom: 8px;">
             前往登录
+          </button>
+          <button onclick="location.reload()" class="btn btn-secondary" style="width: 100%;">
+            刷新页面
           </button>
         </div>
       </div>
