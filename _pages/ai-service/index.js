@@ -184,6 +184,10 @@ export class AIServicePage {
           content = await this.modules.balance.render();
           break;
           
+        case 'balanceEnhanced':
+          content = await this.modules.balanceEnhanced.render();
+          break;
+          
         case 'cost':
           content = await this.modules.cost.render();
           break;

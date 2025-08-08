@@ -16,7 +16,30 @@ export class LoadBalanceEnhanced {
   async render() {
     try {
       // 获取仪表板数据
-      const dashboard = await this.loadBalanceManager.getDashboard();
+      let dashboard = await this.loadBalanceManager.getDashboard();
+      
+      // 确保dashboard有正确的结构
+      if (!dashboard || typeof dashboard !== 'object') {
+        dashboard = {
+          summary: {
+            totalPools: 0,
+            activePools: 0,
+            totalStrategies: 8,
+            totalPresets: 0
+          },
+          pools: []
+        };
+      }
+      
+      // 确保summary存在
+      if (!dashboard.summary) {
+        dashboard.summary = {
+          totalPools: dashboard.pools ? dashboard.pools.length : 0,
+          activePools: 0,
+          totalStrategies: 8,
+          totalPresets: 0
+        };
+      }
       
       return `
         <div class="load-balance-enhanced-container">
